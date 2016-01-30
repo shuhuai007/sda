@@ -2,21 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import urllib2
-from urllib import urlencode
 import gzip
 import StringIO
 import ConfigParser
 
+from urllib import urlencode
+
 def get_content(toUrl):
-    """ Return the content of given url
-
-        Args:
-            toUrl: target url
-        Return:
-            content if success
-            'Fail' if fail
-    """
-
     cf = ConfigParser.ConfigParser()
     cf.read("config.ini")
     cookie = cf.get("cookie", "cookie")
@@ -55,7 +47,7 @@ def get_content(toUrl):
 
     return content
 
-def post(toUrl, offset=20):
+def post(toUrl, level1_topic_id, hash_id, offset=20):
     cf = ConfigParser.ConfigParser()
     cf.read("config.ini")
     cookie = cf.get("cookie", "cookie")
@@ -69,18 +61,28 @@ def post(toUrl, offset=20):
         'Accept-Encoding':'gzip'
     }
 
-    # method:next
-    # params:{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}
-    postDict = {
-        "method"  : "next",
-        "params"  : '{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}',
-        "_xsrf"   : "dacc17fefe1dd92f1f814fb77d3a359f"
-    }
-    postData = urlencode(postDict)
-    # postData = 'method=next&params=%7B%22topic_id%22%3A253%2C%22offset%22%3A40%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=dacc17fefe1dd92f1f814fb77d3a359f'
-    print "... postData:%s" % postData
+    post_dict = {}
+    post_dict["method"] = "next"
 
-    req = urllib2.Request(toUrl, postData, headers)
+    # post_dict["params"] = '{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}'
+    params_dict = '{' \
+                    '"topic_id":' + str(level1_topic_id) + ',' \
+                    '"offset":' + str(offset) + ',' \
+                    '"hash_id":' + '"' + str(hash_id) + '"' \
+                  '}'
+
+    post_dict["params"] = params_dict
+    print "\n\nparams_dict:%s" % params_dict
+
+    # post_dict["_xsrf"] = "dacc17fefe1dd92f1f814fb77d3a359f"
+    post_dict["_xsrf"] = get_xsrf_from_cookie(cookie)
+    # print "\n\n...xsrf:%s" % post_dict["_xsrf"]
+
+    post_data = urlencode(post_dict)
+    # post_data = 'method=next&params=%7B%22topic_id%22%3A253%2C%22offset%22%3A40%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=dacc17fefe1dd92f1f814fb77d3a359f'
+    print "... post_data:%s" % post_data
+
+    req = urllib2.Request(toUrl, post_data, headers)
     resp = urllib2.urlopen(req)
     content = resp.read()
     if resp.info().get('Content-Encoding') == 'gzip':
@@ -90,3 +92,18 @@ def post(toUrl, offset=20):
         gz.close()
 
     return content
+
+def get_xsrf_from_cookie(cookie):
+    cookie_list = cookie.split(';')
+    # print "\n\ncookie_list:%s" % cookie_list
+
+    for cookie_item in cookie_list:
+        cookie_key = cookie_item.split('=')[0].strip()
+        cookie_value = cookie_item.split('=')[1]
+        # print "\n\ncookie_key:%s" % cookie_key
+        # print "\n\ncookie_value:%s" % cookie_value
+
+        if cookie_key == '_xsrf':
+            return cookie_value
+    print "\n\n_xsrf doesn't exist in cookie"
+    return ""

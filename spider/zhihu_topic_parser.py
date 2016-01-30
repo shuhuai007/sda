@@ -21,6 +21,8 @@ from zhihu_util import post
 LEVEL1_TOPICS_URL = "https://www.zhihu.com/topics"
 LEVER2_PAGE_OFFSET = 20
 
+
+
 def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
     content = get_content(level1_topic_url)
     # print "...Level 1 topics's page content:%s" % content
@@ -29,21 +31,29 @@ def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
     # print "------level1_ul_tag:%s" % level1_ul
     level1_li_list = level1_ul.findAll('li')
     # print "------level1_li_list:%s" % level1_li_list
+
+    # find hash_id,which will be used when sending request to fetch level2 topic
+    data_init_str = soup.find('div', attrs={'class': 'zh-general-list clearfix'}).get('data-init')
+    data_init_json = json.loads(data_init_str)
+    hash_id = data_init_json['params']['hash_id']
+    #'<div class="zh-general-list clearfix" data-init="{&quot;params&quot;: {
+    # &quot;topic_id&quot;: 253, &quot;offset&quot;: 0, &quot;hash_id&quot;: &quot;dced108689287057f5cc3b5e85cb8289&quot;}, &quot;nodename&quot;: &quot;TopicsPlazzaListV2&quot;}">'
+
     level1_topic_list = []
     for level1_li in level1_li_list:
         topic_id = level1_li.get('data-id')
         topic_name = level1_li.a.get_text()
         # print "------topic_id:%s" % topic_id
         # print "------topic_name:%s" % topic_name
-        level1_topic_list = level1_topic_list + [(topic_id, topic_name)]
+        level1_topic_list = level1_topic_list + [(topic_id, topic_name, hash_id)]
     return level1_topic_list
 
 def fetch_level2_topic_list(level1_list):
     offset = 0
     level2_topic_list = []
-    for (level1_topic_id, level1_topic_name) in level1_list:
+    for (level1_topic_id, level1_topic_name, hash_id) in level1_list:
         topic_url = generate_level2_topic_url(level1_topic_id)
-        content = post(topic_url, offset)
+        content = post(topic_url, level1_topic_id, hash_id, offset)
         print "...level2 topic content:%s:" % content
 
         temp_list = parse_level2_response(content)

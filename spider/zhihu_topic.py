@@ -17,79 +17,79 @@ import ConfigParser
 from zhihu_util import get_content
 import zhihu_topic_parser
 
-class UpdateOneTopic(threading.Thread):
-    def __init__(self,queue):
-        self.queue = queue
-        threading.Thread.__init__(self)
-
-        cf = ConfigParser.ConfigParser()
-        cf.read("config.ini")
-        
-        host = cf.get("db", "host")
-        port = int(cf.get("db", "port"))
-        user = cf.get("db", "user")
-        passwd = cf.get("db", "passwd")
-        db_name = cf.get("db", "db")
-        charset = cf.get("db", "charset")
-        use_unicode = cf.get("db", "use_unicode")
-
-        self.db = MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db_name, charset=charset, use_unicode=use_unicode)
-        self.cursor = self.db.cursor()
-        
-    def run(self):
-        while not self.queue.empty():
-            t = self.queue.get()
-            link_id = t[0]
-            count_id = t[1]
-            self.find_new_question_by_topic(link_id,count_id)
-
-    def find_question_by_link(self,topic_url,count_id):
-
-        print "...topic url:%s" % topic_url
-
-        content = get_content(topic_url,count_id)
-
-        if content == "FAIL":
-            return 0
-
-        print "...content:%s" % content
-
-        soup = BeautifulSoup(content, "html.parser")
-
-        questions = soup.findAll('a',attrs={'class':'question_link'})
-
-        i = 0
-        p_str = 'INSERT IGNORE INTO QUESTION (NAME, LINK_ID, FOCUS, ANSWER, LAST_VISIT, ADD_TIME, TOP_ANSWER_NUMBER) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-        anser_list = []
-        time_now = int(time.time())
-
-        for question in questions:
-            tem_text = question.get_text()
-            tem_id = question.get('href')
-            tem_id = tem_id.replace('/question/','')
-
-            anser_list = anser_list + [(tem_text, int(tem_id), 0, 0, 0, time_now, 0)]
-
-        self.cursor.executemany(p_str,anser_list)
-
-        return self.cursor.rowcount
-
-    def find_new_question_by_topic(self,link_id,count_id):
-        new_question_amount_total = 0
-        for i in range(1,7):
-            topic_url = 'http://www.zhihu.com/topic/' + link_id + '/questions?page=' + str(i)
-            new_question_amount_one_page = self.find_question_by_link(topic_url,count_id)
-            new_question_amount_total = new_question_amount_total + new_question_amount_one_page
-
-            if new_question_amount_one_page <= 2:
-                break
-        
-        if count_id % 2 == 0:
-            print str(count_id) + " , " + self.getName() + " Finshed TOPIC " + link_id + ", page " + str(i) + " ; Add " + str(new_question_amount_total) + " questions."
-
-        time_now = int(time.time())
-        sql = "UPDATE TOPIC SET LAST_VISIT = %s WHERE LINK_ID = %s"
-        self.cursor.execute(sql,(time_now,link_id))
+# class UpdateOneTopic(threading.Thread):
+#     def __init__(self,queue):
+#         self.queue = queue
+#         threading.Thread.__init__(self)
+#
+#         cf = ConfigParser.ConfigParser()
+#         cf.read("config.ini")
+#
+#         host = cf.get("db", "host")
+#         port = int(cf.get("db", "port"))
+#         user = cf.get("db", "user")
+#         passwd = cf.get("db", "passwd")
+#         db_name = cf.get("db", "db")
+#         charset = cf.get("db", "charset")
+#         use_unicode = cf.get("db", "use_unicode")
+#
+#         self.db = MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db_name, charset=charset, use_unicode=use_unicode)
+#         self.cursor = self.db.cursor()
+#
+#     def run(self):
+#         while not self.queue.empty():
+#             t = self.queue.get()
+#             link_id = t[0]
+#             count_id = t[1]
+#             self.find_new_question_by_topic(link_id,count_id)
+#
+#     def find_question_by_link(self,topic_url,count_id):
+#
+#         print "...topic url:%s" % topic_url
+#
+#         content = get_content(topic_url,count_id)
+#
+#         if content == "FAIL":
+#             return 0
+#
+#         print "...content:%s" % content
+#
+#         soup = BeautifulSoup(content, "html.parser")
+#
+#         questions = soup.findAll('a',attrs={'class':'question_link'})
+#
+#         i = 0
+#         p_str = 'INSERT IGNORE INTO QUESTION (NAME, LINK_ID, FOCUS, ANSWER, LAST_VISIT, ADD_TIME, TOP_ANSWER_NUMBER) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+#         anser_list = []
+#         time_now = int(time.time())
+#
+#         for question in questions:
+#             tem_text = question.get_text()
+#             tem_id = question.get('href')
+#             tem_id = tem_id.replace('/question/','')
+#
+#             anser_list = anser_list + [(tem_text, int(tem_id), 0, 0, 0, time_now, 0)]
+#
+#         self.cursor.executemany(p_str,anser_list)
+#
+#         return self.cursor.rowcount
+#
+#     def find_new_question_by_topic(self,link_id,count_id):
+#         new_question_amount_total = 0
+#         for i in range(1,7):
+#             topic_url = 'http://www.zhihu.com/topic/' + link_id + '/questions?page=' + str(i)
+#             new_question_amount_one_page = self.find_question_by_link(topic_url,count_id)
+#             new_question_amount_total = new_question_amount_total + new_question_amount_one_page
+#
+#             if new_question_amount_one_page <= 2:
+#                 break
+#
+#         if count_id % 2 == 0:
+#             print str(count_id) + " , " + self.getName() + " Finshed TOPIC " + link_id + ", page " + str(i) + " ; Add " + str(new_question_amount_total) + " questions."
+#
+#         time_now = int(time.time())
+#         sql = "UPDATE TOPIC SET LAST_VISIT = %s WHERE LINK_ID = %s"
+#         self.cursor.execute(sql,(time_now,link_id))
 
 class ZhihuTopicUtil:
     def __init__(self, run_mode='prod'):
