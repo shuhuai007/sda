@@ -1,39 +1,46 @@
-# zhihu-spider
-A web spider for zhihu.com, which is used for [ZhihuHot](http://zhihuhot.sinaapp.com/).  
-This spider can scrape question & topic data from zhihu.com.  
+## Python 命名规范
+python源码和其他一些书籍，命名各种个性，没有一个比较统一的命名规范。于是自己总结了一些，可供参考。
+###模块名：
+小写字母，单词之间用_分割
+ad_stats.py
 
+###包名：
+和模块名一样
 
-## Author
-I'm Morgan Zhang, a graduate computer science student in University of San Francisco.  
+###类名：
+单词首字母大写
+AdStats
+ConfigUtil
 
-### My another tool
-See my another command line tool `line` [here](https://github.com/MorganZhang100/line), which can tell you the amount of lines and files under current directory.
+###全局变量名（类变量，在java中相当于static变量）：
+大写字母，单词之间用_分割
+NUMBER
+COLOR_WRITE
 
-### Why I made zhihu-spider
-Coding for fun as well as learn Python.
+###普通变量：
+小写字母，单词之间用_分割
+this_is_a_var
 
-### Contact Information
-MorganZhang100@gmail.com
+###实例变量：
+以_开头，其他和普通变量一样
+_price    
+_instance_var
 
-## Run it
+###私有实例变量（外部访问会报错）：
+以__开头（2个下划线），其他和普通变量一样
+__private_var
 
-### What do you need to run it
-- Python 2.7.6 (Maybe it work for other versions.) 
-- MySQL
-- BeautifulSoup
+###专有变量：
+__开头，__结尾，一般为python的自有变量，不要以这种方式命名
+__doc__
+__class__
 
-### How to run it
-1. Download the code
-1. Run init.sql to set up datebase and insert initial data.
-1. Find out your cookie of zhihu.com throught browser's developer tool.
-1. Modify config.ini
-1. Use ```python question.py``` to scrpy questions from zhihu.com
-1. Use ```python topic.py``` to scrpy topics from zhihu.com
+###普通函数：
+和普通变量一样：
+get_name()
+count_number()
+ad_stat()
 
-## Warning
-You can change thread amount in config.ini to make this spider run faster.  
-But your IP may be blocked from zhihu.com if you connect to zhihu.com too frequently.  
-You'd better use proxy when you use multi thread mode.
-
-## License
-The MIT license.
+###私有函数（外部访问会报错）：
+以__开头（2个下划线），其他和普通函数一样
+__get_name()
