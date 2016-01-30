@@ -14,6 +14,8 @@ import threading
 import Queue
 import ConfigParser
 
+from zhihu_constants import *
+
 from urllib import urlencode
 
 from zhihu_util import get_content
@@ -21,11 +23,6 @@ from zhihu_util import post
 from zhihu_util import get_xsrf_from_cookie
 from zhihu_util import get_xsrf
 
-
-# 1st Level Topics url
-LEVEL1_TOPICS_URL = "https://www.zhihu.com/topics"
-# 2st Level Topics url
-LEVEL2_TOPICS_URL = "https://www.zhihu.com/node/TopicsPlazzaListV2"
 
 LEVER2_TOPIC_COUNT_PER_PAGE = 20
 LEVEL2_TOPIC_MAX_PAGE_INDEX = 1000
