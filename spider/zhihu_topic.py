@@ -77,14 +77,17 @@ class ZhihuTopicUtil:
 
     def update_topic(self):
         # Fetch 1st level topics
-        print "Fetch 1st level topics from Zhihu ..."
+        print "\n\nFetch 1st level topics from Zhihu ......"
         level1_list = zhihu_topic_parser.fetch_level1_topic_list()
         print "level1_list's len:%d" % len(level1_list)
 
         # Fetch 2st level topics
-        print "Fetch 2st level topics from Zhihu"
+        print "\n\nFetch 2st level topics from Zhihu ......"
 
         level2_list = zhihu_topic_parser.fetch_level2_topic_list(level1_list)
+
+        print "level1_list's len:%d" % len(level1_list)
+        print "level2_list's len:%d" % len(level2_list)
 
         # Persist topics into database
         print "persist topics into database"

@@ -19,7 +19,7 @@ from zhihu_util import post
 
 # 1st Level Topics url
 LEVEL1_TOPICS_URL = "https://www.zhihu.com/topics"
-LEVER2_PAGE_OFFSET = 20
+LEVER2_TOPIC_COUNT_PER_PAGE = 20
 
 
 
@@ -49,18 +49,29 @@ def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
     return level1_topic_list
 
 def fetch_level2_topic_list(level1_list):
-    offset = 0
+
     level2_topic_list = []
+    page_count = 0
     for (level1_topic_id, level1_topic_name, hash_id) in level1_list:
         topic_url = generate_level2_topic_url(level1_topic_id)
-        content = post(topic_url, level1_topic_id, hash_id, offset)
-        print "...level2 topic content:%s:" % content
 
-        temp_list = parse_level2_response(content)
-        level2_topic_list += temp_list
-        offset += LEVER2_PAGE_OFFSET
-        break
+        offset = 0
+        page_index = 1
+        while page_index < 1000:
+            content = post(topic_url, level1_topic_id, hash_id, offset)
+            # print "...level2 topic content:%s:" % content
 
+            temp_list = parse_level2_response(content)
+            if temp_list:
+                level2_topic_list += temp_list
+            else:
+                break
+            offset += page_index * LEVER2_TOPIC_COUNT_PER_PAGE
+            page_index += 1
+        page_count += (page_index - 1)
+
+    print "...Total pagecount:%d" % page_count
+    return level2_topic_list
 
 def generate_level2_topic_url(level1_topic_id):
     return "https://www.zhihu.com/node/TopicsPlazzaListV2"
@@ -91,10 +102,11 @@ def parse_level2_response(content):
         # print "\n\n...soup:%s" % soup
         level2_topic_id = soup.find('a', attrs={'target': '_blank'}).get('href').split('/')[2]
         level2_topic_name = soup.find('strong').get_text()
-        print "\n\n...level2_topic_id:%s" % level2_topic_id
-        print "...level2_topic_name:%s" % level2_topic_name
+        # print "\n\n...level2_topic_id:%s" % level2_topic_id
+        # print "...level2_topic_name:%s" % level2_topic_name
         result_list.append((level2_topic_id, level2_topic_name))
-    print "\n\nresult_list's len:%d" % len(result_list)
+    if len(result_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
+        print "\n\nresult_list's len:%d" % len(result_list)
     return result_list
 
 
