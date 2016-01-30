@@ -9,9 +9,7 @@ import ConfigParser
 from urllib import urlencode
 
 def get_content(toUrl):
-    cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
-    cookie = cf.get("cookie", "cookie")
+    cookie = get_cookie()
 
     headers = {
         'Cookie': cookie,
@@ -48,10 +46,7 @@ def get_content(toUrl):
     return content
 
 def post(toUrl, level1_topic_id, hash_id, offset=20):
-    cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
-    cookie = cf.get("cookie", "cookie")
-
+    cookie = get_cookie()
 
     headers = {
         'Cookie': cookie,
@@ -61,25 +56,7 @@ def post(toUrl, level1_topic_id, hash_id, offset=20):
         'Accept-Encoding':'gzip'
     }
 
-    post_dict = {}
-    post_dict["method"] = "next"
-
-    # post_dict["params"] = '{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}'
-    params_dict = '{' \
-                    '"topic_id":' + str(level1_topic_id) + ',' \
-                    '"offset":' + str(offset) + ',' \
-                    '"hash_id":' + '"' + str(hash_id) + '"' \
-                  '}'
-
-    post_dict["params"] = params_dict
-    print "\n\nparams_dict:%s" % params_dict
-
-    # post_dict["_xsrf"] = "dacc17fefe1dd92f1f814fb77d3a359f"
-    post_dict["_xsrf"] = get_xsrf_from_cookie(cookie)
-    # print "\n\n...xsrf:%s" % post_dict["_xsrf"]
-
-    post_data = urlencode(post_dict)
-    # post_data = 'method=next&params=%7B%22topic_id%22%3A253%2C%22offset%22%3A40%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=dacc17fefe1dd92f1f814fb77d3a359f'
+    post_data = generate_post_data_for_level2(cookie, hash_id, level1_topic_id, offset)
     print "... post_data:%s" % post_data
 
     req = urllib2.Request(toUrl, post_data, headers)
@@ -92,6 +69,26 @@ def post(toUrl, level1_topic_id, hash_id, offset=20):
         gz.close()
 
     return content
+
+
+def generate_post_data_for_level2(cookie, hash_id, level1_topic_id, offset):
+    post_dict = {}
+    post_dict["method"] = "next"
+    # post_dict["params"] = '{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}'
+    params_dict = '{' \
+                  '"topic_id":' + str(level1_topic_id) + ',' \
+                  '"offset":' + str(offset) + ',' \
+                  '"hash_id":' + '"' + str(hash_id) + '"' \
+                  '}'
+    post_dict["params"] = params_dict
+    print "\n\nparams_dict:%s" % params_dict
+    # post_dict["_xsrf"] = "dacc17fefe1dd92f1f814fb77d3a359f"
+    post_dict["_xsrf"] = get_xsrf_from_cookie(cookie)
+    # print "\n\n...xsrf:%s" % post_dict["_xsrf"]
+    post_data = urlencode(post_dict)
+    # post_data = 'method=next&params=%7B%22topic_id%22%3A253%2C%22offset%22%3A40%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=dacc17fefe1dd92f1f814fb77d3a359f'
+    return post_data
+
 
 def get_xsrf_from_cookie(cookie):
     cookie_list = cookie.split(';')
@@ -107,3 +104,9 @@ def get_xsrf_from_cookie(cookie):
             return cookie_value
     print "\n\n_xsrf doesn't exist in cookie"
     return ""
+
+def get_cookie():
+    cf = ConfigParser.ConfigParser()
+    cf.read("config.ini")
+    cookie = cf.get("cookie", "cookie")
+    return cookie
