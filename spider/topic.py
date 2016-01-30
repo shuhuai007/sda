@@ -1,4 +1,6 @@
 #coding=utf-8
+import sys
+import getopt
 import MySQLdb
 from bs4 import BeautifulSoup
 import json
@@ -45,7 +47,7 @@ class UpdateOneTopic(threading.Thread):
         if content == "FAIL":
             return 0
 
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content, "html.parser")
 
         questions = soup.findAll('a',attrs={'class':'question_link'})
 
@@ -83,7 +85,7 @@ class UpdateOneTopic(threading.Thread):
         self.cursor.execute(sql,(time_now,link_id))
 
 class UpdateTopics:
-    def __init__(self):
+    def __init__(self, mode='prod'):
         cf = ConfigParser.ConfigParser()
         cf.read("config.ini")
         
@@ -99,6 +101,10 @@ class UpdateTopics:
 
         self.db = MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db_name, charset=charset, use_unicode=use_unicode)
         self.cursor = self.db.cursor()
+        self.mode = mode
+
+    def is_develop_mode(self):
+        return self.mode == 'develop'
 
     def run(self):
         time_now = int(time.time())
@@ -108,6 +114,12 @@ class UpdateTopics:
         threads = []
 
         sql = "SELECT LINK_ID FROM TOPIC WHERE LAST_VISIT < %s ORDER BY LAST_VISIT"
+        if self.is_develop_mode():
+            sql += " LIMIT 2"
+
+        print "------------sql:%s"%sql
+        # sys.exit(2)
+
         self.cursor.execute(sql, (before_last_vist_time,))
         results = self.cursor.fetchall()
 
@@ -131,7 +143,29 @@ class UpdateTopics:
 
         print 'All task done'
 
+def usage():
+    print 'topic.py usage:'
+    print '-h,--help: print help message.'
+    print '-m, --mode: develop or prod, prod is default value if not set.'
+
 if __name__ == '__main__':
-    topic_spider = UpdateTopics()
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hm:', ['mode='])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(2)
+    for o, a in opts:
+        if o in ('-h', '--help'):
+            usage()
+            sys.exit(1)
+        elif o in ('-m', '--mode'):
+            mode = a
+        else:
+            print 'unhandled option'
+            sys.exit(2)
+    topic_spider = UpdateTopics(mode)
+    print "topic's mode:%s"%topic_spider.mode
+
     topic_spider.run()
 
