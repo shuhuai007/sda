@@ -33,11 +33,11 @@ def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
     # print "------level1_li_list:%s" % level1_li_list
 
     # find hash_id,which will be used when sending request to fetch level2 topic
+    #'<div class="zh-general-list clearfix" data-init="{&quot;params&quot;: {
+    # &quot;topic_id&quot;: 253, &quot;offset&quot;: 0, &quot;hash_id&quot;: &quot;dced108689287057f5cc3b5e85cb8289&quot;}, &quot;nodename&quot;: &quot;TopicsPlazzaListV2&quot;}">'
     data_init_str = soup.find('div', attrs={'class': 'zh-general-list clearfix'}).get('data-init')
     data_init_json = json.loads(data_init_str)
     hash_id = data_init_json['params']['hash_id']
-    #'<div class="zh-general-list clearfix" data-init="{&quot;params&quot;: {
-    # &quot;topic_id&quot;: 253, &quot;offset&quot;: 0, &quot;hash_id&quot;: &quot;dced108689287057f5cc3b5e85cb8289&quot;}, &quot;nodename&quot;: &quot;TopicsPlazzaListV2&quot;}">'
 
     level1_topic_list = []
     for level1_li in level1_li_list:
