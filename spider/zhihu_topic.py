@@ -1,4 +1,6 @@
-#coding=utf-8
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import sys
 import getopt
 import MySQLdb
@@ -12,8 +14,8 @@ import threading
 import Queue
 import ConfigParser
 
-from util import get_content
-
+from zhihu_util import get_content
+import zhihu_topic_parser
 
 class UpdateOneTopic(threading.Thread):
     def __init__(self,queue):
@@ -89,7 +91,7 @@ class UpdateOneTopic(threading.Thread):
         sql = "UPDATE TOPIC SET LAST_VISIT = %s WHERE LINK_ID = %s"
         self.cursor.execute(sql,(time_now,link_id))
 
-class UpdateTopics:
+class ZhihuTopicUtil:
     def __init__(self, run_mode='prod'):
         cf = ConfigParser.ConfigParser()
         cf.read("config.ini")
@@ -148,29 +150,50 @@ class UpdateTopics:
 
         print 'All task done'
 
+    def update_topic(self):
+        # Fetch 1st level topics
+        print "Fetch 1st level topics from Zhihu ..."
+        level1_list = zhihu_topic_parser.fetch_level1_topic_list()
+        print "level1_list:%s" % level1_list
+
+        # Fetch 2st level topics
+        print "Fetch 2st level topics from Zhihu"
+
+        level2_list = zhihu_topic_parser.fetch_level2_topic_list(level1_list)
+
+
+        # Persist topics into database
+        print "persist topics into database"
+
 def usage():
     print 'topic.py usage:'
     print '-h,--help: print help message.'
     print '-m, --mode: develop or prod, prod is default value if not set.'
 
-if __name__ == '__main__':
+def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hm:', ['mode='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
         sys.exit(2)
-    for o, a in opts:
-        if o in ('-h', '--help'):
+
+    mode = "prod"
+    for opt, val in opts:
+        if opt in ('-h', '--help'):
             usage()
             sys.exit(1)
-        elif o in ('-m', '--mode'):
-            mode = a
+        elif opt in ('-m', '--mode'):
+            mode = val
         else:
             print 'unhandled option'
             sys.exit(2)
-    topic_spider = UpdateTopics(mode)
-    print "topic's mode:%s"%topic_spider.mode
 
-    topic_spider.run()
+    topic_util = ZhihuTopicUtil(mode)
+    print "topic's mode:%s" % topic_util.mode
+
+    topic_util.update_topic()
+
+if __name__ == '__main__':
+    main()
 
