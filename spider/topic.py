@@ -42,10 +42,15 @@ class UpdateOneTopic(threading.Thread):
             self.find_new_question_by_topic(link_id,count_id)
 
     def find_question_by_link(self,topic_url,count_id):
+
+        print "...topic url:%s" % topic_url
+
         content = get_content(topic_url,count_id)
 
         if content == "FAIL":
             return 0
+
+        print "...content:%s" % content
 
         soup = BeautifulSoup(content, "html.parser")
 
@@ -85,7 +90,7 @@ class UpdateOneTopic(threading.Thread):
         self.cursor.execute(sql,(time_now,link_id))
 
 class UpdateTopics:
-    def __init__(self, mode='prod'):
+    def __init__(self, run_mode='prod'):
         cf = ConfigParser.ConfigParser()
         cf.read("config.ini")
         
@@ -101,7 +106,7 @@ class UpdateTopics:
 
         self.db = MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db_name, charset=charset, use_unicode=use_unicode)
         self.cursor = self.db.cursor()
-        self.mode = mode
+        self.mode = run_mode
 
     def is_develop_mode(self):
         return self.mode == 'develop'
@@ -117,7 +122,7 @@ class UpdateTopics:
         if self.is_develop_mode():
             sql += " LIMIT 2"
 
-        print "------------sql:%s"%sql
+        print "---execute sql:%s"%sql
         # sys.exit(2)
 
         self.cursor.execute(sql, (before_last_vist_time,))
