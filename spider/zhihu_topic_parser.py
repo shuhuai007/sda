@@ -19,7 +19,12 @@ from zhihu_util import post
 
 # 1st Level Topics url
 LEVEL1_TOPICS_URL = "https://www.zhihu.com/topics"
+# 2st Level Topics url
+LEVEL2_TOPICS_URL = "https://www.zhihu.com/node/TopicsPlazzaListV2"
+
+
 LEVER2_TOPIC_COUNT_PER_PAGE = 20
+LEVEL2_TOPIC_MAX_PAGE_INDEX = 1000
 
 
 
@@ -53,11 +58,11 @@ def fetch_level2_topic_list(level1_list):
     level2_topic_list = []
     page_count = 0
     for (level1_topic_id, level1_topic_name, hash_id) in level1_list:
-        topic_url = generate_level2_topic_url(level1_topic_id)
+        topic_url = generate_level2_topic_url()
 
         offset = 0
         page_index = 1
-        while page_index < 1000:
+        while page_index < LEVEL2_TOPIC_MAX_PAGE_INDEX:
             content = post(topic_url, level1_topic_id, hash_id, offset)
             # print "...level2 topic content:%s:" % content
 
@@ -73,8 +78,8 @@ def fetch_level2_topic_list(level1_list):
     print "...Total pagecount:%d" % page_count
     return level2_topic_list
 
-def generate_level2_topic_url(level1_topic_id):
-    return "https://www.zhihu.com/node/TopicsPlazzaListV2"
+def generate_level2_topic_url():
+    return LEVEL2_TOPICS_URL
 
 def parse_level2_response(content):
     '''
