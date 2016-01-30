@@ -14,9 +14,7 @@ REFER_DICT = {
 }
 
 def get_content(to_url):
-    cookie = get_cookie()
-
-    headers = get_headers(cookie, to_url)
+    headers = get_headers(to_url)
 
     req = urllib2.Request(
         url = to_url,
@@ -27,39 +25,34 @@ def get_content(to_url):
         opener = urllib2.build_opener(urllib2.ProxyHandler())
         urllib2.install_opener(opener)
 
-        page = urllib2.urlopen(req, timeout = 15)
+        resp = urllib2.urlopen(req, timeout = 15)
 
-        headers = page.info()
-        content = page.read()
     except Exception,e:
         # if count % 1 == 0:
         #     print str(count) + ", Error: " + str(e) + " URL: " + to_url
         return "FAIL"
 
-    if page.info().get('Content-Encoding') == 'gzip':
-        data = StringIO.StringIO(content)
-        gz = gzip.GzipFile(fileobj=data)
-        content = gz.read()
-        gz.close()
-
-    return content
+    return get_content_from_resp(resp)
 
 def post(to_url, post_data):
-    cookie = get_cookie()
-
-    headers = get_headers(cookie, to_url)
-
+    headers = get_headers(to_url)
 
     req = urllib2.Request(to_url, post_data, headers)
     resp = urllib2.urlopen(req)
+    content = get_content_from_resp(resp)
+
+    return content
+
+
+def get_content_from_resp(resp):
     content = resp.read()
     if resp.info().get('Content-Encoding') == 'gzip':
         data = StringIO.StringIO(content)
         gz = gzip.GzipFile(fileobj=data)
         content = gz.read()
         gz.close()
-
     return content
+
 
 def get_xsrf_from_cookie(cookie):
     cookie_list = cookie.split(';')
@@ -85,7 +78,8 @@ def get_cookie():
     cookie = cf.get("cookie", "cookie")
     return cookie
 
-def get_headers(cookie, to_url):
+def get_headers(to_url):
+    cookie = get_cookie()
     headers = {
         'Cookie':cookie,
         'Host':'www.zhihu.com',
