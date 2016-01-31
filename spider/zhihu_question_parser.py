@@ -29,8 +29,8 @@ def fetch_question_list(level2_topic_id_list):
     question_list = []
     # 1. list all the questions for each level2 topic.
     for level2_topic_id in level2_topic_id_list:
-        temp_question_list = fetch_question_list_per_topic(level2_topic_id)
-        question_list += temp_question_list
+        question_list_per_topic = fetch_question_list_per_topic(level2_topic_id)
+        question_list += question_list_per_topic
 
     print "\n......question_list:%s" % question_list
     # 2. update the list created by 1st step
@@ -39,28 +39,33 @@ def fetch_question_list(level2_topic_id_list):
 
     return question_list
 
+def get_question_list_url(level2_topic_id, page_index):
+    return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
+
+
 def fetch_question_list_per_topic(level2_topic_id):
     temp_question_list = []
-    # TODO(zj) add logic
-    # URL-https://www.zhihu.com/topic/19552397/questions?page=1
-    max_page_index = get_max_page_index()
-    print "\n......max page index:%s" % max_page_index
 
+    # URL-https://www.zhihu.com/topic/19552397/questions?page=1
+    list_question_url = get_question_list_url(level2_topic_id, 1)
+    max_page_index = get_max_page_index(list_question_url)
+
+    print "\n......max page index:%s" % max_page_index
+    max_page_index = 1
     page_index = 1
-    while page_index <= int(round(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
+    # while page_index <= int(round(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
+    while page_index <= 1:
         print "......enter while loop"
-        list_question_url = "https://www.zhihu.com/topic/19550994/questions?page=1"
+        list_question_url = get_question_list_url(level2_topic_id, page_index)
         resp = get_content(list_question_url)
-        print "......resp:%s" % resp
+        # print "......resp:%s" % resp
         question_list_per_page = generate_question_list_per_page(resp)
         temp_question_list += question_list_per_page
         page_index += 1
     return temp_question_list
 
-def get_max_page_index():
-    # TODO(zj) parse the html to get the page total count
+def get_max_page_index(list_question_url):
     max_index = 1
-    list_question_url = "https://www.zhihu.com/topic/19550994/questions"
     resp = get_content(list_question_url)
     soup = BeautifulSoup(resp, "html.parser")
     soup.find('div', )
