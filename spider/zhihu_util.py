@@ -1,6 +1,8 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+import getopt
 import urllib2
 import gzip
 import StringIO
@@ -88,3 +90,27 @@ def get_headers(to_url):
         'Accept-Encoding':'gzip'
     }
     return headers
+
+def parse_options():
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], 'hm:', ['mode='])
+    except getopt.GetoptError, err:
+        print str(err)
+        usage()
+        sys.exit(2)
+    mode = "prod"
+    for opt, val in opts:
+        if opt in ('-h', '--help'):
+            usage()
+            sys.exit(1)
+        elif opt in ('-m', '--mode'):
+            mode = val
+        else:
+            print 'unhandled option'
+            sys.exit(2)
+    return mode
+
+def usage():
+    print 'Usage:'
+    print '-h,--help: print help message.'
+    print '-m, --mode: develop or prod, prod is default value if not set.'
