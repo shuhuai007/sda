@@ -28,7 +28,7 @@ LEVER2_TOPIC_COUNT_PER_PAGE = 20
 LEVEL2_TOPIC_MAX_PAGE_INDEX = 1000
 
 
-def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
+def fetch_level1_topic_dict(level1_topic_url=LEVEL1_TOPICS_URL):
     content = get_content(level1_topic_url)
     # print "...Level 1 topics's page content:%s" % content
     soup = BeautifulSoup(content, "html.parser")
@@ -50,14 +50,14 @@ def fetch_level1_topic_list(level1_topic_url=LEVEL1_TOPICS_URL):
         topic_name = level1_li.a.get_text()
         # print "------topic_id:%s" % topic_id
         # print "------topic_name:%s" % topic_name
-        level1_topic_list = level1_topic_list + [(topic_id, topic_name, hash_id)]
-    return level1_topic_list
+        level1_topic_list = level1_topic_list + [(topic_id, topic_name, topic_id)]
+    level1_topic_dict = {"topic_list" : level1_topic_list, "hash_id" : hash_id}
+    return level1_topic_dict
 
-def fetch_level2_topic_list(level1_list):
-
+def fetch_level2_topic_list(level1_list, hash_id):
     level2_topic_list = []
     page_count = 0
-    for (level1_topic_id, level1_topic_name, hash_id) in level1_list:
+    for (level1_topic_id, level1_topic_name, level1_parent_id) in level1_list:
         topic_url = generate_level2_topic_url()
 
         offset = 0
@@ -66,7 +66,7 @@ def fetch_level2_topic_list(level1_list):
             # content = post(topic_url, level1_topic_id, hash_id, offset)
             content = post(topic_url, generate_post_data_for_level2(hash_id, level1_topic_id, offset))
             # print "...level2 topic content:%s:" % content
-            temp_list = parse_level2_response(content)
+            temp_list = parse_level2_response(content, level1_topic_id)
             if temp_list:
                 level2_topic_list += temp_list
             else:
@@ -81,7 +81,7 @@ def fetch_level2_topic_list(level1_list):
 def generate_level2_topic_url():
     return LEVEL2_TOPICS_URL
 
-def parse_level2_response(content):
+def parse_level2_response(content, level1_topic_id):
     '''
     :param content: is json str, just like: {"r":0, "msg": []}
     :return: list[(level2_topic_id, level2_topic_name)]
@@ -109,7 +109,7 @@ def parse_level2_response(content):
         level2_topic_name = soup.find('strong').get_text()
         # print "\n\n...level2_topic_id:%s" % level2_topic_id
         # print "...level2_topic_name:%s" % level2_topic_name
-        result_list.append((level2_topic_id, level2_topic_name))
+        result_list.append((level2_topic_id, level2_topic_name, level1_topic_id))
     if len(result_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
         print "\n\nresult_list's len:%d" % len(result_list)
     return result_list
