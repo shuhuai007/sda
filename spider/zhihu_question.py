@@ -16,28 +16,13 @@ import ConfigParser
 
 import zhihu_topic_parser
 import zhihu_util
+from zhihu_object import ZhihuObject
 
-class ZhihuQuestion:
+class ZhihuQuestion(ZhihuObject):
     def __init__(self, run_mode='prod'):
-        cf = ConfigParser.ConfigParser()
-        cf.read("config.ini")
-        
-        host = cf.get("db", "host")
-        port = int(cf.get("db", "port"))
-        user = cf.get("db", "user")
-        passwd = cf.get("db", "passwd")
-        db_name = cf.get("db", "db")
-        charset = cf.get("db", "charset")
-        use_unicode = cf.get("db", "use_unicode")
-
-        self.topic_thread_amount = int(cf.get("topic_thread_amount","topic_thread_amount"))
-
-        self.db = MySQLdb.connect(host=host, port=port, user=user, passwd=passwd, db=db_name, charset=charset, use_unicode=use_unicode)
-        self.cursor = self.db.cursor()
-        self.mode = run_mode
-
-    def is_develop_mode(self):
-        return self.mode == 'develop'
+        ZhihuObject.__init__(self, run_mode)
+        self.question_thread_amount = int(self.cf.get("question_thread_amount",
+                                                  "question_thread_amount"))
 
     def run(self):
         time_now = int(time.time())
