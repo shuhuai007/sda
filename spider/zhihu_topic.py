@@ -85,8 +85,6 @@ class ZhihuTopicUtil:
         print "level1_list's len:%d" % len(level1_list)
         print "level1_list's :%s" % level1_list
 
-
-
         # Fetch 2st level topics
         print "\n\nFetch 2st level topics from Zhihu ......"
 
@@ -97,9 +95,13 @@ class ZhihuTopicUtil:
 
         # Persist topics into database
         print "persist topics into database"
-        # persit_level1_topics(level1_list)
-        # persist_level2_topics(level2_list)
+        self.persist_topics(level1_list + level2_list)
 
+    def persist_topics(self, topic_list):
+        # p_str = '  INSERT IGNORE INTO QUESTION (NAME, LINK_ID, FOCUS, ANSWER, LAST_VISIT, ADD_TIME, TOP_ANSWER_NUMBER) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+        insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) VALUES (%s, %s, " \
+                     "%s)"
+        self.cursor.executemany(insert_sql,topic_list)
 
 def usage():
     print 'topic.py usage:'

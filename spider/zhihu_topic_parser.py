@@ -60,20 +60,19 @@ def fetch_level2_topic_list(level1_list, hash_id):
     for (level1_topic_id, level1_topic_name, level1_parent_id) in level1_list:
         topic_url = generate_level2_topic_url()
 
-        offset = 0
         page_index = 1
         while page_index < LEVEL2_TOPIC_MAX_PAGE_INDEX:
-            # content = post(topic_url, level1_topic_id, hash_id, offset)
+            offset = (page_index - 1) * LEVER2_TOPIC_COUNT_PER_PAGE
             content = post(topic_url, generate_post_data_for_level2(hash_id, level1_topic_id, offset))
             # print "...level2 topic content:%s:" % content
             temp_list = parse_level2_response(content, level1_topic_id)
             if temp_list:
                 level2_topic_list += temp_list
-            else:
+            if len(temp_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
+                # last page, break the loop
                 break
-            offset += page_index * LEVER2_TOPIC_COUNT_PER_PAGE
             page_index += 1
-        page_count += (page_index - 1)
+        page_count += page_index
 
     print "...Total pagecount:%d" % page_count
     return level2_topic_list
