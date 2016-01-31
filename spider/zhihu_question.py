@@ -17,6 +17,7 @@ import ConfigParser
 import zhihu_topic_parser
 import zhihu_util
 from zhihu_object import ZhihuObject
+import zhihu_question_parser
 
 class ZhihuQuestion(ZhihuObject):
     def __init__(self, run_mode='prod'):
@@ -61,7 +62,7 @@ class ZhihuQuestion(ZhihuObject):
 
         print 'All task done'
 
-    def update_topic(self):
+    def update_question_tmp(self):
         # Fetch 1st level topics
         print "\n\nFetch 1st level topics from Zhihu ......"
         level1_dict = zhihu_topic_parser.fetch_level1_topic_dict()
@@ -85,11 +86,41 @@ class ZhihuQuestion(ZhihuObject):
         print "persist topics into database"
         self.persist_topics(level1_list + level2_list)
 
-    def persist_topics(self, topic_list):
-        # p_str = '  INSERT IGNORE INTO QUESTION (NAME, LINK_ID, FOCUS, ANSWER, LAST_VISIT, ADD_TIME, TOP_ANSWER_NUMBER) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-        insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) VALUES (%s, %s, " \
-                     "%s)"
-        self.cursor.executemany(insert_sql,topic_list)
+    def update_question(self):
+        # Get the level 2 topic id list from db.
+        print "\n...Get all the topic info needed from db"
+        level2_topic_id_list = self.get_level2_topic_id_list()
+        print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
+        print "\n...level2_topic_id_list:%s" % level2_topic_id_list
+
+        # Iterate each topic to find out all the questions
+        question_list = zhihu_question_parser.fetch_question_list(level2_topic_id_list)
+
+        # persisit question into database
+        print "\n...Persist questions into db"
+        self.persist_questions(question_list)
+
+    def get_level2_topic_id_list(self):
+        level2_topic_id_list = []
+        sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID"
+        if self.is_develop_mode():
+            sql += " LIMIT 2"
+
+        print "......execute sql:%s"%sql
+        # sys.exit(2)
+
+        self.cursor.execute(sql)
+        results = self.cursor.fetchall()
+
+        for row in results:
+            link_id = str(row[0])
+            level2_topic_id_list.append(str(row[0]))
+
+        return level2_topic_id_list
+
+    def persist_questions(self, question_list):
+        # TODO(zj) add logic
+        return
 
 
 def main():
@@ -98,8 +129,7 @@ def main():
     zhihu_question = ZhihuQuestion(mode)
     print "question's mode:%s" % zhihu_question.mode
 
-    # zhihu_question.update_topic()
-
+    zhihu_question.update_question()
 
 if __name__ == '__main__':
     main()
