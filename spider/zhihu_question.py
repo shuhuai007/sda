@@ -27,14 +27,16 @@ class ZhihuQuestion(ZhihuObject):
 
     def update_question(self):
         # Get the level 2 topic id list from db.
-        print "\n...Get all the topic info needed from db"
+        print "\n...Get all the level2 topic info needed from db"
         level2_topic_id_list = self.get_level2_topic_id_list()
         print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
-        print "\n...level2_topic_id_list:%s" % level2_topic_id_list
+        # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
 
         # Iterate each topic to find out all the questions
         for level2_topic_id in level2_topic_id_list:
+            print "\n...Begin, to fetch quesitons for topic - %s" % level2_topic_id
             question_list_per_topic = zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id)
+            print "\n...End, the topic %s has %s questions" % (level2_topic_id, len(question_list_per_topic))
             self.persist_questions(question_list_per_topic)
 
     def persist_questions(self, question_list_per_topic):

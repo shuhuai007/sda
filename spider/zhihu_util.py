@@ -114,3 +114,11 @@ def usage():
     print 'Usage:'
     print '-h,--help: print help message.'
     print '-m, --mode: develop or prod, prod is default value if not set.'
+
+def error_2_file(msg, file_name):
+    file_object = open(file_name, 'w+')
+    try:
+        file_object.write(msg)
+    finally:
+        file_object.close( )
+
