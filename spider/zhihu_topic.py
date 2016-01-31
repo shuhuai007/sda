@@ -92,6 +92,9 @@ class ZhihuTopicUtil:
 
         print "level1_list's len:%d" % len(level1_list)
         print "level2_list's len:%d" % len(level2_list)
+        # level2_topic_id_list = map(lambda x: x[0], level2_list)
+        # level2_topic_id_list = list(set(level2_topic_id_list))
+        # print "after distinct, level2_topic_id_list's len:%d" % len(level2_topic_id_list)
 
         # Persist topics into database
         print "persist topics into database"

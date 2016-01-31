@@ -74,7 +74,7 @@ def fetch_level2_topic_list(level1_list, hash_id):
             page_index += 1
         page_count += page_index
 
-    print "...Total pagecount:%d" % page_count
+    print "\n\n...Total pagecount:%d" % page_count
     return level2_topic_list
 
 def generate_level2_topic_url():
