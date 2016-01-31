@@ -23,22 +23,7 @@ from zhihu_util import post
 from zhihu_util import get_xsrf_from_cookie
 from zhihu_util import get_xsrf
 
-LIST_QUESITON_PAGE_COUNT_PERCENTAGE=1
-
-def fetch_question_list(level2_topic_id_list):
-    question_list = []
-    # 1. list all the questions for each level2 topic.
-    for level2_topic_id in level2_topic_id_list:
-        question_list_per_topic = fetch_question_list_per_topic(level2_topic_id)
-        question_list += question_list_per_topic
-
-    # print "\n......question_list:%s" % question_list
-    print "\n......question_list's len:%s" % len(question_list)
-    # 2. update the list created by 1st step
-    # URL-https://www.zhihu.com/question/40009083
-    # TODO add logic
-
-    return question_list
+LIST_QUESITON_PAGE_COUNT_PERCENTAGE=0.001
 
 def get_question_list_url(level2_topic_id, page_index):
     return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
@@ -54,8 +39,7 @@ def fetch_question_list_per_topic(level2_topic_id):
     print "\n......max page index:%s" % max_page_index
     max_page_index = 1
     page_index = 1
-    # while page_index <= int(round(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
-    while page_index <= 1:
+    while page_index <= int(round(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
         print "......enter while loop"
         list_question_url = get_question_list_url(level2_topic_id, page_index)
         resp = get_content(list_question_url)
@@ -90,10 +74,23 @@ def generate_question_list_per_page(resp):
         # print ".........div_tag:%s" % div_tag
         answer_count = div_tag.find('meta', attrs={'itemprop' : 'answerCount'}).get('content')
         is_top_quesiton = div_tag.find('meta', attrs={'itemprop' : 'isTopQuestion'}).get('content')
+        # print "...............is_top_quesiton:%s" % is_top_quesiton
+        if is_top_quesiton == 'true':
+            is_top_quesiton = 1
+        else:
+            is_top_quesiton = 0
+
         h2_tag = div_tag.find('h2', attrs={'class', 'question-item-title'})
         question_title = h2_tag.a.get_text()
         question_id = h2_tag.a.get('href').split('/')[2]
-        created_time = h2_tag.span.get('data-timestamp')
+        timestamp_ms = h2_tag.span.get('data-timestamp')
+        created_time = transfer_timestamp(timestamp_ms)
         question_list.append((question_id, question_title, answer_count, is_top_quesiton, created_time))
 
     return question_list
+
+
+def transfer_timestamp(timestamp_ms):
+    timeArray = time.localtime(float(timestamp_ms)/1000)
+    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+    return otherStyleTime
