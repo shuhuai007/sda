@@ -122,3 +122,12 @@ def error_2_file(msg, file_name):
     finally:
         file_object.close()
 
+def get_today_date():
+    import time
+    ## dd/mm/yyyy format
+    return time.strftime("%Y-%m-%d")
+
+def get_current_timestamp():
+    from datetime import datetime
+    i = datetime.now()
+    print i.strftime('%Y-%m-%d %H:%M:%S')
