@@ -15,7 +15,7 @@ import Queue
 import ConfigParser
 
 import zhihu_topic_parser
-import zhihu_util
+from zhihu_util import *
 from zhihu_object import ZhihuObject
 import zhihu_question_parser
 
@@ -33,12 +33,19 @@ class ZhihuQuestion(ZhihuObject):
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
 
         # Iterate each topic to find out all the questions
+        wm = WorkerManager(10)
         for level2_topic_id in level2_topic_id_list:
-            print "\n...Begin, to fetch quesitons for topic - %s" % level2_topic_id
-            question_list_per_topic = zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id)
-            print "\n...End, the topic %s has %s questions" % (level2_topic_id, len(question_list_per_topic))
-            self.persist_questions(question_list_per_topic)
-            self.update_level2_topic_timestamp(level2_topic_id)
+            wm.add_job(self.update_question_for_each_topic, level2_topic_id)
+        wm.wait_for_complete()
+
+    def update_question_for_each_topic(self, level2_topic_id):
+        print "\n...Begin, to fetch quesitons for topic - %s" % level2_topic_id
+        question_list_per_topic = zhihu_question_parser.fetch_question_list_per_topic(
+            level2_topic_id)
+        print "\n...End, the topic %s has %s questions" % (
+        level2_topic_id, len(question_list_per_topic))
+        self.persist_questions(question_list_per_topic)
+        self.update_level2_topic_timestamp(level2_topic_id)
 
     def persist_questions(self, question_list_per_topic):
         insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION (QUESTION_ID, QUESTION_TITLE, ANSWER, IS_TOP_QUESTION, CREATED_TIME) VALUES (%s, %s, %s, %s, %s)"
@@ -46,11 +53,11 @@ class ZhihuQuestion(ZhihuObject):
 
     def update_level2_topic_timestamp(self, level2_topic_id):
         sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = %s WHERE TOPIC_ID = %s"
-        self.cursor.execute(sql,(zhihu_util.get_current_timestamp(), level2_topic_id))
+        self.cursor.execute(sql,(get_current_timestamp(), level2_topic_id))
 
     def get_level2_topic_id_list(self):
         level2_topic_id_list = []
-        today_date = zhihu_util.get_today_date()
+        today_date = get_today_date()
         sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" % today_date
 
         if self.is_develop_mode():
@@ -68,7 +75,7 @@ class ZhihuQuestion(ZhihuObject):
 
 
 def main():
-    mode = zhihu_util.parse_options()
+    mode = parse_options()
 
     zhihu_question = ZhihuQuestion(mode)
     print "question's mode:%s" % zhihu_question.mode
