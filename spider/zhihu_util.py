@@ -120,5 +120,5 @@ def error_2_file(msg, file_name):
     try:
         file_object.write(msg)
     finally:
-        file_object.close( )
+        file_object.close()
 
