@@ -62,7 +62,6 @@ class ZhihuQuestion(ZhihuObject):
         results = self.cursor.fetchall()
 
         for row in results:
-            link_id = str(row[0])
             level2_topic_id_list.append(str(row[0]))
 
         return level2_topic_id_list
