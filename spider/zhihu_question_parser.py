@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 import getopt
 import MySQLdb
 from bs4 import BeautifulSoup
@@ -25,11 +28,22 @@ from zhihu_util import get_xsrf
 from zhihu_util import error_2_file
 
 
-LIST_QUESITON_PAGE_COUNT_PERCENTAGE = 0.01
+LIST_QUESITON_PAGE_COUNT_PERCENTAGE = 0.1
+QUESTION_WRITE_BUFFER_PAGE_COUNT = 10
 
 def get_question_list_url(level2_topic_id, page_index):
     return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
 
+
+def write_question(temp_question_list, level2_topic_id):
+    file_name = "%s_question.data" % level2_topic_id
+    target = open(file_name, 'w+')
+    for question_item in temp_question_list:
+        question_list = list(question_item)
+        question_str = ZHIHU_QUESTION_DATA_DELIMETER.join(map(str, question_list))
+        target.write(question_str)
+
+    target.close()
 
 def fetch_question_list_per_topic(level2_topic_id):
     temp_question_list = []
@@ -40,6 +54,7 @@ def fetch_question_list_per_topic(level2_topic_id):
 
     print "\n......max page index:%s" % max_page_index
     page_index = 1
+    max_page_index = 1
     while page_index <= int(ceil(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
         # print "......enter while loop"
         list_question_url = get_question_list_url(level2_topic_id, page_index)
@@ -47,8 +62,11 @@ def fetch_question_list_per_topic(level2_topic_id):
         # print "......resp:%s" % resp
         question_list_per_page = generate_question_list_per_page(resp)
         temp_question_list += question_list_per_page
+        if len(temp_question_list) > QUESTION_WRITE_BUFFER_PAGE_COUNT:
+            write_question(temp_question_list, level2_topic_id)
+            temp_question_list = []
         page_index += 1
-    return temp_question_list
+    # return temp_question_list
 
 def get_max_page_index(list_question_url):
     max_index = 1
@@ -101,6 +119,5 @@ def generate_question_list_per_page(resp):
 
 
 def transfer_timestamp(timestamp_ms):
-    timeArray = time.localtime(float(timestamp_ms)/1000)
-    otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-    return otherStyleTime
+    time_arr = time.localtime(float(timestamp_ms)/1000)
+    return time.strftime("%Y-%m-%d %H:%M:%S", time_arr)

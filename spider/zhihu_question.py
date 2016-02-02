@@ -33,19 +33,23 @@ class ZhihuQuestion(ZhihuObject):
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
 
         # Iterate each topic to find out all the questions
-        wm = WorkerManager(10)
+        wm = WorkerManager(self.question_thread_amount)
+        index = 0
         for level2_topic_id in level2_topic_id_list:
+            if self.is_develop_mode():
+                if index >= 2:
+                    break
+            index += 1
             wm.add_job(self.update_question_for_each_topic, level2_topic_id)
         wm.wait_for_complete()
 
     def update_question_for_each_topic(self, level2_topic_id):
         print "\n...Begin, to fetch quesitons for topic - %s" % level2_topic_id
-        question_list_per_topic = zhihu_question_parser.fetch_question_list_per_topic(
-            level2_topic_id)
-        print "\n...End, the topic %s has %s questions" % (
-        level2_topic_id, len(question_list_per_topic))
-        self.persist_questions(question_list_per_topic)
-        self.update_level2_topic_timestamp(level2_topic_id)
+        zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id)
+        # print "\n...End, the topic %s has %s questions" % (
+        # level2_topic_id, len(question_list_per_topic))
+        # self.persist_questions(question_list_per_topic)
+        # self.update_level2_topic_timestamp(level2_topic_id)
 
     def persist_questions(self, question_list_per_topic):
         insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION (QUESTION_ID, QUESTION_TITLE, ANSWER, IS_TOP_QUESTION, CREATED_TIME) VALUES (%s, %s, %s, %s, %s)"
