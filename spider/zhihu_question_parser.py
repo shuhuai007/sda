@@ -24,7 +24,7 @@ from urllib import urlencode
 from zhihu_util import *
 
 
-LIST_QUESITON_PAGE_COUNT_PERCENTAGE = 0.1
+LIST_QUESITON_PAGE_COUNT_PERCENTAGE = 1
 QUESTION_WRITE_BUFFER_PAGE_COUNT = 10
 
 def get_question_list_url(level2_topic_id, page_index):
@@ -32,6 +32,9 @@ def get_question_list_url(level2_topic_id, page_index):
 
 
 def write_question(temp_question_list, level2_topic_id, question_dir):
+    if len(temp_question_list) == 0:
+        return
+
     file_name = "%s/%s_question.data" % (question_dir, level2_topic_id)
     target = open(file_name, 'w+')
     for question_tuple in temp_question_list:
@@ -63,7 +66,8 @@ def fetch_question_list_per_topic(level2_topic_id):
             write_question(temp_question_list, level2_topic_id, question_dir)
             temp_question_list = []
         page_index += 1
-    # return temp_question_list
+    write_question(temp_question_list, level2_topic_id, question_dir)
+
 
 def get_max_page_index(list_question_url):
     max_index = 1
