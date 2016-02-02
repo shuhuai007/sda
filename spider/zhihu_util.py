@@ -202,9 +202,9 @@ def get_question_data_directory():
 
 def get_local_ip():
     import socket
-    myname = socket.getfqdn(socket.gethostname())
-    myaddr = socket.gethostbyname(myname)
-    return myaddr
+    host_name = socket.getfqdn(socket.gethostname())
+    address = socket.gethostbyname(host_name)
+    return address
 
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
