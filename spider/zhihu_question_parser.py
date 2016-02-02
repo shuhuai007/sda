@@ -56,7 +56,8 @@ def fetch_question_list_per_topic(level2_topic_id):
     page_index = 1
     max_page_index = 1
     while page_index <= int(ceil(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
-        # print "......enter while loop"
+        print "......topic %s, page_index: %s, page_total: %s" % \
+              (level2_topic_id, page_index, max_page_index)
         list_question_url = get_question_list_url(level2_topic_id, page_index)
         resp = get_content(list_question_url)
         # print "......resp:%s" % resp
