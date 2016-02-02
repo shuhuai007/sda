@@ -107,7 +107,7 @@ def generate_question_list_per_page(resp):
             else:
                 is_top_quesiton = 0
 
-            h2_tag = div_tag.find('h2', attrs={'class', 'question-item-title'})
+            h2_tag = div_tag.find('h2', attrs={'class': 'question-item-title'})
             question_title = h2_tag.a.get_text()
             question_id = h2_tag.a.get('href').split('/')[2]
             timestamp_ms = h2_tag.span.get('data-timestamp')
