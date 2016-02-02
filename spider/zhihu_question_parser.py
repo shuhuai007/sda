@@ -6,12 +6,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-import getopt
-import MySQLdb
 from bs4 import BeautifulSoup
-import json
-import re
-import time
 from math import ceil
 import logging
 import threading
