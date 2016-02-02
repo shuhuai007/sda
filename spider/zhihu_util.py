@@ -199,3 +199,16 @@ def get_question_data_directory():
 
     question_dir = cf.get("data", "zhihu_data_directory")
     return question_dir
+
+def get_local_ip():
+    import socket
+    myname = socket.getfqdn(socket.gethostname())
+    myaddr = socket.gethostbyname(myname)
+    return myaddr
+
+def get_topic_id_seed(ip):
+    cf = ConfigParser.ConfigParser()
+    cf.read("config.ini")
+
+    topic_id_seed = cf.get("nodes", ip)
+    return topic_id_seed

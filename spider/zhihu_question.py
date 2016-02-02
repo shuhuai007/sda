@@ -20,6 +20,23 @@ from zhihu_util import *
 from zhihu_object import ZhihuObject
 import zhihu_question_parser
 
+MAX_TOPIC_TABLE_ID = 15000
+TOPIC_ID_STEP = 10
+
+def generate_available_topic_ids():
+    id_list = []
+    # find the seed from config.ini
+    topic_id_seed = get_topic_id_seed(get_local_ip())
+    print "...............topic_id_seed:%s" % topic_id_seed
+    # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
+    topic_id = int(topic_id_seed)
+    while topic_id < MAX_TOPIC_TABLE_ID:
+        id_list.append(str(topic_id))
+        topic_id += TOPIC_ID_STEP
+
+    return ",".join(id_list)
+
+
 class ZhihuQuestion(ZhihuObject):
     def __init__(self, run_mode='prod'):
         ZhihuObject.__init__(self, run_mode)
@@ -32,6 +49,7 @@ class ZhihuQuestion(ZhihuObject):
         level2_topic_id_list = self.get_level2_topic_id_list()
         print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
+        exit()
 
         # Iterate each topic to find out all the questions
         wm = WorkerManager(self.question_thread_amount)
@@ -62,6 +80,8 @@ class ZhihuQuestion(ZhihuObject):
         level2_topic_id_list = []
         today_date = get_today_date()
         sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" % today_date
+        available_topic_ids = generate_available_topic_ids()
+        sql += " AND ID IN (%s) " % available_topic_ids
 
         if self.is_develop_mode():
             sql += " LIMIT 2"
