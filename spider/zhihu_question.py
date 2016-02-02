@@ -45,7 +45,7 @@ class ZhihuQuestion(ZhihuObject):
 
     def update_question_for_each_topic(self, level2_topic_id):
         print "\n...Begin, to fetch quesitons for topic - %s" % level2_topic_id
-        zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id)
+        zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id, self.is_develop_mode())
         # self.persist_questions(question_list_per_topic)
         self.update_level2_topic_timestamp(level2_topic_id)
 

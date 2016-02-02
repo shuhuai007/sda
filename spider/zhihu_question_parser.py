@@ -44,7 +44,7 @@ def write_question(temp_question_list, level2_topic_id, question_dir):
         target.write('\n')
     target.close()
 
-def fetch_question_list_per_topic(level2_topic_id):
+def fetch_question_list_per_topic(level2_topic_id, run_mode='prod'):
     temp_question_list = []
     question_dir = get_question_data_directory()
 
@@ -54,8 +54,7 @@ def fetch_question_list_per_topic(level2_topic_id):
 
     print "\n......max page index:%s" % max_page_index
     page_index = 1
-    max_page_index = 1
-    while page_index <= int(ceil(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index)):
+    while page_index <= get_page_index_threshold(max_page_index, run_mode):
         print "......topic %s, page_index: %s, page_total: %s" % \
               (level2_topic_id, page_index, max_page_index)
         list_question_url = get_question_list_url(level2_topic_id, page_index)
@@ -123,3 +122,8 @@ def generate_question_list_per_page(resp):
 def transfer_timestamp(timestamp_ms):
     time_arr = time.localtime(float(timestamp_ms)/1000)
     return time.strftime("%Y-%m-%d %H:%M:%S", time_arr)
+
+def get_page_index_threshold(max_page_index, run_mode):
+    if run_mode == "develop":
+        return 1
+    return int(ceil(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index))
