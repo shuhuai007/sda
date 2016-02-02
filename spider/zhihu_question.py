@@ -49,7 +49,7 @@ class ZhihuQuestion(ZhihuObject):
         level2_topic_id_list = self.get_level2_topic_id_list()
         print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
-        exit()
+        # exit()
 
         # Iterate each topic to find out all the questions
         wm = WorkerManager(self.question_thread_amount)
@@ -107,4 +107,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
