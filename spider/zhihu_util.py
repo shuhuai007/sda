@@ -19,15 +19,15 @@ def get_content(to_url):
     headers = get_headers(to_url)
 
     req = urllib2.Request(
-        url = to_url,
-        headers = headers
+        url=to_url,
+        headers=headers
     )
 
     try:
         opener = urllib2.build_opener(urllib2.ProxyHandler())
         urllib2.install_opener(opener)
 
-        resp = urllib2.urlopen(req, timeout = 15)
+        resp = urllib2.urlopen(req, timeout=15)
 
     except Exception,e:
         # if count % 1 == 0:
