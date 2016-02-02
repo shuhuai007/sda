@@ -192,3 +192,10 @@ class WorkerManager:
 
     def get_result( self, *args, **kwds ):
         return self.resultQueue.get( *args, **kwds )
+
+def get_question_data_directory():
+    cf = ConfigParser.ConfigParser()
+    cf.read("config.ini")
+
+    question_dir = cf.get("data", "zhihu_data_directory")
+    return question_dir
