@@ -21,11 +21,6 @@ from zhihu_constants import *
 
 from urllib import urlencode
 
-from zhihu_util import get_content
-from zhihu_util import post
-from zhihu_util import get_xsrf_from_cookie
-from zhihu_util import get_xsrf
-from zhihu_util import error_2_file
 from zhihu_util import *
 
 
