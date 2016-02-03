@@ -16,10 +16,11 @@ USE `sda`;
 # ) ENGINE=MyISAM AUTO_INCREMENT=1000000000000030 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 # question
-# question_id, question_title, answer_count, is_top_quesiton, created_time
+# question_id, question_title, answer_count, is_top_quesiton, created_time, spider_time
 
 # question detail
-# question_id, question_content, answer_count, comment_count, focus, browse_count, related_focus
+# question_id, question_content, comment_count, focus, focus_user_list, browse_count,
+# related_focus, last_edited, spider_time
 
 
 CREATE TABLE IF NOT EXISTS `ZHIHU_TOPIC` (
