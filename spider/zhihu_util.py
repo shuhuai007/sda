@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import getopt
 import urllib2
 import gzip
@@ -11,12 +10,13 @@ import ConfigParser
 from zhihu_constants import *
 
 REFER_DICT = {
-    LEVEL1_TOPICS_URL : 'http://www.zhihu.com/',
-    LEVEL2_TOPICS_URL : 'https://www.zhihu.com/topics'
+    LEVEL1_TOPICS_URL: 'http://www.zhihu.com/',
+    LEVEL2_TOPICS_URL: 'https://www.zhihu.com/topics'
 }
 
+
 def get_content(to_url):
-    headers = get_headers(to_url)
+    headers = get_headers()
 
     req = urllib2.Request(
         url=to_url,
@@ -29,12 +29,13 @@ def get_content(to_url):
 
         resp = urllib2.urlopen(req, timeout=15)
 
-    except Exception,e:
+    except Exception, e:
         # if count % 1 == 0:
         #     print str(count) + ", Error: " + str(e) + " URL: " + to_url
         return "FAIL"
 
     return get_content_from_resp(resp)
+
 
 def post(to_url, post_data):
     headers = get_headers(to_url)
@@ -71,8 +72,10 @@ def get_xsrf_from_cookie(cookie):
     print "\n\n_xsrf doesn't exist in cookie"
     return ""
 
+
 def get_xsrf():
     return get_xsrf_from_cookie(get_cookie())
+
 
 def get_cookie():
     cf = ConfigParser.ConfigParser()
@@ -80,16 +83,18 @@ def get_cookie():
     cookie = cf.get("cookie", "cookie")
     return cookie
 
-def get_headers(to_url):
+
+def get_headers():
     cookie = get_cookie()
     headers = {
-        'Cookie':cookie,
-        'Host':'www.zhihu.com',
-        'Referer':'www.zhihu.com',
-        'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
-        'Accept-Encoding':'gzip'
+        'Cookie': cookie,
+        'Host': 'www.zhihu.com',
+        'Referer': 'www.zhihu.com',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36',
+        'Accept-Encoding': 'gzip'
     }
     return headers
+
 
 def parse_options():
     try:
@@ -110,10 +115,12 @@ def parse_options():
             sys.exit(2)
     return mode
 
+
 def usage():
     print 'Usage:'
     print '-h,--help: print help message.'
     print '-m, --mode: develop or prod, prod is default value if not set.'
+
 
 def error_2_file(msg, file_name):
     file_object = open(file_name, 'w+')
@@ -122,36 +129,39 @@ def error_2_file(msg, file_name):
     finally:
         file_object.close()
 
+
 def get_today_date():
     import time
-    ## dd/mm/yyyy format
+
     return time.strftime("%Y-%m-%d")
+
 
 def get_current_timestamp():
     from datetime import datetime
+
     i = datetime.now()
     print i.strftime('%Y-%m-%d %H:%M:%S')
 
-import Queue, threading, sys
+
+import Queue, sys
 from threading import Thread
-import time
-import urllib
 
 # working thread
 class Worker(Thread):
     worker_count = 0
     timeout = 1
-    def __init__( self, workQueue, resultQueue, **kwds):
-        Thread.__init__( self, **kwds )
+
+    def __init__(self, work_queue, result_queue, **kwds):
+        Thread.__init__(self, **kwds)
         self.id = Worker.worker_count
         Worker.worker_count += 1
-        self.setDaemon( True )
-        self.workQueue = workQueue
-        self.resultQueue = resultQueue
+        self.setDaemon(True)
+        self.workQueue = work_queue
+        self.resultQueue = result_queue
         self.start()
 
     def run(self):
-        ''' the get-some-work, do-some-work main loop of worker threads '''
+        """ the get-some-work, do-some-work main loop of worker threads """
         while True:
             try:
                 callable, args, kwds = self.workQueue.get(timeout=Worker.timeout)
@@ -161,9 +171,10 @@ class Worker(Thread):
                 # time.sleep(Worker.sleep)
             except Queue.Empty:
                 break
-            except :
+            except:
                 print "worker[%2d]" % self.id, sys.exc_info()[:2]
                 raise
+
 
 class WorkerManager:
     def __init__(self, num_of_workers=10, timeout=2):
@@ -193,6 +204,7 @@ class WorkerManager:
     def get_result(self, *args, **kwds):
         return self.resultQueue.get(*args, **kwds)
 
+
 def get_question_data_directory():
     cf = ConfigParser.ConfigParser()
     cf.read("config.ini")
@@ -200,11 +212,14 @@ def get_question_data_directory():
     question_dir = cf.get("data", "zhihu_data_directory")
     return question_dir
 
+
 def get_local_ip():
     import socket
+
     host_name = socket.getfqdn(socket.gethostname())
     address = socket.gethostbyname(host_name)
     return address
+
 
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
@@ -212,6 +227,7 @@ def get_topic_id_seed(ip):
 
     topic_id_seed = cf.get("nodes", ip)
     return topic_id_seed
+
 
 def generate_id_list(id_seed=1, step_range=1, max_id=100):
     id_list = []
@@ -221,17 +237,18 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
     return id_list
 
 
-def write_buffer_file(buffer_list, file_name, delimeter=","):
+def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
         return
 
     target = open(file_name, 'a')
     for item_tuple in buffer_list:
         item_list = list(item_tuple)
-        item_str = delimeter.join(map(str, item_list))
+        item_str = delimiter.join(map(str, item_list))
         target.write(item_str)
         target.write('\n')
     target.close()
+
 
 if __name__ == '__main__':
     print generate_id_list()
