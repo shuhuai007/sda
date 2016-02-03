@@ -220,5 +220,18 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
         id_seed += step_range
     return id_list
 
+
+def write_buffer_file(buffer_list, file_name, delimeter=","):
+    if len(buffer_list) == 0:
+        return
+
+    target = open(file_name, 'a')
+    for item_tuple in buffer_list:
+        item_list = list(item_tuple)
+        item_str = delimeter.join(map(str, item_list))
+        target.write(item_str)
+        target.write('\n')
+    target.close()
+
 if __name__ == '__main__':
     print generate_id_list()

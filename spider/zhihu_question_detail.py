@@ -15,10 +15,9 @@ import Queue
 import ConfigParser
 import random
 
-import zhihu_topic_parser
 from zhihu_util import *
 from zhihu_object import ZhihuObject
-import zhihu_question_parser
+import zhihu_question_detail_parser
 
 MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
@@ -81,10 +80,8 @@ class ZhihuQuestionDetail(ZhihuObject):
         wm.wait_for_complete()
 
     def update_question_detail(self, question_id_list, index_list):
-        # TODO (zj)
-        for index in index_list:
-            print "index:%s, question id:%s" % (index, question_id_list[int(index)])
 
+        zhihu_question_detail_parser.update_question_detail(question_id_list, index_list)
 
 def main():
     mode = parse_options()
