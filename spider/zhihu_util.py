@@ -156,42 +156,42 @@ class Worker(Thread):
             try:
                 callable, args, kwds = self.workQueue.get(timeout=Worker.timeout)
                 res = callable(*args, **kwds)
-                print "worker[%2d]: %s" % (self.id, str(res) )
-                self.resultQueue.put( res )
-                #time.sleep(Worker.sleep)
+                print "worker[%d]'s result: %s" % (self.id, str(res))
+                self.resultQueue.put(res)
+                # time.sleep(Worker.sleep)
             except Queue.Empty:
                 break
             except :
-                print 'worker[%2d]' % self.id, sys.exc_info()[:2]
+                print "worker[%2d]" % self.id, sys.exc_info()[:2]
                 raise
 
 class WorkerManager:
-    def __init__( self, num_of_workers=10, timeout = 2):
+    def __init__(self, num_of_workers=10, timeout=2):
         self.workQueue = Queue.Queue()
         self.resultQueue = Queue.Queue()
         self.workers = []
         self.timeout = timeout
-        self._recruitThreads( num_of_workers )
+        self._recruitThreads(num_of_workers)
 
-    def _recruitThreads( self, num_of_workers ):
-        for i in range( num_of_workers ):
-            worker = Worker( self.workQueue, self.resultQueue )
+    def _recruitThreads(self, num_of_workers):
+        for i in range(num_of_workers):
+            worker = Worker(self.workQueue, self.resultQueue)
             self.workers.append(worker)
 
-    def wait_for_complete( self):
+    def wait_for_complete(self):
         # ...then, wait for each of them to terminate:
         while len(self.workers):
             worker = self.workers.pop()
-            worker.join( )
+            worker.join()
             if worker.isAlive() and not self.workQueue.empty():
-                self.workers.append( worker )
+                self.workers.append(worker)
         print "All jobs are are completed."
 
-    def add_job( self, callable, *args, **kwds ):
-        self.workQueue.put( (callable, args, kwds) )
+    def add_job(self, callable, *args, **kwds):
+        self.workQueue.put((callable, args, kwds))
 
-    def get_result( self, *args, **kwds ):
-        return self.resultQueue.get( *args, **kwds )
+    def get_result(self, *args, **kwds):
+        return self.resultQueue.get(*args, **kwds)
 
 def get_question_data_directory():
     cf = ConfigParser.ConfigParser()
@@ -212,3 +212,13 @@ def get_topic_id_seed(ip):
 
     topic_id_seed = cf.get("nodes", ip)
     return topic_id_seed
+
+def generate_id_list(id_seed=1, step_range=1, max_id=100):
+    id_list = []
+    while id_seed <= max_id:
+        id_list.append(str(id_seed))
+        id_seed += step_range
+    return id_list
+
+if __name__ == '__main__':
+    print generate_id_list()
