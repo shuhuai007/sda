@@ -97,14 +97,21 @@ def get_headers():
 
 
 def parse_options():
+    def usage():
+        print "Usage:"
+        print "-h,--help: print help message."
+        print "-m, --mode: develop or prod, prod is default value if not set."
+        print "-d, --date: last_visit_date, default value is today's date if not set"
+
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hmd:', ['mode='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hm:d:', ['help', 'mode=', 'date='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
         sys.exit(2)
     mode = "prod"
     last_visit_date = get_today_date()
+    print "...last_visit:%s, opts:%s" % (last_visit_date, opts)
     for opt, val in opts:
         if opt in ('-h', '--help'):
             usage()
@@ -119,10 +126,7 @@ def parse_options():
     return mode, last_visit_date
 
 
-def usage():
-    print 'Usage:'
-    print '-h,--help: print help message.'
-    print '-m, --mode: develop or prod, prod is default value if not set.'
+
 
 
 def error_2_file(msg, file_name):
