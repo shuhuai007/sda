@@ -98,7 +98,7 @@ def get_headers():
 
 def parse_options():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hm:', ['mode='])
+        opts, args = getopt.getopt(sys.argv[1:], 'hmd:', ['mode='])
     except getopt.GetoptError, err:
         print str(err)
         usage()
@@ -254,4 +254,6 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
 
 
 if __name__ == '__main__':
-    print generate_id_list()
+    mode, last_visit_date = parse_options()
+    print "mode:%s" % mode
+    print "last_visit_date:%s" % last_visit_date
