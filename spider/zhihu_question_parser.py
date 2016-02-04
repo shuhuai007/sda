@@ -121,6 +121,7 @@ def generate_question_list_per_page(resp):
 
 
 def transfer_timestamp(timestamp_ms):
+    import time
     time_arr = time.localtime(float(timestamp_ms) / 1000)
     return time.strftime("%Y-%m-%d %H:%M:%S", time_arr)
 
