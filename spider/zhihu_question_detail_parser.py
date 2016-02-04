@@ -6,6 +6,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
+import time
+
 from bs4 import BeautifulSoup
 from zhihu_constants import *
 
