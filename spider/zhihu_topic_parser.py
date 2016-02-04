@@ -120,9 +120,9 @@ def generate_post_data_for_level2(hash_id, level1_topic_id, offset):
         # post_dict["params"] = '{"topic_id":253,"offset":40,"hash_id":"dced108689287057f5cc3b5e85cb8289"}'
         params_dict = '{' \
                       '"topic_id":' + str(level1_topic_id) + ',' \
-                                                             '"offset":' + str(offset) + ',' \
-                                                                                         '"hash_id":' + '"' + str(hash_id) + '"' \
-                                                                                                                             '}'
+                      '"offset":' + str(offset) + ',' \
+                      '"hash_id":' + '"' + str(hash_id) + '"' \
+                      '}'
         post_dict["params"] = params_dict
         print "\n\nparams_dict:%s" % params_dict
         # post_dict["_xsrf"] = "dacc17fefe1dd92f1f814fb77d3a359f"
