@@ -90,14 +90,13 @@ def get_related_focus_info(soup):
     # print "......quesiton_status_div:%s" % quesiton_status_div
 
 
-def update_question_detail(question_id_list, index_list):
-    if not question_id_list or not index_list:
+def update_question_detail(question_id_list):
+    if not question_id_list:
         return
 
     buffer_list = []
-    for index in index_list:
+    for question_id in question_id_list:
         # print "index:%s, question id:%s" % (index, question_id_list[int(index)])
-        question_id = question_id_list[int(index)]
         print "......question id:%s" % question_id
         request_url = ZHIHU_QUESTION_DETAIL_URL.format(question_id)
         resp = get_content(request_url)

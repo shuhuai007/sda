@@ -254,6 +254,6 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
 
 
 if __name__ == '__main__':
-    mode, last_visit_date = parse_options()
-    print "mode:%s" % mode
-    print "last_visit_date:%s" % last_visit_date
+    run_mode, last_visit = parse_options()
+    print "mode:%s" % run_mode
+    print "last_visit_date:%s" % last_visit

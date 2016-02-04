@@ -99,11 +99,11 @@ class ZhihuQuestion(ZhihuObject):
 
 
 def main():
-    mode, last_visit_date = parse_options()
+    run_mode, last_visit = parse_options()
 
-    zhihu_question = ZhihuQuestion(mode)
+    zhihu_question = ZhihuQuestion(run_mode)
     print "question's mode:%s" % zhihu_question.mode
-    zhihu_question.update_question(last_visit_date)
+    zhihu_question.update_question(last_visit)
 
 
 if __name__ == '__main__':

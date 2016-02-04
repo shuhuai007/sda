@@ -75,16 +75,14 @@ class ZhihuQuestionDetail(ZhihuObject):
 
         for index in range(split_count):
             id_list = generate_id_list(int(index), split_count, max_id - 1)
-            wm.add_job(self.update_question_detail, question_id_list, id_list)
+            question_id_list = map(lambda i: question_id_list[i], id_list)
+            wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list)
 
         wm.wait_for_complete()
 
-    def update_question_detail(self, question_id_list, index_list):
-
-        zhihu_question_detail_parser.update_question_detail(question_id_list, index_list)
 
 def main():
-    mode = parse_options()
+    mode, last_visit_date = parse_options()
 
     question_detail = ZhihuQuestionDetail(mode)
     print "question detail's mode:%s" % question_detail.mode
