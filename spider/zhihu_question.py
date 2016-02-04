@@ -23,6 +23,7 @@ import zhihu_question_parser
 MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
 
+
 def generate_available_topic_ids():
     id_list = []
     # find the seed from config.ini
@@ -41,12 +42,12 @@ class ZhihuQuestion(ZhihuObject):
     def __init__(self, run_mode='prod'):
         ZhihuObject.__init__(self, run_mode)
         self.question_thread_amount = int(self.cf.get("question_thread_amount",
-                                                  "question_thread_amount"))
+                                                      "question_thread_amount"))
 
-    def update_question(self):
+    def update_question(self, last_visit_date):
         # Get the level 2 topic id list from db.
         print "\n...Get all the level2 topic info needed from db"
-        level2_topic_id_list = self.get_level2_topic_id_list()
+        level2_topic_id_list = self.get_level2_topic_id_list(last_visit_date)
         print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
         # exit()
@@ -74,19 +75,19 @@ class ZhihuQuestion(ZhihuObject):
 
     def update_level2_topic_timestamp(self, level2_topic_id):
         sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = %s WHERE TOPIC_ID = %s"
-        self.cursor.execute(sql,(get_current_timestamp(), level2_topic_id))
+        self.cursor.execute(sql, (get_current_timestamp(), level2_topic_id))
 
-    def get_level2_topic_id_list(self):
+    def get_level2_topic_id_list(self, last_visit_date):
         level2_topic_id_list = []
-        today_date = get_today_date()
-        sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" % today_date
+        sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" \
+              % last_visit_date
         available_topic_ids = generate_available_topic_ids()
         sql += " AND ID IN (%s) " % available_topic_ids
 
         if self.is_develop_mode():
             sql += " LIMIT 2"
 
-        print "......execute sql:%s"%sql
+        print "......execute sql:%s" % sql
 
         self.cursor.execute(sql)
         results = self.cursor.fetchall()
@@ -98,12 +99,12 @@ class ZhihuQuestion(ZhihuObject):
 
 
 def main():
-    mode = parse_options()
+    mode, last_visit_date = parse_options()
 
     zhihu_question = ZhihuQuestion(mode)
     print "question's mode:%s" % zhihu_question.mode
+    zhihu_question.update_question(last_visit_date)
 
-    zhihu_question.update_question()
 
 if __name__ == '__main__':
     main()

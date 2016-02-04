@@ -104,16 +104,19 @@ def parse_options():
         usage()
         sys.exit(2)
     mode = "prod"
+    last_visit_date = get_today_date()
     for opt, val in opts:
         if opt in ('-h', '--help'):
             usage()
             sys.exit(1)
         elif opt in ('-m', '--mode'):
             mode = val
+        elif opt in ('-d', '--date'):
+            last_visit_date = val
         else:
             print 'unhandled option'
             sys.exit(2)
-    return mode
+    return mode, last_visit_date
 
 
 def usage():

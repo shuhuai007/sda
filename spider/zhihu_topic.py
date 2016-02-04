@@ -50,13 +50,12 @@ class ZhihuTopic(ZhihuObject):
         self.persist_topics(level1_list + level2_list)
 
     def persist_topics(self, topic_list):
-        # p_str = '  INSERT IGNORE INTO QUESTION (NAME, LINK_ID, FOCUS, ANSWER, LAST_VISIT, ADD_TIME, TOP_ANSWER_NUMBER) VALUES (%s, %s, %s, %s, %s, %s, %s)'
         insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) VALUES (%s, %s, " \
                      "%s)"
         self.cursor.executemany(insert_sql,topic_list)
 
 def main():
-    mode = zhihu_util.parse_options()
+    mode, last_visit_date = zhihu_util.parse_options()
 
     topic_util = ZhihuTopic(mode)
     print "topic's mode:%s" % topic_util.mode
