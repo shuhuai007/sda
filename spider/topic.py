@@ -133,7 +133,7 @@ class UpdateTopics:
             link_id = str(row[0])
 
             queue.put([link_id, i])
-            i = i + 1
+            i += 1
 
         for i in range(self.topic_thread_amount):
             threads.append(UpdateOneTopic(queue))
