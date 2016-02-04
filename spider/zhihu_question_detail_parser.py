@@ -7,15 +7,7 @@ reload(sys)
 sys.setdefaultencoding("utf-8")
 
 from bs4 import BeautifulSoup
-from math import ceil
-import logging
-import threading
-import Queue
-import ConfigParser
-
 from zhihu_constants import *
-
-from urllib import urlencode
 
 from zhihu_util import *
 
