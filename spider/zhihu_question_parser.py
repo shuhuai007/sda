@@ -13,13 +13,9 @@ import threading
 import Queue
 import ConfigParser
 
-from zhihu_constants import *
-
-from urllib import urlencode
-
 from zhihu_util import *
 
-LIST_QUESITON_PAGE_COUNT_PERCENTAGE = 1
+LIST_QUESTION_PAGE_COUNT_PERCENTAGE = 1
 
 # Write 200 questions from buffer into file once
 QUESTION_COUNT_WRITE_BUFFER = 10000
@@ -99,13 +95,13 @@ def generate_question_list_per_page(resp):
         try:
             # print ".........div_tag:%s" % div_tag
             answer_count = div_tag.find('meta', attrs={'itemprop': 'answerCount'}).get('content')
-            is_top_quesiton = div_tag.find('meta', attrs={'itemprop': 'isTopQuestion'}).get(
+            is_top_question = div_tag.find('meta', attrs={'itemprop': 'isTopQuestion'}).get(
                 'content')
-            # print "...............is_top_quesiton:%s" % is_top_quesiton
-            if is_top_quesiton == 'true':
-                is_top_quesiton = 1
+            # print "...............is_top_question:%s" % is_top_question
+            if is_top_question == 'true':
+                is_top_question = 1
             else:
-                is_top_quesiton = 0
+                is_top_question = 0
 
             h2_tag = div_tag.find('h2', attrs={'class': 'question-item-title'})
             question_title = h2_tag.a.get_text()
@@ -113,7 +109,7 @@ def generate_question_list_per_page(resp):
             timestamp_ms = h2_tag.span.get('data-timestamp')
             created_time = transfer_timestamp(timestamp_ms)
             question_list.append(
-                (question_id, question_title, answer_count, is_top_quesiton, created_time))
+                (question_id, question_title, answer_count, is_top_question, created_time))
         except:
             print "Fail to parse when executing generate_question_list_per_page()... "
 
@@ -129,4 +125,4 @@ def transfer_timestamp(timestamp_ms):
 def get_page_index_threshold(max_page_index, is_develop=False):
     if is_develop:
         return 1
-    return int(ceil(LIST_QUESITON_PAGE_COUNT_PERCENTAGE * max_page_index))
+    return int(ceil(LIST_QUESTION_PAGE_COUNT_PERCENTAGE * max_page_index))
