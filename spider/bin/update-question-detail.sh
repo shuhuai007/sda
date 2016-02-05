@@ -2,8 +2,10 @@
 
 bin=`cd "$( dirname "$0" )"; pwd`
 spider_dir=`cd ${bin}/..;pwd`
-log_dir=${spider_dir}/log
 
+cd ${spider_dir}
+
+log_dir=${spider_dir}/log
 [ ! -d ${log_dir} ] && mkdir ${log_dir}
 
 echo "......execute update-question-detail.sh remotely......"
