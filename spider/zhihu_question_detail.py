@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from zhihu_util import *
-from zhihu_object import ZhihuObject
+from zhihu_item import ZhihuItem
 import zhihu_question_detail_parser
 
 MAX_TOPIC_TABLE_ID = 15000
@@ -33,10 +33,10 @@ def get_question_id_list():
     return question_id_list
 
 
-class ZhihuQuestionDetail(ZhihuObject):
+class ZhihuQuestionDetail(ZhihuItem):
 
     def __init__(self, run_mode='prod'):
-        self.mode = run_mode
+        ZhihuItem.__init__(self, run_mode)
         self.question_detail_thread_amount = get_question_detail_thread_amount()
 
     def is_develop_mode(self):
