@@ -2,8 +2,9 @@
 
 set ip [ lindex $argv 0 ]
 set password [ lindex $argv 1 ]
-set timeout 10
-set cmd "cd /root/work/sda; git status; sleep 3;"
+set timeout 100
+set cmd1 "cd /root/work/sda; git status; sleep 3;"
+set cmd2 [ lindex $argv 2 ]
 
 spawn ssh root@$ip
 expect {
@@ -15,6 +16,7 @@ expect {
 #interact
 
 expect "#*"
-send "$cmd\r"
+send "$cmd1\r"
+send "$cmd2\r"
 send  "exit\r"
 expect eof
