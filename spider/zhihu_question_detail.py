@@ -1,20 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import getopt
-import MySQLdb
-from bs4 import BeautifulSoup
-import json
-import re
-import time
-from math import ceil
-import logging
-import threading
-import Queue
-import ConfigParser
-import random
-
 from zhihu_util import *
 from zhihu_object import ZhihuObject
 import zhihu_question_detail_parser
@@ -48,10 +34,13 @@ def get_question_id_list():
 
 
 class ZhihuQuestionDetail(ZhihuObject):
+
     def __init__(self, run_mode='prod'):
-        ZhihuObject.__init__(self, run_mode)
-        self.question_detail_thread_amount = int(self.cf.get("question_detail_thread_amount",
-                                                             "question_detail_thread_amount"))
+        self.mode = run_mode
+        self.question_detail_thread_amount = get_question_detail_thread_amount()
+
+    def is_develop_mode(self):
+        return self.mode == 'develop'
 
     def update_question(self):
         # 1. Get all the question id needed
@@ -82,7 +71,6 @@ class ZhihuQuestionDetail(ZhihuObject):
             wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list)
 
         wm.wait_for_complete()
-
 
 def main():
     mode, last_visit_date = parse_options()

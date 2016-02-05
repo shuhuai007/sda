@@ -242,6 +242,13 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
         id_seed += step_range
     return id_list
 
+def get_question_detail_thread_amount():
+    cf = ConfigParser.ConfigParser()
+    cf.read("config.ini")
+    question_detail_thread_amount = int(cf.get("question_detail_thread_amount",
+                                               "question_detail_thread_amount"))
+    return question_detail_thread_amount
+
 
 def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
