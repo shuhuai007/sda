@@ -68,14 +68,17 @@ class ZhihuQuestionDetail(ZhihuObject):
         # TODO (zj) : need to get all the question id from db or file
         return []
 
-    def fetch_question_detail(self, question_id_list):
+    def fetch_question_detail(self, question_total_id_list):
         split_count = self.question_detail_thread_amount
         wm = WorkerManager(split_count)
-        max_id = len(question_id_list)
+        max_id = len(question_total_id_list)
+
+        # print "...question_id_list:%s" % question_total_id_list
 
         for index in range(split_count):
             id_list = generate_id_list(int(index), split_count, max_id - 1)
-            question_id_list = map(lambda i: question_id_list[i], id_list)
+            # print "...id_list:%s" % id_list
+            question_id_list = map(lambda i: question_total_id_list[int(i)], id_list)
             wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list)
 
         wm.wait_for_complete()
