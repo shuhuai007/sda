@@ -213,11 +213,9 @@ class WorkerManager:
 
 
 def get_question_data_directory():
-    cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
-
-    question_dir = cf.get("data", "zhihu_data_directory")
-    return question_dir
+    import os
+    question_data_dir = os.path.abspath('../../data/question')
+    return question_data_dir
 
 
 def get_local_ip():
@@ -258,6 +256,4 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
 
 
 if __name__ == '__main__':
-    run_mode, last_visit = parse_options()
-    print "mode:%s" % run_mode
-    print "last_visit_date:%s" % last_visit
+    print "...question data dir:%s" % get_question_data_directory()
