@@ -114,7 +114,7 @@ def update_question_detail(question_id_list):
 
         if len(buffer_list) >= QUESTION_WRITE_BUFFER_SIZE:
             write_buffer(buffer_list, question_id)
-    write_buffer(buffer_list, question_id_list[int(index_list[0])])
+    write_buffer(buffer_list, question_id)
     print "...buffer_list:%s" % buffer_list
 
 
