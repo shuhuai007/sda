@@ -1,5 +1,3 @@
-import MySQLdb
-from DBUtils.PooledDB import PooledDB
 from transaction_manager import TransactionManager
 
 if __name__ == '__main__':
