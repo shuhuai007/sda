@@ -214,7 +214,8 @@ class WorkerManager:
 
 def get_question_data_directory():
     import os
-    question_data_dir = os.path.abspath('../../data/question')
+    # TODO (zj) should be contant variable
+    question_data_dir = os.path.abspath('../../data/zhihu/question')
     return question_data_dir
 
 
