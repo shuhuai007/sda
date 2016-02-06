@@ -25,12 +25,6 @@ EOF
 }
 
 parseArgs() {
-    if [ $# -lt 1 ]; then
-        echo "Error.. need args"
-        usage
-        exit 1
-    fi
-
     while getopts "m:h" arg
     do
         case ${arg} in
