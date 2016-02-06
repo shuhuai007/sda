@@ -7,19 +7,19 @@ from transaction_manager import TransactionManager
 import zhihu_question_detail_parser
 
 
-MAX_TOPIC_TABLE_ID = 15000
-TOPIC_ID_STEP = 10
+MAX_QUESTION_TABLE_ID = 500
+QUESTION_ID_STEP = 10
 
-def generate_available_topic_ids():
+def generate_available_ids(max_id, step):
     id_list = []
     # find the seed from config.ini
-    topic_id_seed = get_topic_id_seed(get_local_ip())
-    print "...............topic_id_seed:%s" % topic_id_seed
+    id_seed = get_topic_id_seed(get_local_ip())
+    print "...............id_seed:%s" % id_seed
     # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
-    topic_id = int(topic_id_seed)
-    while topic_id < MAX_TOPIC_TABLE_ID:
-        id_list.append(str(topic_id))
-        topic_id += TOPIC_ID_STEP
+    id = int(id_seed)
+    while id < max_id:
+        id_list.append(str(id))
+        id += step
 
     return ",".join(id_list)
 
@@ -58,10 +58,13 @@ class ZhihuQuestionDetail(ZhihuItem):
         if self.is_develop_mode():
             return get_question_id_list()
         tm = TransactionManager()
-        sql = "SELECT QUESTION_ID FROM ZHIHU_QUESTION_ID " \
-              "WHERE timestamp(LAST_VISIT) < timestamp('%s')" % last_visit
+        pre_sql = "SET @index=0;"
+        sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')"  % last_visit
+        available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
+        sql += " AND ID IN (%s) " % available_ids
+
         print "...sql:%s" % sql
-        results = tm.execute_sql(sql)
+        results = tm.execute_sql(sql, pre_sql)
         for row in results:
             question_id_list.append(str(row[0]))
         return question_id_list

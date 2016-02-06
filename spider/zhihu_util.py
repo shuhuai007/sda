@@ -224,6 +224,7 @@ def get_local_ip():
 
     host_name = socket.getfqdn(socket.gethostname())
     address = socket.gethostbyname(host_name)
+    print "...local address:%s" % address
     return address
 
 
