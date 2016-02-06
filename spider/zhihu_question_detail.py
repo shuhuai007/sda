@@ -7,7 +7,7 @@ from transaction_manager import TransactionManager
 import zhihu_question_detail_parser
 
 
-MAX_QUESTION_TABLE_ID = 4000000
+MAX_QUESTION_TABLE_ID = 10000
 QUESTION_ID_STEP = 10
 
 def generate_available_ids(max_id, step):
@@ -70,6 +70,8 @@ class ZhihuQuestionDetail(ZhihuItem):
         return question_id_list
 
     def fetch_question_detail(self, question_total_id_list):
+        if len(question_total_id_list) == 0:
+            return
         split_count = self.question_detail_thread_amount
         wm = WorkerManager(split_count)
         max_id = len(question_total_id_list)
