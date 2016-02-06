@@ -56,14 +56,18 @@ def get_focus_count(soup):
 
 def get_focus_users(soup):
     user_list = []
-    soup = soup.find('div', attrs={'id': 'zh-question-side-header-wrap'})
-    a_tag = soup.find_all('a')
-    for item in a_tag:
-        # href="/people/jin-chen-ran-79"
-        user_name = item.get('href').split("/")[2]
-        if user_name.strip():
-            user_list.append(user_name)
-    # print "......focus user list:%s" % ",".join(user_list)
+    try:
+
+        soup = soup.find('div', attrs={'id': 'zh-question-side-header-wrap'})
+        a_tag = soup.find_all('a')
+        for item in a_tag:
+            # href="/people/jin-chen-ran-79"
+            user_name = item.get('href').split("/")[2]
+            if user_name.strip():
+                user_list.append(user_name)
+        # print "......focus user list:%s" % ",".join(user_list)
+    except Exception,e:
+        print "......Couldn't get user list, will be empty string"
     return ",".join(user_list)
 
 
