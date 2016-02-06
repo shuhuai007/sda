@@ -3,7 +3,7 @@
 set ip [ lindex $argv 0 ]
 set password [ lindex $argv 1 ]
 set timeout 100
-set git_cmd "cd /root/work/sda/spider/; git reset --hard;git pull; sleep 3;"
+#set git_cmd "cd /root/work/sda/spider/; git reset --hard;git pull; sleep 3;"
 set cmd [ lindex $argv 2 ]
 
 spawn ssh root@$ip
@@ -16,7 +16,7 @@ expect {
 #interact
 
 expect "#*"
-send "$git_cmd\r"
+#send "$git_cmd\r"
 send "$cmd\r"
 send  "exit\r"
 expect eof
