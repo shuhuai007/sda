@@ -57,7 +57,6 @@ def get_focus_count(soup):
 def get_focus_users(soup):
     user_list = []
     try:
-
         soup = soup.find('div', attrs={'id': 'zh-question-side-header-wrap'})
         a_tag = soup.find_all('a')
         for item in a_tag:
