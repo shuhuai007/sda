@@ -107,3 +107,18 @@ class TransactionManager(object):
             self.conn.close()
         return r
 
+    def execute_many_sql(self, query, args, pre_sql=None):
+        r = []
+        try:
+            if pre_sql:
+                self.cursor.execut(pre_sql)
+            self.cursor.executemany(query, args)
+            r = self.cursor.fetchall()
+            self.conn.commit()
+        except:
+            print "...exception, rollback"
+            self.conn.rollback()
+        finally:
+            self.cursor.close()
+            self.conn.close()
+        return r

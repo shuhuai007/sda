@@ -147,7 +147,7 @@ def get_current_timestamp():
     from datetime import datetime
 
     i = datetime.now()
-    print i.strftime('%Y-%m-%d %H:%M:%S')
+    return i.strftime('%Y-%m-%d %H:%M:%S')
 
 
 import Queue, sys

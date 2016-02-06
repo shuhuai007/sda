@@ -3,7 +3,9 @@
 
 from zhihu_util import *
 from zhihu_item import ZhihuItem
+from transaction_manager import TransactionManager
 import zhihu_question_detail_parser
+
 
 MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
@@ -68,7 +70,8 @@ class ZhihuQuestionDetail(ZhihuItem):
             id_list = generate_id_list(int(index), split_count, max_id - 1)
             # print "...id_list:%s" % id_list
             question_id_list = map(lambda i: question_total_id_list[int(i)], id_list)
-            wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list)
+            tm = TransactionManager()
+            wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list, tm)
 
         wm.wait_for_complete()
 

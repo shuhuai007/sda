@@ -49,7 +49,7 @@ def get_focus_count(soup):
         count = int(count)
     except:
         print "......get count error, it will be 0"
-    print "......focus count:%s" % count
+    # print "......focus count:%s" % count
 
     return count
 
@@ -63,7 +63,7 @@ def get_focus_users(soup):
         user_name = item.get('href').split("/")[2]
         if user_name.strip():
             user_list.append(user_name)
-    print "......focus user list:%s" % ",".join(user_list)
+    # print "......focus user list:%s" % ",".join(user_list)
     return ",".join(user_list)
 
 
@@ -72,7 +72,7 @@ def get_browse_count(soup):
         count = soup.find('meta', attrs={'itemprop': 'visitsCount'}).get('content')
     except:
         print "......get visitsCount error"
-    print "......browse_count:%s" % count
+    # print "......browse_count:%s" % count
     return count
 
 
@@ -90,7 +90,7 @@ def get_related_focus_info(soup):
     # print "......quesiton_status_div:%s" % quesiton_status_div
 
 
-def update_question_detail(question_id_list):
+def update_question_detail(question_id_list, tm):
     if not question_id_list:
         return
 
@@ -113,13 +113,25 @@ def update_question_detail(question_id_list):
                             browse_count, related_focus, last_edited, spider_time))
 
         if len(buffer_list) >= QUESTION_WRITE_BUFFER_SIZE:
-            write_buffer(buffer_list, question_id)
-    write_buffer(buffer_list, question_id)
-    print "...buffer_list:%s" % buffer_list
+            write_buffer(buffer_list, tm)
+    write_buffer(buffer_list, tm)
+    # print "...buffer_list:%s" % buffer_list
 
 
-def write_buffer(buffer_list, question_id):
+def write_buffer(buffer_list, tm):
+    if len(buffer_list) == 0:
+        return
     dir_name = get_question_data_directory()
-    buffer_filename = "%s/question-detail-%s-%s" % (dir_name, question_id, int(time.time()))
+    buffer_filename = "%s/question-detail-%s-%s" % (dir_name, buffer_list[0][0], int(time.time()))
     # print "......buffer_filename:%s" % buffer_filename
     write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
+
+    # update the question_id_list in db
+    question_id_list = map(lambda question: question[0], buffer_list)
+
+    sql = "UPDATE ZHIHU_QUESTION_ID SET LAST_VISIT = %s WHERE QUESTION_ID = %s"
+    ts = get_current_timestamp()
+    args = map(lambda question_id: (ts, question_id), question_id_list)
+    print "...update sql:%s, args:%s" % (sql, args)
+    tm.execute_many_sql(sql, args)
+
