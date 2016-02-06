@@ -67,8 +67,6 @@ shift $((OPTIND-1))
 WHAT=$1
 echo "...What:${WHAT}"
 
-
-
 if [ "$WHAT" == "status" ]; then
     status
 elif [ "$WHAT" == "start" ]; then

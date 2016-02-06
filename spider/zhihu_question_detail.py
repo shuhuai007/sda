@@ -7,9 +7,9 @@ from transaction_manager import TransactionManager
 import zhihu_question_detail_parser
 
 
-MAX_QUESTION_TABLE_ID = 2000000
+MAX_QUESTION_TABLE_ID = 4000000
 QUESTION_ID_STEP = 10
-AVAIL_ID_SIZE_THRESHOLD = 100000
+AVAIL_ID_SIZE_THRESHOLD = 10000
 
 
 def generate_available_ids(max_id, step):

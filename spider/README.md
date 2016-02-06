@@ -1,2 +1,6 @@
 ### Usage
-./remote-login.sh [your-host] [your password] "bin/update-question-detail.sh"
+./slave-control.sh  -i \<ip>  -p \<password> start
+
+
+./slave-control.sh  -i \<ip>  -p \<password> staus
+
