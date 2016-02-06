@@ -22,7 +22,7 @@ def get_question_content(soup):
     content = ""
     try:
         content = soup.find('div', attrs={'id': 'zh-question-detail'}). \
-            find('div', attrs={'class':'zm-editable-content'}).get_text()
+            find('div', attrs={'class': 'zm-editable-content'}).get_text()
     except:
         print "...get content error"
     return content

@@ -12,21 +12,25 @@ cat << EOF
         slave-control.sh - script to control the slaves remotely.
 
     SYNOPSIS
-        $0 -p <password> [start|status]
+        $0 -i <ip> -p <password> [start|status]
 
     OPTIONS:
         -h      Show this message
+        -i      IP , slave's ip
         -p      Password, default all the slaves have the same password
 EOF
 }
 
 
 parseArgs() {
-    while getopts "p:h" arg
+    while getopts "p:i:h" arg
     do
         case ${arg} in
              p)
                 password=$OPTARG
+                ;;
+             i)
+                ip=$OPTARG
                 ;;
              h)
                 usage
@@ -43,14 +47,15 @@ parseArgs() {
 
 
 start() {
-    ${bin}/remote-execute.sh  10.29.10.111 ${password}  "cd /root/work/sda/spider/; git reset
-    --hard;git pull; sleep 3; bin/update-question-detail.sh"
+    ${bin}/remote-execute.sh  ${ip} ${password} \
+    "cd /root/work/sda/spider/; git reset --hard;\
+     git pull; sleep 3; bin/update-question-detail.sh"
     sleep 3
 }
 
 status() {
-    echo "########################Slave######################"
-    ${bin}/remote-execute.sh  10.29.10.111 ${password} "ps -ef | grep zhihu;"
+    echo "########################Slave Status######################"
+    ${bin}/remote-execute.sh ${ip} ${password} "ps -ef | grep zhihu;"
     sleep 3
 }
 
