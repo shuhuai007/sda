@@ -99,7 +99,7 @@ class TransactionManager(object):
             self.cursor.execute(sql)
             r = self.cursor.fetchall()
             self.conn.commit()
-        except:
+        except Exception, e:
             print "...exception, rollback"
             self.conn.rollback()
         finally:

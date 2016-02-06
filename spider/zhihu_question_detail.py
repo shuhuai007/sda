@@ -59,7 +59,6 @@ class ZhihuQuestionDetail(ZhihuItem):
         question_id_list = []
         if self.is_develop_mode():
             return get_question_id_list()
-        tm = TransactionManager()
 
         available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
         available_id_list = available_ids.split(',')
@@ -73,6 +72,7 @@ class ZhihuQuestionDetail(ZhihuItem):
         i = 0
         pre_sql = None
         while i < loop:
+            tm = TransactionManager()
             begin_index = i * AVAIL_ID_SIZE_THRESHOLD
             end_index = (i + 1) * AVAIL_ID_SIZE_THRESHOLD
 
