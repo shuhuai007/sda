@@ -71,6 +71,7 @@ def get_focus_users(soup):
 
 
 def get_browse_count(soup):
+    count = 0
     try:
         count = soup.find('meta', attrs={'itemprop': 'visitsCount'}).get('content')
     except:
