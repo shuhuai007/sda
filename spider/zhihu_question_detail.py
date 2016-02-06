@@ -44,20 +44,27 @@ class ZhihuQuestionDetail(ZhihuItem):
     def is_develop_mode(self):
         return self.mode == 'develop'
 
-    def update_question(self):
+    def update_question(self, last_visit):
         # 1. Get all the question id needed
         print "\n...Get all the question id needed"
-        question_id_list = self.generate_question_id_list()
+        question_id_list = self.generate_question_id_list(last_visit)
         print "\n...question_id_list's len:%s" % len(question_id_list)
 
         # 2. Resolve all the question id concurrently, save to local files
-        self.fetch_question_detail(question_id_list)
+        # self.fetch_question_detail(question_id_list)
 
-    def generate_question_id_list(self):
+    def generate_question_id_list(self, last_visit):
+        question_id_list = []
         if self.is_develop_mode():
             return get_question_id_list()
-        # TODO (zj) : need to get all the question id from db or file
-        return []
+        tm = TransactionManager()
+        sql = "SELECT QUESTION_ID FROM ZHIHU_QUESTION_ID " \
+              "WHERE timestamp(LAST_VISIT) < timestamp('%s')" % last_visit
+        print "...sql:%s" % sql
+        results = tm.execute_sql(sql)
+        for row in results:
+            question_id_list.append(str(row[0]))
+        return question_id_list
 
     def fetch_question_detail(self, question_total_id_list):
         split_count = self.question_detail_thread_amount
@@ -81,7 +88,7 @@ def main():
     question_detail = ZhihuQuestionDetail(mode)
     print "question detail's mode:%s" % question_detail.mode
 
-    question_detail.update_question()
+    question_detail.update_question(last_visit_date)
 
 if __name__ == '__main__':
     main()
