@@ -51,7 +51,7 @@ class ZhihuQuestionDetail(ZhihuItem):
         print "\n...question_id_list's len:%s" % len(question_id_list)
 
         # 2. Resolve all the question id concurrently, save to local files
-        # self.fetch_question_detail(question_id_list)
+        self.fetch_question_detail(question_id_list)
 
     def generate_question_id_list(self, last_visit):
         question_id_list = []
@@ -75,7 +75,7 @@ class ZhihuQuestionDetail(ZhihuItem):
         max_id = len(question_total_id_list)
 
         # print "...question_id_list:%s" % question_total_id_list
-
+        print "...Thread count:%s" % split_count
         for index in range(split_count):
             id_list = generate_id_list(int(index), split_count, max_id - 1)
             # print "...id_list:%s" % id_list

@@ -132,6 +132,6 @@ def write_buffer(buffer_list, tm):
     sql = "UPDATE ZHIHU_QUESTION_ID SET LAST_VISIT = %s WHERE QUESTION_ID = %s"
     ts = get_current_timestamp()
     args = map(lambda question_id: (ts, question_id), question_id_list)
-    print "...update sql:%s, args:%s" % (sql, args)
+    print "......Update sql:%s, args:%s" % (sql, args)
     tm.execute_many_sql(sql, args)
 
