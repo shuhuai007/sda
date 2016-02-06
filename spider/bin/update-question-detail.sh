@@ -50,5 +50,4 @@ echo "......mode:$mode"
 
 echo "......execute update-question-detail.sh remotely......"
 
-#nohup python ${spider_dir}/zhihu_question_detail.py -m develop > ${log_dir}/question_detail.log
-# 2>&1 &
+nohup python ${spider_dir}/zhihu_question_detail.py -m ${mode} > ${log_dir}/question_detail.log 2>&1 &
