@@ -9,6 +9,8 @@ import zhihu_question_detail_parser
 
 MAX_QUESTION_TABLE_ID = 2000000
 QUESTION_ID_STEP = 10
+AVAIL_ID_SIZE_THRESHOLD = 100000
+
 
 def generate_available_ids(max_id, step):
     id_list = []
@@ -51,22 +53,40 @@ class ZhihuQuestionDetail(ZhihuItem):
         print "\n...question_id_list's len:%s" % len(question_id_list)
 
         # 2. Resolve all the question id concurrently, save to local files
-        self.fetch_question_detail(question_id_list)
+        # self.fetch_question_detail(question_id_list)
 
     def generate_question_id_list(self, last_visit):
         question_id_list = []
         if self.is_develop_mode():
             return get_question_id_list()
         tm = TransactionManager()
-        pre_sql = "SET @index=0;"
-        sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')"  % last_visit
-        available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
-        sql += " AND ID IN (%s) " % available_ids
 
-        print "...sql:%s" % sql
-        results = tm.execute_sql(sql, pre_sql)
-        for row in results:
-            question_id_list.append(str(row[0]))
+        available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
+        available_id_list = available_ids.split(',')
+
+        # debug code
+        # available_id_list = ['40079131', '26497360', '39977714', '39019297']
+
+        import math
+        loop = int(math.ceil(float(len(available_id_list))/AVAIL_ID_SIZE_THRESHOLD))
+        print "......loop:%s" % loop
+        i = 0
+        pre_sql = None
+        while i < loop:
+            begin_index = i * AVAIL_ID_SIZE_THRESHOLD
+            end_index = (i + 1) * AVAIL_ID_SIZE_THRESHOLD
+
+            sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')"  % last_visit
+            sql += " AND ID IN (%s) " % ",".join(available_id_list[begin_index:end_index])
+
+            print "...sql:%s" % sql
+            if i == 1:
+                pre_sql = "SET @index=0;"
+            results = tm.execute_sql(sql, pre_sql)
+            for row in results:
+                question_id_list.append(str(row[0]))
+            i += 1
+
         return question_id_list
 
     def fetch_question_detail(self, question_total_id_list):
