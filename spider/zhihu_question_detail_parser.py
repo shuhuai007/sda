@@ -16,7 +16,7 @@ from zhihu_util import *
 ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 
 # BUFFER SIZE of questions
-QUESTION_WRITE_BUFFER_SIZE = 5000
+QUESTION_WRITE_BUFFER_SIZE = 10000
 
 def get_question_content(soup):
     content = ""
