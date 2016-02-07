@@ -55,7 +55,9 @@ start() {
 
 status() {
     echo "########################Slave Status######################"
-    ${bin}/remote-execute.sh ${ip} ${password} "ps -ef | grep zhihu;"
+    ${bin}/remote-execute.sh ${ip} ${password} \
+    "ps -ef | grep zhihu;sleep 3; \
+    echo datafilecount:`ls -l /root/work/data/zhihu/question | wc -l`"
     sleep 3
 }
 
