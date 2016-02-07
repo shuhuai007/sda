@@ -15,7 +15,7 @@ from zhihu_util import *
 
 ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 
-# BUFFER SIZE of quesitons
+# BUFFER SIZE of questions
 QUESTION_WRITE_BUFFER_SIZE = 5000
 
 def get_question_content(soup):
@@ -118,6 +118,7 @@ def update_question_detail(question_id_list, tm):
 
         if len(buffer_list) >= QUESTION_WRITE_BUFFER_SIZE:
             write_buffer(buffer_list, tm)
+            buffer_list = []
     write_buffer(buffer_list, tm)
     # print "...buffer_list:%s" % buffer_list
 
