@@ -131,8 +131,11 @@ def write_buffer(buffer_list, tm):
     write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
 
     # update the question_id_list in db
-    question_id_list = map(lambda question: question[0], buffer_list)
+    # update_buffer_to_db(buffer_list, tm)
 
+
+def update_buffer_to_db(buffer_list, tm):
+    question_id_list = map(lambda question: question[0], buffer_list)
     sql = "UPDATE ZHIHU_QUESTION_ID SET LAST_VISIT = %s WHERE QUESTION_ID = %s"
     ts = get_current_timestamp()
     args = map(lambda question_id: (ts, question_id), question_id_list)
