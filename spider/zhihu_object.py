@@ -13,6 +13,7 @@ import logging
 import threading
 import Queue
 import ConfigParser
+from zhihu_constants import *
 
 import zhihu_topic_parser
 import zhihu_util
@@ -20,7 +21,7 @@ import zhihu_util
 class ZhihuObject:
     def __init__(self, run_mode='prod'):
         self.cf = ConfigParser.ConfigParser()
-        self.cf.read("config.ini")
+        self.cf.read(CONFIG_INI_PATH)
         
         host = self.cf.get("db", "host")
         port = int(self.cf.get("db", "port"))

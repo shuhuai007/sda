@@ -4,6 +4,7 @@
 import MySQLdb
 from DBUtils.PooledDB import PooledDB
 import ConfigParser
+from zhihu_constants import *
 
 
 class Singleton(object):
@@ -16,7 +17,7 @@ class Singleton(object):
 class ConnectionPool(Singleton):
     def __init__(self):
         cf = ConfigParser.ConfigParser()
-        cf.read("config.ini")
+        cf.read(CONFIG_INI_PATH)
 
         host = cf.get("db", "host")
         port = int(cf.get("db", "port"))
