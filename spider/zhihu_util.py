@@ -6,13 +6,7 @@ import urllib2
 import gzip
 import StringIO
 import ConfigParser
-
 from zhihu_constants import *
-
-REFER_DICT = {
-    LEVEL1_TOPICS_URL: 'http://www.zhihu.com/',
-    LEVEL2_TOPICS_URL: 'https://www.zhihu.com/topics'
-}
 
 
 def get_content(to_url):
@@ -79,7 +73,7 @@ def get_xsrf():
 
 def get_cookie():
     cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
+    cf.read(CONFIG_INI_PATH)
     cookie = cf.get("cookie", "cookie")
     return cookie
 
@@ -218,7 +212,6 @@ def get_question_data_directory():
     question_data_dir = os.path.abspath('../../data/zhihu/question')
     return question_data_dir
 
-
 def get_local_ip():
     import socket
 
@@ -227,14 +220,12 @@ def get_local_ip():
     print "...local address:%s" % address
     return address
 
-
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
+    cf.read(CONFIG_INI_PATH)
 
     topic_id_seed = cf.get("nodes", ip)
     return topic_id_seed
-
 
 def generate_id_list(id_seed=1, step_range=1, max_id=100):
     id_list = []
@@ -245,11 +236,10 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
 
 def get_question_detail_thread_amount():
     cf = ConfigParser.ConfigParser()
-    cf.read("config.ini")
+    cf.read(CONFIG_INI_PATH)
     question_detail_thread_amount = int(cf.get("question_detail_thread_amount",
                                                "question_detail_thread_amount"))
     return question_detail_thread_amount
-
 
 def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
