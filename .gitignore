@@ -8,3 +8,4 @@
 *.txt
 *.sample
 data
+spider/log
