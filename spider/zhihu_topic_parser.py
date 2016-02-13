@@ -51,7 +51,7 @@ def fetch_level1_topic_dict(level1_topic_url=LEVEL1_TOPICS_URL):
         # print "------topic_id:%s" % topic_id
         # print "------topic_name:%s" % topic_name
         level1_topic_list = level1_topic_list + [(topic_id, topic_name, topic_id)]
-    level1_topic_dict = {"topic_list" : level1_topic_list, "hash_id" : hash_id}
+    level1_topic_dict = {"topic_list": level1_topic_list, "hash_id" : hash_id}
     return level1_topic_dict
 
 def fetch_level2_topic_list(level1_list, hash_id):

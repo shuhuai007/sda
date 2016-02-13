@@ -25,6 +25,15 @@ def get_content(to_url, max_attempts=3):
         print "......urllib2 install opener fail:%s......" % e.message
         return "FAIL"
 
+    resp = call_url(max_attempts, req, to_url)
+
+    if resp is None:
+        return "FAIL"
+
+    return get_content_from_resp(resp)
+
+
+def call_url(max_attempts, req, to_url):
     retry = 0
     resp = None
     while resp is None and retry < max_attempts:
@@ -34,21 +43,19 @@ def get_content(to_url, max_attempts=3):
             retry += 1
             print "Calling url: {0}, error:{1}, Re-trying.....".format(to_url, e.message)
             time.sleep(3)
+    return resp
+
+
+def post(to_url, post_data, max_attempts=3):
+    headers = get_headers()
+
+    req = urllib2.Request(to_url, post_data, headers)
+    resp = call_url(max_attempts, req, to_url)
 
     if resp is None:
         return "FAIL"
 
     return get_content_from_resp(resp)
-
-
-def post(to_url, post_data):
-    headers = get_headers(to_url)
-
-    req = urllib2.Request(to_url, post_data, headers)
-    resp = urllib2.urlopen(req, timeout=30)
-    content = get_content_from_resp(resp)
-
-    return content
 
 
 def get_content_from_resp(resp):
