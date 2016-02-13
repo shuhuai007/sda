@@ -6,10 +6,11 @@ import urllib2
 import gzip
 import StringIO
 import ConfigParser
+import time
 from zhihu_constants import *
 
 
-def get_content(to_url):
+def get_content(to_url, max_attempts=3):
     headers = get_headers()
 
     req = urllib2.Request(
@@ -20,12 +21,21 @@ def get_content(to_url):
     try:
         opener = urllib2.build_opener(urllib2.ProxyHandler())
         urllib2.install_opener(opener)
-
-        resp = urllib2.urlopen(req, timeout=15)
-
     except Exception, e:
-        # if count % 1 == 0:
-        #     print str(count) + ", Error: " + str(e) + " URL: " + to_url
+        print "......urllib2 install opener fail:%s......" % e.message
+        return "FAIL"
+
+    retry = 0
+    resp = None
+    while resp is None and retry < max_attempts:
+        try:
+            resp = urllib2.urlopen(req, timeout=30)
+        except Exception, e:
+            retry += 1
+            print "Calling url: {0}, error:{1}, Re-trying.....".format(to_url, e.message)
+            time.sleep(3)
+
+    if resp is None:
         return "FAIL"
 
     return get_content_from_resp(resp)
@@ -35,7 +45,7 @@ def post(to_url, post_data):
     headers = get_headers(to_url)
 
     req = urllib2.Request(to_url, post_data, headers)
-    resp = urllib2.urlopen(req)
+    resp = urllib2.urlopen(req, timeout=30)
     content = get_content_from_resp(resp)
 
     return content
