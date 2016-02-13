@@ -22,6 +22,10 @@ USE `sda`;
 # question_id, question_content, comment_count, focus, focus_user_list, browse_count,
 # related_focus, last_edited, spider_time
 
+# answer table
+# answer_id(data-atoken), answer_content, data_aid, user created_time(data-created),
+# vote_count, comment_count
+
 
 CREATE TABLE IF NOT EXISTS `ZHIHU_TOPIC` (
   `ID` int(10) unsigned NOT NULL AUTO_INCREMENT,

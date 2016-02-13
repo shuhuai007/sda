@@ -12,4 +12,6 @@ LEVEL1_TOPICS_URL = "https://www.zhihu.com/topics"
 # 2st Level Topics url
 LEVEL2_TOPICS_URL = "https://www.zhihu.com/node/TopicsPlazzaListV2"
 
+ZHIHU_ANSWER_POST_URL = "https://www.zhihu.com/node/QuestionAnswerListV2"
+
 ZHIHU_QUESTION_DATA_DELIMETER = 'question_delimeter'
