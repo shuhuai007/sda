@@ -3,6 +3,8 @@
 
 import os
 CONFIG_INI_PATH = "{0}/config.ini".format(os.path.dirname(os.path.abspath(__file__)))
+QUESTION_ID_SAMPLE_PATH = "{0}/question_id.sample".format(os.path.dirname(os.path.abspath(
+                                                          __file__)))
 
 
 # 1st Level Topics url

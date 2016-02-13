@@ -27,7 +27,7 @@ def generate_available_ids(max_id, step):
 
 
 def get_question_id_list():
-    sample_file = "question_id.sample"
+    sample_file = QUESTION_ID_SAMPLE_PATH
     file_object = open(sample_file, 'r')
     try:
         line = file_object.readline()
