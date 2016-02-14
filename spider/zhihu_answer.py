@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import zhihu_answer_parser
+
 from zhihu_util import *
 from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
-import zhihu_answer_parser
 
 
 MAX_QUESTION_TABLE_ID = 4000000

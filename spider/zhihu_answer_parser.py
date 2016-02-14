@@ -9,13 +9,10 @@ sys.setdefaultencoding("utf-8")
 import json
 
 from bs4 import BeautifulSoup
-from zhihu_constants import *
 from urllib import urlencode
 
 
 from zhihu_util import *
-
-# TODO (zj) need to generate answer's url
 
 # BUFFER SIZE
 ANSWER_BUFFER_SIZE = 100
