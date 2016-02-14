@@ -100,25 +100,29 @@ class TransactionManager(object):
             r = self.cursor.fetchall()
             self.conn.commit()
         except Exception, e:
-            print "...exception, rollback"
+            print "Exception when execute_sql:%s, rollback" % e
             self.conn.rollback()
         finally:
-            self.cursor.close()
-            self.conn.close()
+            # self.cursor.close()
+            # self.conn.close()
+            pass
         return r
 
     def execute_many_sql(self, query, args, pre_sql=None):
-        r = []
         try:
             if pre_sql:
                 self.cursor.execut(pre_sql)
             self.cursor.executemany(query, args)
-            r = self.cursor.fetchall()
+            # r = self.cursor.fetchall()
             self.conn.commit()
         except Exception, e:
             print "Exception when execute_many_sql:%s, rollback" % e
             self.conn.rollback()
         finally:
-            self.cursor.close()
-            self.conn.close()
-        return r
+            # self.cursor.close()
+            # self.conn.close()
+            pass
+
+    def close_connection(self):
+        self.cursor.close()
+        self.conn.close()

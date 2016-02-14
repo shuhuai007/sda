@@ -4,6 +4,8 @@
 import zhihu_topic_parser
 import zhihu_util
 from zhihu_item import ZhihuItem
+from transaction_manager import TransactionManager
+
 
 class ZhihuTopic(ZhihuItem):
     def __init__(self, run_mode='prod'):
@@ -38,7 +40,10 @@ class ZhihuTopic(ZhihuItem):
     def persist_topics(self, topic_list):
         insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
                      "VALUES (%s, %s, %s)"
-        self.transaction_manager.execute_many_sql(insert_sql, topic_list)
+        print "insert sql:%s" % insert_sql
+        tm = TransactionManager()
+        tm.execute_many_sql(insert_sql, topic_list)
+        tm.close_connection()
 
 def main():
     mode, last_visit_date = zhihu_util.parse_options()
