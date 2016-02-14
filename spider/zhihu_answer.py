@@ -18,10 +18,10 @@ def generate_available_ids(max_id, step):
     id_seed = get_topic_id_seed(get_local_ip())
     print "...............id_seed:%s" % id_seed
     # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
-    id = int(id_seed)
-    while id < max_id:
-        id_list.append(str(id))
-        id += step
+    id_seed = int(id_seed)
+    while id_seed < max_id:
+        id_list.append(str(id_seed))
+        id_seed += step
 
     return ",".join(id_list)
 
