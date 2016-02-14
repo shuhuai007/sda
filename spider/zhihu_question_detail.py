@@ -95,14 +95,13 @@ class ZhihuQuestionDetail(ZhihuItem):
         split_count = self.question_detail_thread_amount
         wm = WorkerManager(split_count)
         max_id = len(question_total_id_list)
-        tm = self.transaction_manager
         # print "...question_id_list:%s" % question_total_id_list
         print "...Thread count:%s" % split_count
         for index in range(split_count):
             id_list = generate_id_list(int(index), split_count, max_id - 1)
             # print "...id_list:%s" % id_list
             question_id_list = map(lambda i: question_total_id_list[int(i)], id_list)
-            wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list, tm)
+            wm.add_job(zhihu_question_detail_parser.update_question_detail, question_id_list)
 
         wm.wait_for_complete()
 

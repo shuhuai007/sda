@@ -6,11 +6,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-import time
-
 from bs4 import BeautifulSoup
-from zhihu_constants import *
-
 from zhihu_util import *
 
 ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
@@ -94,7 +90,7 @@ def get_related_focus_info(soup):
     # print "......quesiton_status_div:%s" % quesiton_status_div
 
 
-def update_question_detail(question_id_list, tm):
+def update_question_detail(question_id_list):
     if not question_id_list:
         return
 
@@ -117,13 +113,13 @@ def update_question_detail(question_id_list, tm):
                             browse_count, related_focus, last_edited, spider_time))
 
         if len(buffer_list) >= QUESTION_WRITE_BUFFER_SIZE:
-            write_buffer(buffer_list, tm)
+            write_buffer(buffer_list)
             buffer_list = []
-    write_buffer(buffer_list, tm)
+    write_buffer(buffer_list)
     # print "...buffer_list:%s" % buffer_list
 
 
-def write_buffer(buffer_list, tm):
+def write_buffer(buffer_list):
     if len(buffer_list) == 0:
         return
     dir_name = get_question_data_directory()
@@ -132,7 +128,7 @@ def write_buffer(buffer_list, tm):
     write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
 
     # update the question_id_list in db
-    # update_buffer_to_db(buffer_list, tm)
+    # update_buffer_to_db(buffer_list)
 
 
 def update_buffer_to_db(buffer_list, tm):
