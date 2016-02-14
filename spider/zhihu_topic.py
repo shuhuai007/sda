@@ -1,28 +1,14 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import getopt
-import MySQLdb
-from bs4 import BeautifulSoup
-import json
-import re
-import time
-from math import ceil
-import logging
-import threading
-import Queue
-import ConfigParser
-
 import zhihu_topic_parser
 import zhihu_util
-from zhihu_object import ZhihuObject
+from zhihu_item import ZhihuItem
 
-class ZhihuTopic(ZhihuObject):
+class ZhihuTopic(ZhihuItem):
     def __init__(self, run_mode='prod'):
-        ZhihuObject.__init__(self, run_mode)
-        self.topic_thread_amount = int(self.cf.get("topic_thread_amount",
-                                                      "topic_thread_amount"))
+        ZhihuItem.__init__(self, run_mode)
+        self.topic_thread_amount = zhihu_util.get_thread_amount("topic_thread_amount")
 
     def update_topic(self):
         # Fetch 1st level topics
@@ -50,9 +36,9 @@ class ZhihuTopic(ZhihuObject):
         self.persist_topics(level1_list + level2_list)
 
     def persist_topics(self, topic_list):
-        insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) VALUES (%s, %s, " \
-                     "%s)"
-        self.cursor.executemany(insert_sql,topic_list)
+        insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
+                     "VALUES (%s, %s, %s)"
+        self.transaction_manager.execute_many_sql(insert_sql, topic_list)
 
 def main():
     mode, last_visit_date = zhihu_util.parse_options()

@@ -258,6 +258,12 @@ def get_question_detail_thread_amount():
                                                "question_detail_thread_amount"))
     return question_detail_thread_amount
 
+def get_thread_amount(config_key):
+    cf = ConfigParser.ConfigParser()
+    cf.read(CONFIG_INI_PATH)
+    thread_amount = int(cf.get(config_key, config_key))
+    return thread_amount
+
 def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
         return

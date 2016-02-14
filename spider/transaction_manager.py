@@ -115,8 +115,8 @@ class TransactionManager(object):
             self.cursor.executemany(query, args)
             r = self.cursor.fetchall()
             self.conn.commit()
-        except:
-            print "...exception, rollback"
+        except Exception, e:
+            print "Exception when execute_many_sql:%s, rollback" % e
             self.conn.rollback()
         finally:
             self.cursor.close()
