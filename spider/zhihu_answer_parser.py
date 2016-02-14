@@ -251,6 +251,7 @@ def get_answers_for_question(question_id):
 
 
 def update_answer(question_id_list, tm):
+    print "...enter update_answer..."
     if not question_id_list:
         return
 

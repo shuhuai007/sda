@@ -167,7 +167,7 @@ from threading import Thread
 # working thread
 class Worker(Thread):
     worker_count = 0
-    timeout = 1
+    timeout = 2
 
     def __init__(self, work_queue, result_queue, **kwds):
         Thread.__init__(self, **kwds)
