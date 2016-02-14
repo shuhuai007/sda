@@ -250,7 +250,7 @@ def get_answers_for_question(question_id):
     print "...buffer_list's length:%s" % len(buffer_list)
 
 
-def update_answer(question_id_list, tm):
+def update_answer(question_id_list):
     print "...enter update_answer..."
     if not question_id_list:
         return

@@ -71,8 +71,8 @@ class ZhihuAnswer(ZhihuItem):
         print "......loop:%s" % loop
         i = 0
         pre_sql = None
+        tm = TransactionManager()
         while i < loop:
-            tm = TransactionManager()
             begin_index = i * AVAIL_ID_SIZE_THRESHOLD
             end_index = (i + 1) * AVAIL_ID_SIZE_THRESHOLD
 
@@ -86,14 +86,13 @@ class ZhihuAnswer(ZhihuItem):
             for row in results:
                 question_id_list.append(str(row[0]))
             i += 1
-
+        tm.close_connection()
         return question_id_list
 
     def fetch_answer(self, question_total_id_list):
         if len(question_total_id_list) == 0:
             return
         split_count = self.question_detail_thread_amount
-        tm = TransactionManager()
         wm = WorkerManager(split_count)
         max_id = len(question_total_id_list)
 
@@ -104,7 +103,7 @@ class ZhihuAnswer(ZhihuItem):
             print "...id_list:%s" % id_list
             question_id_list = map(lambda i: question_total_id_list[int(i)], id_list)
             print "...question_id_list:%s" % question_id_list
-            wm.add_job(zhihu_answer_parser.update_answer, question_id_list, tm)
+            wm.add_job(zhihu_answer_parser.update_answer, question_id_list)
 
         wm.wait_for_complete()
 
