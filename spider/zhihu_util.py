@@ -252,10 +252,7 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
     return id_list
 
 def get_question_detail_thread_amount():
-    cf = ConfigParser.ConfigParser()
-    cf.read(CONFIG_INI_PATH)
-    question_detail_thread_amount = int(cf.get("question_detail_thread_amount",
-                                               "question_detail_thread_amount"))
+    question_detail_thread_amount = get_thread_amount("question_detail_thread_amount")
     return question_detail_thread_amount
 
 def get_thread_amount(config_key):
