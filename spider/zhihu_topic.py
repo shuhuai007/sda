@@ -6,6 +6,13 @@ import zhihu_util
 from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
 
+def persist_topics(topic_list):
+    insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
+                 "VALUES (%s, %s, %s)"
+    print "insert sql:%s" % insert_sql
+    tm = TransactionManager()
+    tm.execute_many_sql(insert_sql, topic_list)
+    tm.close_connection()
 
 class ZhihuTopic(ZhihuItem):
     def __init__(self, run_mode='prod'):
@@ -35,15 +42,8 @@ class ZhihuTopic(ZhihuItem):
 
         # Persist topics into database
         print "persist topics into database"
-        self.persist_topics(level1_list + level2_list)
+        persist_topics(level1_list + level2_list)
 
-    def persist_topics(self, topic_list):
-        insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
-                     "VALUES (%s, %s, %s)"
-        print "insert sql:%s" % insert_sql
-        tm = TransactionManager()
-        tm.execute_many_sql(insert_sql, topic_list)
-        tm.close_connection()
 
 def main():
     mode, last_visit_date = zhihu_util.parse_options()
