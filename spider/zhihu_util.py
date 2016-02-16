@@ -225,9 +225,17 @@ class WorkerManager:
 
 def get_question_data_directory():
     import os
-    # TODO (zj) should be contant variable
+    # TODO (zj) should be constant variable
     question_data_dir = os.path.abspath('../../data/zhihu/question')
     return question_data_dir
+
+def get_answer_data_directory():
+    import os
+    # TODO (zj) should be constant variable
+    answer_data_dir = os.path.abspath('../../data/zhihu/answer')
+    if not os.path.exists(answer_data_dir):
+        os.mkdir(answer_data_dir, mode=777)
+    return answer_data_dir
 
 def get_local_ip():
     import socket

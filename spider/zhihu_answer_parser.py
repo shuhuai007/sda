@@ -260,7 +260,7 @@ def update_answer(question_id_list):
 def write_buffer(buffer_list, question_id):
     if len(buffer_list) == 0:
         return
-    dir_name = get_question_data_directory()
+    dir_name = get_answer_data_directory()
     buffer_filename = "%s/answer-%s-%s" % (dir_name, question_id, int(time.time()))
     # print "......buffer_filename:%s" % buffer_filename
     write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
