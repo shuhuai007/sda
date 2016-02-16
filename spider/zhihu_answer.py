@@ -26,7 +26,6 @@ def generate_available_ids(max_id, step):
 
     return ",".join(id_list)
 
-
 def get_question_id_list():
     sample_file = QUESTION_ID_SAMPLE_PATH
     file_object = open(sample_file, 'r')
@@ -91,6 +90,7 @@ class ZhihuAnswer(ZhihuItem):
         return question_id_list
 
     def fetch_answer(self, question_total_id_list):
+        print LOG_PREFIX.format("fetch_answer()")
         if len(question_total_id_list) == 0:
             return
         split_count = self.question_detail_thread_amount
@@ -107,6 +107,7 @@ class ZhihuAnswer(ZhihuItem):
             wm.add_job(zhihu_answer_parser.update_answer, question_id_list)
 
         wm.wait_for_complete()
+
 
 def main():
     mode, last_visit_date = parse_options()
