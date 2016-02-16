@@ -93,7 +93,7 @@ class ZhihuAnswer(ZhihuItem):
         print LOG_PREFIX.format("fetch_answer()")
         if len(question_total_id_list) == 0:
             return
-        split_count = self.question_detail_thread_amount
+        split_count = self.answer_thread_amount
         wm = WorkerManager(split_count)
         max_id = len(question_total_id_list)
 
