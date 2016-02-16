@@ -111,7 +111,7 @@ def generate_post_data(question_id, offset, pagesize=20):
                       '"pagesize":' + '"' + str(pagesize) + '"' \
                       '}'
         post_dict["params"] = params_dict
-        print "\n\nparams_dict:%s" % params_dict
+        print "params_dict:%s" % params_dict
         # post_dict["_xsrf"] = "dacc17fefe1dd92f1f814fb77d3a359f"
         post_dict["_xsrf"] = get_xsrf()
         # print "\n\n...xsrf:%s" % post_dict["_xsrf"]
@@ -258,7 +258,7 @@ def update_answer(question_id_list):
 
     for question_id in question_id_list:
         # print "index:%s, question id:%s" % (index, question_id_list[int(index)])
-        print "......question id:%s" % question_id
+        print "\n\n......question id:%s" % question_id
         get_answers_for_question(question_id)
 
 def write_buffer(buffer_list, question_id):
