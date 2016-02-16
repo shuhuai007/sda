@@ -234,7 +234,11 @@ def get_answers_for_question(question_id):
         post_data = generate_post_data(question_id, offset)
         resp = post(request_url, post_data)
         # print "...resp:%s" % resp
-        answer_list = generate_answer_list(resp)
+        try:
+            answer_list = generate_answer_list(resp)
+        except:
+            print "...exception when generate_answer_list, param resp:%s" % resp
+            continue
         buffer_list += answer_list
 
         if len(buffer_list) >= ANSWER_BUFFER_SIZE:
