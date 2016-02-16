@@ -41,7 +41,7 @@ class ZhihuAnswer(ZhihuItem):
 
     def __init__(self, run_mode='prod'):
         ZhihuItem.__init__(self, run_mode)
-        self.question_detail_thread_amount = get_question_detail_thread_amount()
+        self.answer_thread_amount = get_thread_amount("answer_thread_amount")
 
     def is_develop_mode(self):
         return self.mode == 'develop'

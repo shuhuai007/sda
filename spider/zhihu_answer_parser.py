@@ -15,7 +15,7 @@ from urllib import urlencode
 from zhihu_util import *
 
 # BUFFER SIZE
-ANSWER_BUFFER_SIZE = 100
+ANSWER_BUFFER_SIZE = 3000
 
 ANSWER_MAX_PAGE_INDEX = 1000
 ANSWER_COUNT_PER_PAGE = 20
