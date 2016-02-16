@@ -12,7 +12,7 @@ cat << EOF
         slave-control.sh - script to control the slaves remotely.
 
     SYNOPSIS
-        $0 -i <ip> -p <password> [start|status]
+        $0 -i <ip> -p <password> -c <content> [start|status]
 
     OPTIONS:
         -h      Show this message
@@ -72,6 +72,13 @@ shift $((OPTIND-1))
 
 WHAT=$1
 echo "...What:${WHAT}"
+
+echo "...content:${content}"
+
+if [ "$content" == "" ]; then
+    echo "...content should not be empty."
+    exit
+fi
 
 if [ "$WHAT" == "status" ]; then
     status
