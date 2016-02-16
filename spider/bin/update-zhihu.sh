@@ -13,7 +13,7 @@ cat << EOF
     usage: $0 options
 
     NAME
-        update-question-detail.sh - script to update the question remotely.
+        update-zhihu.sh - script to update the question remotely.
 
     SYNOPSIS
         $0 -m <run-mode>
@@ -21,15 +21,19 @@ cat << EOF
     OPTIONS:
         -h      Show this message
         -m      running mode - develop/prod
+        -c      what should be updated - question_detail/question/answer
 EOF
 }
 
 parseArgs() {
-    while getopts "m:h" arg
+    while getopts "m:c:h" arg
     do
         case ${arg} in
              m)
                 mode=$OPTARG
+                ;;
+             c)
+                content=$OPTARG
                 ;;
              h)
                 usage
@@ -47,7 +51,14 @@ mode=prod
 
 parseArgs $*
 echo "......mode:$mode"
+echo "......content:$content"
 
-echo "......execute update-question-detail.sh remotely......"
+echo "......execute update-zhihu.sh remotely......"
 
-nohup python ${spider_dir}/zhihu_question_detail.py -m ${mode} > ${log_dir}/question_detail.log 2>&1 &
+PYTHON_ZHIHU_SCRIPT="${spider_dir}/zhihu_${content}.py"
+LOG_FILE="${log_dir}/${content}.log"
+
+echo "......script:${PYTHON_ZHIHU_SCRIPT}"
+echo "......log file:${LOG_FILE}"
+
+nohup python ${PYTHON_ZHIHU_SCRIPT} -m ${mode} > ${LOG_FILE} 2>&1 &

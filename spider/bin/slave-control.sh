@@ -18,12 +18,13 @@ cat << EOF
         -h      Show this message
         -i      IP , slave's ip
         -p      Password, default all the slaves have the same password
+        -c      Content, what should be updated - question_detail/question/answer
 EOF
 }
 
 
 parseArgs() {
-    while getopts "p:i:h" arg
+    while getopts "c:p:i:h" arg
     do
         case ${arg} in
              p)
@@ -31,6 +32,9 @@ parseArgs() {
                 ;;
              i)
                 ip=$OPTARG
+                ;;
+             c)
+                content=$OPTARG
                 ;;
              h)
                 usage
@@ -45,11 +49,10 @@ parseArgs() {
 }
 
 
-
 start() {
     ${bin}/remote-execute.sh  ${ip} ${password} \
     "cd /root/work/sda/spider/; git reset --hard;\
-     git pull; sleep 3; bin/update-question-detail.sh"
+     git pull; sleep 3; bin/update-zhihu.sh -c ${content}"
     sleep 3
 }
 
@@ -58,7 +61,7 @@ status() {
     ${bin}/remote-execute.sh ${ip} ${password} \
     "ps -ef | grep zhihu;sleep 3; \
     echo data-file:\`ls -l /root/work/data/zhihu/question | grep detail | wc -l \`; \
-    echo question-id:\`grep \"......question id\" /root/work/sda/spider/log/question_detail.log |wc -l \`"
+    echo question-id:\`grep \"......question id\" /root/work/sda/spider/log/${content}.log |wc -l\`"
     sleep 3
 }
 
