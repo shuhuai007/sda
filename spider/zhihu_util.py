@@ -231,10 +231,12 @@ def get_question_data_directory():
 
 def get_answer_data_directory():
     import os
+    import stat
     # TODO (zj) should be constant variable
     answer_data_dir = os.path.abspath('../../data/zhihu/answer')
     if not os.path.exists(answer_data_dir):
-        os.mkdir(answer_data_dir, mode=777)
+        os.makedirs(answer_data_dir)
+        os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     return answer_data_dir
 
 def get_local_ip():
