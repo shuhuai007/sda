@@ -1,6 +1,5 @@
 use sda;
 
-
 # question
 # question_id, question_title, answer_count, is_top_quesiton, created_time, spider_time
 create table sda.zhihu_question (
@@ -10,6 +9,7 @@ create table sda.zhihu_question (
   is_top_question           int,
     created_time            string
 );
+
 
 # question detail
 # question_id, question_content, comment_count, focus, focus_user_list, browse_count,
@@ -39,7 +39,4 @@ WITH SERDEPROPERTIES (
 # answer table
 # answer_id(data-atoken), answer_content, data_aid, user created_time(data-created),
 # vote_count, comment_count
-
-
-
 
