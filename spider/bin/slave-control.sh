@@ -63,7 +63,7 @@ status() {
     ${bin}/remote-execute.sh ${ip} ${password} \
     "ps -ef | grep zhihu;sleep 3; \
     echo data-file:\`ls -l ${REMOTE_SPIDER_DATA_DIR}/${content} | wc -l \`; \
-    echo question-id:\`grep \"......question id\" ${REMOTE_SPIDER_LOG_DIR}/${content}.log |wc -l\`"
+    echo question-id:\`grep -a \"......question id\" ${REMOTE_SPIDER_LOG_DIR}/${content}.log |wc -l\`"
     sleep 3
 }
 
