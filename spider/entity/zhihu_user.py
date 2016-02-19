@@ -139,7 +139,7 @@ class User:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             try:
@@ -311,7 +311,7 @@ class User:
             增加了获取某用户所有赞过答案的功能 #29
             (https://github.com/egrcc/zhihu-python/pull/29)
         """
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return
             yield
@@ -332,7 +332,7 @@ class User:
                         yield Question(url, title)
 
     def get_answers(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return
             yield
@@ -620,11 +620,11 @@ class User:
         # TODO (zj)
         return self.get_user_name(), self.get_user_title(), self.get_user_agree_num()
 
+
 def init_bloom_filter():
     f = BloomFilter(capacity=1000, error_rate=0.001)
     # TODO (zj) : need get initial info from datasource
     return f
-
 
 def flush_buffer(write_buffer, suffix):
     # TODO (zj)
@@ -633,7 +633,6 @@ def flush_buffer(write_buffer, suffix):
     data_dir = zhihu_util.get_data_directory("user")
     buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(time.time()))
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, "\001")
-
 
 def consume(filter, queue, index, loops):
     print "Thread[%s]consume the queue..." % str(index)
