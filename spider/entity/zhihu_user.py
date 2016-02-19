@@ -1,12 +1,10 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import time
 import platform
 import re
 import json
-import cookielib
 from Queue import Queue
 from urllib import urlencode
 
