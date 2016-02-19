@@ -44,8 +44,9 @@ class User:
                 self.user_id = user_id
 
     def parser(self):
-        r = requests.get(self._url)
-        soup = BeautifulSoup(r.content, "html.parser")
+        # r = requests.get(self._url)
+        resp_content = zhihu_util.get_content(self._url)
+        soup = BeautifulSoup(resp_content, "html.parser")
         self.soup = soup
 
     def get_url_suffix(self):
@@ -102,11 +103,11 @@ class User:
             增加获取知乎识用户的性别
 
         """
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 'unknown'
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             try:
@@ -119,11 +120,11 @@ class User:
                 return 'unknown'
 
     def get_followees_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             try:
@@ -153,7 +154,7 @@ class User:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             try:
@@ -167,7 +168,7 @@ class User:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             try:
@@ -300,7 +301,7 @@ class User:
                         # print "...r_post:%s" % r_post
                         follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
-                            follower_soup = BeautifulSoup(follower_list[j])
+                            follower_soup = BeautifulSoup(follower_list[j], "html.parser")
                             user_link = follower_soup.find("h2", class_="zm-list-content-title").a
                             yield User(user_link["href"], user_link.string.encode("utf-8"))
 
@@ -324,7 +325,7 @@ class User:
                     ask_url = self._url + "/asks?page=" + str(i + 1)
                     r = requests.get(ask_url)
 
-                    soup = BeautifulSoup(r.content)
+                    soup = BeautifulSoup(r.content, "html.parser")
                     for question in soup.find_all("a", class_="question_link"):
                         url = "http://www.zhihu.com" + question["href"]
                         title = question.string.encode("utf-8")
@@ -344,7 +345,7 @@ class User:
                 for i in xrange((answers_num - 1) / 20 + 1):
                     answer_url = self._url + "/answers?page=" + str(i + 1)
                     r = requests.get(answer_url)
-                    soup = BeautifulSoup(r.content)
+                    soup = BeautifulSoup(r.content, "html.parser")
                     for answer in soup.find_all("a", class_="question_link"):
                         question_url = "http://www.zhihu.com" + answer["href"][0:18]
                         question_title = answer.string.encode("utf-8")
@@ -352,7 +353,7 @@ class User:
                         yield Answer("http://www.zhihu.com" + answer["href"], question, self)
 
     def get_collections(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return
             yield
@@ -367,7 +368,7 @@ class User:
 
                     r = requests.get(collection_url)
 
-                    soup = BeautifulSoup(r.content)
+                    soup = BeautifulSoup(r.content, "html.parser")
                     for collection in soup.find_all("div",
                                                     class_="zm-profile-section-item zg-clear"):
                         url = "http://www.zhihu.com" + \
@@ -379,13 +380,13 @@ class User:
 
     def get_likes(self):
         # This function only handles liked answers, not including zhuanlan articles
-        if self._url == None:
+        if self._url is None:
             print "I'm an anonymous user."
             return
             yield
         else:
             r = requests.get(self._url)
-            soup = BeautifulSoup(r.content)
+            soup = BeautifulSoup(r.content, "html.parser")
             # Handle the first liked item
             first_item = soup.find("div",
                                    attrs={'class': 'zm-profile-section-item zm-item clearfix'})
@@ -625,19 +626,18 @@ def init_bloom_filter():
     return f
 
 
-def flush_buffer(write_buffer):
+def flush_buffer(write_buffer, suffix):
     # TODO (zj)
     print "...begin write buffer into disk..."
 
     data_dir = zhihu_util.get_data_directory("user")
-    buffer_filename = "%s/user-%s" % (data_dir, int(time.time()))
+    buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(time.time()))
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, "\001")
 
 
 def consume(filter, queue, index, loops):
     print "Thread[%s]consume the queue..." % str(index)
     count = 0
-    write_buffer_list = []
 
     while count < loops and not queue.empty():
         people_url = USER_URL.format(queue.get())
@@ -648,24 +648,26 @@ def consume(filter, queue, index, loops):
         if suffix in filter:
             continue
         filter.add(suffix)
-        write_buffer_list.append(user.get_fields())
+        write_buffer_list = [user.get_fields()]
 
         for follower in user.get_followers():
+            print "...user %s's follower:%s" % (suffix, follower.get_url_suffix())
             if follower.get_url_suffix() in filter:
+                print "...user %s already exist in bloom filter" % follower.get_url_suffix()
                 continue
             filter.add(suffix)
             write_buffer_list.append(follower.get_fields())
 
-        if len(write_buffer_list) >= 10:
-            flush_buffer(write_buffer_list)
-            write_buffer_list = []
+            if len(write_buffer_list) >= 100:
+                flush_buffer(write_buffer_list, suffix)
+                write_buffer_list = []
+
+        flush_buffer(write_buffer_list, suffix)
 
         for followee in user.get_followees():
             queue.put(followee.get_url_suffix())
 
         count += 1
-
-    flush_buffer(write_buffer_list)
 
 
 def main():

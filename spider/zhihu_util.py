@@ -59,13 +59,17 @@ def post(to_url, post_data, max_attempts=3):
 
 
 def get_content_from_resp(resp):
-    content = resp.read()
-    if resp.info().get('Content-Encoding') == 'gzip':
-        data = StringIO.StringIO(content)
-        gz = gzip.GzipFile(fileobj=data)
-        content = gz.read()
-        gz.close()
-    return content
+    try:
+        content = resp.read()
+        if resp.info().get('Content-Encoding') == 'gzip':
+            data = StringIO.StringIO(content)
+            gz = gzip.GzipFile(fileobj=data)
+            content = gz.read()
+            gz.close()
+        return content
+    except Exception, e:
+        print "Error when get_content_from_resp, error message:%s" % e.message
+        return "FAIL"
 
 
 def get_xsrf_from_cookie(cookie):
