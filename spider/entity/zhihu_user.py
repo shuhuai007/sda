@@ -24,6 +24,7 @@ from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
 THREAD_COUNT = 1
+GRAPH_DEEP_LEVEL = 6
 
 
 class User:
@@ -623,12 +624,12 @@ def init_bloom_filter():
     # TODO (zj) : need get initial info from datasource
     return f
 
-def flush_buffer(write_buffer, suffix):
+def flush_buffer(write_buffer, suffix, ts):
     # TODO (zj)
     print "...begin write buffer into disk..."
 
     data_dir = zhihu_util.get_data_directory("user")
-    buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(time.time()))
+    buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(ts))
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, "\001")
 
 def consume(filter, queue, index, loops):
@@ -645,6 +646,7 @@ def consume(filter, queue, index, loops):
             continue
         filter.add(suffix)
         write_buffer_list = [user.get_fields()]
+        timestamp = time.time()
 
         for follower in user.get_followers():
             print "...user %s's follower:%s" % (suffix, follower.get_url_suffix())
@@ -655,11 +657,14 @@ def consume(filter, queue, index, loops):
             write_buffer_list.append(follower.get_fields())
 
             if len(write_buffer_list) >= 1000:
-                flush_buffer(write_buffer_list, suffix)
+                flush_buffer(write_buffer_list, suffix, timestamp)
                 write_buffer_list = []
-                time.sleep(1)
 
-        flush_buffer(write_buffer_list, suffix)
+            if len(write_buffer_list) >= 100:
+                time.sleep(1)
+                print "......sleep 1s......"
+
+        flush_buffer(write_buffer_list, suffix, timestamp)
         time.sleep(1)
 
         for followee in user.get_followees():
@@ -723,9 +728,8 @@ def main():
     queue.put_nowait(user_seed)
     print "Start, queue's size:%s" % queue.qsize()
 
-    loops = 100
     for i in range(THREAD_COUNT):
-        t = MyThread(consume, (filter, queue, i, loops), consume.__name__)
+        t = MyThread(consume, (filter, queue, i, GRAPH_DEEP_LEVEL), consume.__name__)
         threads.append(t)
 
     for t in threads:
