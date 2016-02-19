@@ -1,16 +1,30 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, sys, time, platform, random
-import re, json, cookielib
+import os
+import time
+import platform
+import re
+import json
+import cookielib
+from Queue import Queue
+from urllib import urlencode
+
 
 # requirements
 import requests
+
+import sys
+sys.path.append("..")
+import zhihu_util
 
 try:
     from bs4 import BeautifulSoup
 except:
     import BeautifulSoup
+
+from pybloom import BloomFilter
+
 
 
 class User:
@@ -32,7 +46,7 @@ class User:
         soup = BeautifulSoup(r.content, "html.parser")
         self.soup = soup
 
-    def get_user_id(self):
+    def get_user_name(self):
         if self._url is None:
             # print "I'm anonymous user."
             if platform.system() == 'Windows':
@@ -63,11 +77,11 @@ class User:
             增加获取知乎 data-id 的方法来确定标识用户的唯一性 #24
             (https://github.com/egrcc/zhihu-python/pull/24)
         """
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             data_id = soup.find("button", class_="zg-btn zg-btn-follow zm-rich-follow-btn")[
@@ -109,7 +123,7 @@ class User:
             return followees_num
 
     def get_followers_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
@@ -121,7 +135,7 @@ class User:
             return followers_num
 
     def get_agree_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
@@ -144,40 +158,40 @@ class User:
             return thanks_num
 
     def get_asks_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             asks_num = int(soup.find_all("span", class_="num")[0].string)
             return asks_num
 
     def get_answers_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             answers_num = int(soup.find_all("span", class_="num")[1].string)
             return answers_num
 
     def get_collections_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
-            if self.soup == None:
+            if self.soup is None:
                 self.parser()
             soup = self.soup
             collections_num = int(soup.find_all("span", class_="num")[3].string)
             return collections_num
 
     def get_followees(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return
             yield
@@ -188,9 +202,9 @@ class User:
                 yield
             else:
                 followee_url = self._url + "/followees"
-                r = requests.get(followee_url)
-
-                soup = BeautifulSoup(r.content)
+                r = zhihu_util.get_content(followee_url)
+                # print "r:%s" % r
+                soup = BeautifulSoup(r, "html.parser")
                 for i in xrange((followees_num - 1) / 20 + 1):
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
@@ -201,7 +215,7 @@ class User:
                         post_url = "http://www.zhihu.com/node/ProfileFolloweesListV2"
                         _xsrf = soup.find("input", attrs={'name': '_xsrf'})["value"]
                         offset = i * 20
-                        hash_id = re.findall("hash_id&quot;: &quot;(.*)&quot;},", r.text)[0]
+                        hash_id = re.findall("hash_id&quot;: &quot;(.*)&quot;},", r)[0]
                         params = json.dumps(
                             {"offset": offset, "order_by": "created", "hash_id": hash_id})
                         data = {
@@ -209,22 +223,17 @@ class User:
                             'method': "next",
                             'params': params
                         }
-                        header = {
-                            'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0",
-                            'Host': "www.zhihu.com",
-                            'Referer': followee_url
-                        }
+                        post_data = urlencode(data)
+                        r_post = zhihu_util.post(post_url, post_data)
 
-                        r_post = requests.post(post_url, data=data, headers=header)
-
-                        followee_list = r_post.json()["msg"]
+                        followee_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followees_num - i * 20, 20)):
-                            followee_soup = BeautifulSoup(followee_list[j])
+                            followee_soup = BeautifulSoup(followee_list[j], "html.parser")
                             user_link = followee_soup.find("h2", class_="zm-list-content-title").a
                             yield User(user_link["href"], user_link.string.encode("utf-8"))
 
     def get_followers(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return
             yield
@@ -235,20 +244,21 @@ class User:
                 yield
             else:
                 follower_url = self._url + "/followers"
-                r = requests.get(follower_url)
-
-                soup = BeautifulSoup(r.content)
+                r = zhihu_util.get_content(follower_url)
+                soup = BeautifulSoup(r, "html.parser")
                 for i in xrange((followers_num - 1) / 20 + 1):
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
+                        print "...user_url_list's len:%s" % len(user_url_list)
                         for j in xrange(min(followers_num, 20)):
+                            print "...j:%s" % j
                             yield User(user_url_list[j].a["href"],
                                        user_url_list[j].a.string.encode("utf-8"))
                     else:
                         post_url = "http://www.zhihu.com/node/ProfileFollowersListV2"
                         _xsrf = soup.find("input", attrs={'name': '_xsrf'})["value"]
                         offset = i * 20
-                        hash_id = re.findall("hash_id&quot;: &quot;(.*)&quot;},", r.text)[0]
+                        hash_id = re.findall("hash_id&quot;: &quot;(.*)&quot;},", r)[0]
                         params = json.dumps(
                             {"offset": offset, "order_by": "created", "hash_id": hash_id})
                         data = {
@@ -256,14 +266,11 @@ class User:
                             'method': "next",
                             'params': params
                         }
-                        header = {
-                            'User-Agent': "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:34.0) Gecko/20100101 Firefox/34.0",
-                            'Host': "www.zhihu.com",
-                            'Referer': follower_url
-                        }
-                        r_post = requests.post(post_url, data=data, headers=header)
-
-                        follower_list = r_post.json()["msg"]
+                        post_data = urlencode(data)
+                        r_post = zhihu_util.post(post_url, post_data)
+                        # print "...data:%s" % data
+                        # print "...r_post:%s" % r_post
+                        follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
                             follower_soup = BeautifulSoup(follower_list[j])
                             user_link = follower_soup.find("h2", class_="zm-list-content-title").a
@@ -402,9 +409,271 @@ class User:
             return
             yield
 
+    def get_user_title(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            user_tile = soup.find("div", class_="title-section ellipsis") \
+                .find("span", class_="bio").string.encode("utf-8")
+            if platform.system() == 'Windows':
+                return user_tile.decode('utf-8').encode('gbk')
+            else:
+                return user_tile
+
+    def get_location(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                location = soup.find("div", attrs={'data-name': 'location'}) \
+                               .find("span", attrs={'class': 'location item'})\
+                               .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return location.decode('utf-8').encode('gbk')
+                else:
+                    return location
+            except:
+                return "unknown"
+
+    def get_business(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                business = soup.find("div", attrs={'data-name': 'location'}) \
+                    .find("span", attrs={'class': 'business item'}) \
+                    .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return business.decode('utf-8').encode('gbk')
+                else:
+                    return business
+            except:
+                return "unknown"
+
+    def get_employment(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                employment = soup.find("div", attrs={'data-name': 'employment'}) \
+                    .find("span", attrs={'class': 'employment item'}) \
+                    .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return employment.decode('utf-8').encode('gbk')
+                else:
+                    return employment
+            except:
+                return "unknown"
+
+    def get_position(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                position = soup.find("div", attrs={'data-name': 'employment'}) \
+                    .find("span", attrs={'class': 'position item'}) \
+                    .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return position.decode('utf-8').encode('gbk')
+                else:
+                    return position
+            except:
+                return "unknown"
+
+    def get_education(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                position = soup.find("div", attrs={'data-name': 'education'}) \
+                    .find("span", attrs={'class': 'education item'}) \
+                    .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return position.decode('utf-8').encode('gbk')
+                else:
+                    return position
+            except:
+                return "unknown"
+
+    def get_education_extra(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 'unknown'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                position = soup.find("div", attrs={'data-name': 'education'}) \
+                    .find("span", attrs={'class': 'education-extra item'}) \
+                    .get('title').encode("utf-8")
+                if platform.system() == 'Windows':
+                    return position.decode('utf-8').encode('gbk')
+                else:
+                    return position
+            except:
+                return "unknown"
+
+    def get_user_agree_num(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return '0'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                user_agree_num = soup.find("span", attrs={'class': 'zm-profile-header-user-agree'})\
+                    .find("strong").get_text().encode("utf-8")
+                return user_agree_num
+            except:
+                return "0"
+
+    def get_user_thanks_num(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return '0'
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                user_agree_num = soup.find("span", attrs={'class': 'zm-profile-header-user-thanks'})\
+                    .find("strong").get_text().encode("utf-8")
+                return user_agree_num
+            except:
+                return "0"
+
+    def get_posts_num(self):
+        # TODO (zj)
+        pass
+
+    def get_logs_num(self):
+        # TODO (zj)
+        pass
+
+    def get_focus_topics_num(self):
+        # TODO (zj)
+        pass
+
+    def get_browse_num(self):
+        # TODO (zj)
+        pass
+
+    def get_fields(self):
+        # TODO (zj)
+        return ()
+
+def init_bloom_filter():
+    f = BloomFilter(capacity=1000, error_rate=0.001)
+    # TODO (zj) : need get initial info from datasource
+    return f
+
+
+def flush_buffer(write_buffer):
+    # TODO (zj)
+    print "...begin write buffer into disk..."
+
+
+def consume(queue, index, loops):
+    print "Thread[%s]consume the queue..." % str(index)
+    count = 1
+    write_buffer = []
+
+    while count < loops:
+        people_url = queue.get()
+        user = User(people_url)
+        user.get_followers()
+        write_buffer.append(user.get_fields())
+        flush_buffer(write_buffer)
+        count += 1
+
+
+def main():
+    f = init_bloom_filter()
+
+    url = "http://www.zhihu.com/people/jixin"
+    # url = "http://www.zhihu.com/people/jie-28"
+    user = User(url)
+    # followers = user.get_followers()
+    # for user in followers:
+    #     print "follower: %s" % user.get_user_name()
+
+    # followees = user.get_followees()
+    # for user in followees:
+    #     print "followee: %s" % user.get_user_name()
+
+    # print "user data id:%s" % user.get_data_id()
+    #
+    # print "user name:%s" % user.get_user_name()
+    # print "user title:%s" % user.get_user_title()
+    # print "user gender:%s" % user.get_gender()
+    #
+    # print "user location:%s" % user.get_location()
+    # print "user business:%s" % user.get_business()
+    #
+    # print "user employment:%s" % user.get_employment()
+    # print "user position:%s" % user.get_position()
+    #
+    # print "user education:%s" % user.get_education()
+    # print "user education extra:%s" % user.get_education_extra()
+    #
+    # print "user agree num:%s" % user.get_user_agree_num()
+    # print "user thanks num:%s" % user.get_user_thanks_num()
+    #
+    # print "asks num:%s" % user.get_asks_num()
+    # print "answers num:%s" % user.get_answers_num()
+    # print "posts num:%s" % user.get_posts_num()
+    # print "collections num:%s" % user.get_collections_num()
+    # print "logs num:%s" % user.get_logs_num()
+    #
+    # print "followees num:%s" % user.get_followees_num()
+    # print "followers num:%s" % user.get_followers_num()
+    # print "focus topics num:%s" % user.get_focus_topics_num()
+    # print "browse num:%s" % user.get_browse_num()
+
+    THREAD_COUNT = 2
+    loops = 10
+    from zhihu_thread import MyThread
+    threads = []
+    queue = Queue()
+    queue.put_nowait(url)
+    for i in range(THREAD_COUNT):
+        t = MyThread(consume, (queue, i, loops), consume.__name__)
+        threads.append(t)
+
+    for t in threads:
+        t.start()
+
+    for t in threads:
+        t.join()
+
+    print "All Done"
+
 
 if __name__ == '__main__':
-    url = "http://www.zhihu.com/people/jixin"
-    user = User(url)
-    print "user's id:%s" % user.get_user_id()
-
+    main()
