@@ -8,7 +8,6 @@ import json
 from Queue import Queue
 from urllib import urlencode
 
-
 # requirements
 import requests
 
@@ -655,11 +654,13 @@ def consume(filter, queue, index, loops):
             filter.add(suffix)
             write_buffer_list.append(follower.get_fields())
 
-            if len(write_buffer_list) >= 100:
+            if len(write_buffer_list) >= 1000:
                 flush_buffer(write_buffer_list, suffix)
                 write_buffer_list = []
+                time.sleep(1)
 
         flush_buffer(write_buffer_list, suffix)
+        time.sleep(1)
 
         for followee in user.get_followees():
             queue.put(followee.get_url_suffix())
