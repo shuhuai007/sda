@@ -239,6 +239,16 @@ def get_answer_data_directory():
         os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     return answer_data_dir
 
+def get_data_directory(keyword):
+    import os
+    import stat
+    # TODO (zj) should be constant variable
+    answer_data_dir = os.path.abspath('../../data/zhihu/{0}'.format(keyword))
+    if not os.path.exists(answer_data_dir):
+        os.makedirs(answer_data_dir)
+        os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+    return answer_data_dir
+
 def get_local_ip():
     import socket
 

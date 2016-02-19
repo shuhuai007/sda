@@ -25,6 +25,8 @@ except:
 
 from pybloom import BloomFilter
 
+USER_URL = "http://www.zhihu.com/people/{0}"
+THREAD_COUNT = 1
 
 
 class User:
@@ -45,6 +47,9 @@ class User:
         r = requests.get(self._url)
         soup = BeautifulSoup(r.content, "html.parser")
         self.soup = soup
+
+    def get_url_suffix(self):
+        return self._url.split("/")[-1]
 
     def get_user_name(self):
         if self._url is None:
@@ -84,9 +89,12 @@ class User:
             if self.soup is None:
                 self.parser()
             soup = self.soup
-            data_id = soup.find("button", class_="zg-btn zg-btn-follow zm-rich-follow-btn")[
-                'data-id']
-            return data_id
+            try:
+                data_id = soup.find("button", class_="zg-btn zg-btn-follow zm-rich-follow-btn")[
+                    'data-id']
+                return data_id
+            except:
+                return 0
 
     def get_gender(self):
         """
@@ -118,9 +126,12 @@ class User:
             if self.soup == None:
                 self.parser()
             soup = self.soup
-            followees_num = int(soup.find("div", class_="zm-profile-side-following zg-clear")
-                                .find("a").strong.string)
-            return followees_num
+            try:
+                followees_num = int(soup.find("div", class_="zm-profile-side-following zg-clear")
+                                    .find("a").strong.string)
+                return followees_num
+            except:
+                return 0
 
     def get_followers_num(self):
         if self._url is None:
@@ -130,9 +141,12 @@ class User:
             if self.soup == None:
                 self.parser()
             soup = self.soup
-            followers_num = int(soup.find("div", class_="zm-profile-side-following zg-clear")
-                                .find_all("a")[1].strong.string)
-            return followers_num
+            try:
+                followers_num = int(soup.find("div", class_="zm-profile-side-following zg-clear")
+                                    .find_all("a")[1].strong.string)
+                return followers_num
+            except:
+                return 0
 
     def get_agree_num(self):
         if self._url is None:
@@ -142,20 +156,26 @@ class User:
             if self.soup == None:
                 self.parser()
             soup = self.soup
-            agree_num = int(soup.find("span", class_="zm-profile-header-user-agree").strong.string)
-            return agree_num
+            try:
+                agree_num = int(soup.find("span", class_="zm-profile-header-user-agree").strong.string)
+                return agree_num
+            except:
+                return 0
 
     def get_thanks_num(self):
-        if self._url == None:
+        if self._url is None:
             print "I'm anonymous user."
             return 0
         else:
             if self.soup == None:
                 self.parser()
             soup = self.soup
-            thanks_num = int(
-                soup.find("span", class_="zm-profile-header-user-thanks").strong.string)
-            return thanks_num
+            try:
+                thanks_num = int(
+                    soup.find("span", class_="zm-profile-header-user-thanks").strong.string)
+                return thanks_num
+            except:
+                return 0
 
     def get_asks_num(self):
         if self._url is None:
@@ -165,8 +185,11 @@ class User:
             if self.soup is None:
                 self.parser()
             soup = self.soup
-            asks_num = int(soup.find_all("span", class_="num")[0].string)
-            return asks_num
+            try:
+                asks_num = int(soup.find_all("span", class_="num")[0].string)
+                return asks_num
+            except:
+                return 0
 
     def get_answers_num(self):
         if self._url is None:
@@ -176,8 +199,11 @@ class User:
             if self.soup is None:
                 self.parser()
             soup = self.soup
-            answers_num = int(soup.find_all("span", class_="num")[1].string)
-            return answers_num
+            try:
+                answers_num = int(soup.find_all("span", class_="num")[1].string)
+                return answers_num
+            except:
+                return 0
 
     def get_collections_num(self):
         if self._url is None:
@@ -187,8 +213,11 @@ class User:
             if self.soup is None:
                 self.parser()
             soup = self.soup
-            collections_num = int(soup.find_all("span", class_="num")[3].string)
-            return collections_num
+            try:
+                collections_num = int(soup.find_all("span", class_="num")[3].string)
+                return collections_num
+            except:
+                return 0
 
     def get_followees(self):
         if self._url is None:
@@ -249,9 +278,8 @@ class User:
                 for i in xrange((followers_num - 1) / 20 + 1):
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
-                        print "...user_url_list's len:%s" % len(user_url_list)
+                        # print "...user_url_list's len:%s" % len(user_url_list)
                         for j in xrange(min(followers_num, 20)):
-                            print "...j:%s" % j
                             yield User(user_url_list[j].a["href"],
                                        user_url_list[j].a.string.encode("utf-8"))
                     else:
@@ -417,12 +445,15 @@ class User:
             if self.soup is None:
                 self.parser()
             soup = self.soup
-            user_tile = soup.find("div", class_="title-section ellipsis") \
-                .find("span", class_="bio").string.encode("utf-8")
-            if platform.system() == 'Windows':
-                return user_tile.decode('utf-8').encode('gbk')
-            else:
-                return user_tile
+            try:
+                user_title = soup.find("div", class_="title-section ellipsis")\
+                    .find("span", class_="bio").string.encode("utf-8")
+                if platform.system() == 'Windows':
+                    return user_title.decode('utf-8').encode('gbk')
+                else:
+                    return user_title
+            except:
+                return "unknown"
 
     def get_location(self):
         if self._url is None:
@@ -433,7 +464,7 @@ class User:
                 self.parser()
             soup = self.soup
             try:
-                location = soup.find("div", attrs={'data-name': 'location'}) \
+                location = soup.find("div", attrs={'data-name': 'location'})\
                                .find("span", attrs={'class': 'location item'})\
                                .get('title').encode("utf-8")
                 if platform.system() == 'Windows':
@@ -586,7 +617,7 @@ class User:
 
     def get_fields(self):
         # TODO (zj)
-        return ()
+        return self.get_user_name(), self.get_user_title(), self.get_user_agree_num()
 
 def init_bloom_filter():
     f = BloomFilter(capacity=1000, error_rate=0.001)
@@ -598,35 +629,60 @@ def flush_buffer(write_buffer):
     # TODO (zj)
     print "...begin write buffer into disk..."
 
+    data_dir = zhihu_util.get_data_directory("user")
+    buffer_filename = "%s/user-%s" % (data_dir, int(time.time()))
+    zhihu_util.write_buffer_file(write_buffer, buffer_filename, "\001")
 
-def consume(queue, index, loops):
+
+def consume(filter, queue, index, loops):
     print "Thread[%s]consume the queue..." % str(index)
-    count = 1
-    write_buffer = []
+    count = 0
+    write_buffer_list = []
 
-    while count < loops:
-        people_url = queue.get()
+    while count < loops and not queue.empty():
+        people_url = USER_URL.format(queue.get())
+        print "...people_url:%s" % people_url
         user = User(people_url)
-        user.get_followers()
-        write_buffer.append(user.get_fields())
-        flush_buffer(write_buffer)
+
+        suffix = user.get_url_suffix()
+        if suffix in filter:
+            continue
+        filter.add(suffix)
+        write_buffer_list.append(user.get_fields())
+
+        for follower in user.get_followers():
+            if follower.get_url_suffix() in filter:
+                continue
+            filter.add(suffix)
+            write_buffer_list.append(follower.get_fields())
+
+        if len(write_buffer_list) >= 10:
+            flush_buffer(write_buffer_list)
+            write_buffer_list = []
+
+        for followee in user.get_followees():
+            queue.put(followee.get_url_suffix())
+
         count += 1
+
+    flush_buffer(write_buffer_list)
 
 
 def main():
-    f = init_bloom_filter()
+    filter = init_bloom_filter()
 
-    url = "http://www.zhihu.com/people/jixin"
+    # url = "http://www.zhihu.com/people/jixin"
     # url = "http://www.zhihu.com/people/jie-28"
-    user = User(url)
+    # user = User(url)
+    #
     # followers = user.get_followers()
     # for user in followers:
     #     print "follower: %s" % user.get_user_name()
-
+    #
     # followees = user.get_followees()
     # for user in followees:
     #     print "followee: %s" % user.get_user_name()
-
+    #
     # print "user data id:%s" % user.get_data_id()
     #
     # print "user name:%s" % user.get_user_name()
@@ -656,14 +712,20 @@ def main():
     # print "focus topics num:%s" % user.get_focus_topics_num()
     # print "browse num:%s" % user.get_browse_num()
 
-    THREAD_COUNT = 2
-    loops = 10
+    # exit()
     from zhihu_thread import MyThread
     threads = []
     queue = Queue()
-    queue.put_nowait(url)
+
+    user_seed = "jixin"
+    user_seed = "jie-28"
+
+    queue.put_nowait(user_seed)
+    print "Start, queue's size:%s" % queue.qsize()
+
+    loops = 100
     for i in range(THREAD_COUNT):
-        t = MyThread(consume, (queue, i, loops), consume.__name__)
+        t = MyThread(consume, (filter, queue, i, loops), consume.__name__)
         threads.append(t)
 
     for t in threads:
@@ -671,6 +733,8 @@ def main():
 
     for t in threads:
         t.join()
+
+    print "End, queue's size:%s" % queue.qsize()
 
     print "All Done"
 
