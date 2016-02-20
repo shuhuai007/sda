@@ -141,9 +141,6 @@ def parse_options():
     return mode, last_visit_date
 
 
-
-
-
 def error_2_file(msg, file_name):
     file_object = open(file_name, 'w+')
     try:
@@ -233,6 +230,7 @@ def get_question_data_directory():
     question_data_dir = os.path.abspath('../../data/zhihu/question')
     return question_data_dir
 
+
 def get_answer_data_directory():
     import os
     import stat
@@ -242,6 +240,7 @@ def get_answer_data_directory():
         os.makedirs(answer_data_dir)
         os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     return answer_data_dir
+
 
 def get_data_directory(keyword):
     import os
@@ -253,6 +252,7 @@ def get_data_directory(keyword):
         os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
     return answer_data_dir
 
+
 def get_local_ip():
     import socket
 
@@ -261,12 +261,14 @@ def get_local_ip():
     print "...local address:%s" % address
     return address
 
+
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
     cf.read(CONFIG_INI_PATH)
 
     topic_id_seed = cf.get("nodes", ip)
     return topic_id_seed
+
 
 def generate_id_list(id_seed=1, step_range=1, max_id=100):
     id_list = []
@@ -275,15 +277,18 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
         id_seed += step_range
     return id_list
 
+
 def get_question_detail_thread_amount():
     question_detail_thread_amount = get_thread_amount("question_detail_thread_amount")
     return question_detail_thread_amount
+
 
 def get_thread_amount(config_key):
     cf = ConfigParser.ConfigParser()
     cf.read(CONFIG_INI_PATH)
     thread_amount = int(cf.get(config_key, config_key))
     return thread_amount
+
 
 def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
@@ -297,6 +302,10 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
         target.write('\n')
     target.close()
 
+def get_file_list(dir_path):
+    return [dir_path + '/' + file_name for file_name in os.listdir(dir_path)]
+
 
 if __name__ == '__main__':
     print "...question data dir:%s" % get_question_data_directory()
+    print "get_file_list:%s" % get_file_list("/Users/jiezhou/OpenSource/sda/spider/entity")

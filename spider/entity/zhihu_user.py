@@ -23,8 +23,12 @@ except:
 from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
-THREAD_COUNT = 1
-GRAPH_DEEP_LEVEL = 6
+# USER_SEED = "jixin"
+USER_SEED = "jie-28"
+THREAD_COUNT = 3
+GRAPH_DEEP_LEVEL = 1000
+
+USER_FIELD_DELIMITER = "\001"
 
 
 class User:
@@ -173,48 +177,6 @@ class User:
                 thanks_num = int(
                     soup.find("span", class_="zm-profile-header-user-thanks").strong.string)
                 return thanks_num
-            except:
-                return 0
-
-    def get_asks_num(self):
-        if self._url is None:
-            print "I'm anonymous user."
-            return 0
-        else:
-            if self.soup is None:
-                self.parser()
-            soup = self.soup
-            try:
-                asks_num = int(soup.find_all("span", class_="num")[0].string)
-                return asks_num
-            except:
-                return 0
-
-    def get_answers_num(self):
-        if self._url is None:
-            print "I'm anonymous user."
-            return 0
-        else:
-            if self.soup is None:
-                self.parser()
-            soup = self.soup
-            try:
-                answers_num = int(soup.find_all("span", class_="num")[1].string)
-                return answers_num
-            except:
-                return 0
-
-    def get_collections_num(self):
-        if self._url is None:
-            print "I'm anonymous user."
-            return 0
-        else:
-            if self.soup is None:
-                self.parser()
-            soup = self.soup
-            try:
-                collections_num = int(soup.find_all("span", class_="num")[3].string)
-                return collections_num
             except:
                 return 0
 
@@ -598,39 +560,146 @@ class User:
             except:
                 return "0"
 
+    def get_asks_num(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                asks_num = int(soup.find_all("span", class_="num")[0].string)
+                return asks_num
+            except:
+                return 0
+
+    def get_answers_num(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                answers_num = int(soup.find_all("span", class_="num")[1].string)
+                return answers_num
+            except:
+                return 0
+
     def get_posts_num(self):
-        # TODO (zj)
-        pass
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                answers_num = int(soup.find_all("span", class_="num")[2].string)
+                return answers_num
+            except:
+                return 0
+
+    def get_collections_num(self):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                collections_num = int(soup.find_all("span", class_="num")[3].string)
+                return collections_num
+            except:
+                return 0
 
     def get_logs_num(self):
-        # TODO (zj)
-        pass
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                collections_num = int(soup.find_all("span", class_="num")[4].string)
+                return collections_num
+            except:
+                return 0
 
     def get_focus_topics_num(self):
-        # TODO (zj)
-        pass
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                focus_topics_num = int(soup.find("div", class_="zm-side-section-inner zg-clear")
+                                       .find("a").strong.string[0])
+                return focus_topics_num
+            except:
+                return 0
 
     def get_browse_num(self):
-        # TODO (zj)
-        pass
+        # zu-main-sidebar, zm-profile-side-section,
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+            try:
+                browse_num = int(soup.find("div", class_="zu-main-sidebar")
+                                     .find_all("div", class_="zm-profile-side-section")[2]
+                                     .find("span").strong.string)
+                return browse_num
+            except:
+                return 0
 
     def get_fields(self):
-        # TODO (zj)
-        return self.get_user_name(), self.get_user_title(), self.get_user_agree_num()
+        return self. get_url_suffix(), self.get_data_id(), self.get_user_name(),\
+            self.get_user_title(), self.get_gender(),\
+            self.get_location(), self.get_business(),\
+            self.get_employment(), self.get_position(),\
+            self.get_education(), self.get_education_extra(),\
+            self.get_user_agree_num(), self.get_user_thanks_num(),\
+            self.get_asks_num(), self.get_answers_num(),\
+            self.get_posts_num(), self.get_collections_num(),\
+            self.get_logs_num(), self.get_followees_num(),\
+            self.get_followers_num(), self.get_focus_topics_num(),\
+            self.get_browse_num()
 
 
 def init_bloom_filter():
-    f = BloomFilter(capacity=1000, error_rate=0.001)
-    # TODO (zj) : need get initial info from datasource
+    print "...init bloom filter..."
+    f = BloomFilter(capacity=1000000, error_rate=0.01)
+    data_dir = zhihu_util.get_data_directory("user")
+    data_file_list = zhihu_util.get_file_list(data_dir)
+    for data_file in data_file_list:
+        # read url_suffix from data file
+        file_object = open(data_file, "r")
+        try:
+            for line in file_object:
+                url_suffix = line.split(USER_FIELD_DELIMITER)[0]
+                if url_suffix.strip() != '':
+                    print "......url suffix:%s added into bloom filter" % url_suffix
+                    f.add(str(url_suffix))
+        finally:
+            file_object.close()
     return f
 
 def flush_buffer(write_buffer, suffix, ts):
-    # TODO (zj)
-    print "...begin write buffer into disk..."
+    print "...write buffer into disk..."
 
     data_dir = zhihu_util.get_data_directory("user")
     buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(ts))
-    zhihu_util.write_buffer_file(write_buffer, buffer_filename, "\001")
+    zhihu_util.write_buffer_file(write_buffer, buffer_filename, USER_FIELD_DELIMITER)
 
 def consume(filter, queue, index, loops):
     print "Thread[%s]consume the queue..." % str(index)
@@ -642,10 +711,7 @@ def consume(filter, queue, index, loops):
         user = User(people_url)
 
         suffix = user.get_url_suffix()
-        if suffix in filter:
-            continue
-        filter.add(suffix)
-        write_buffer_list = [user.get_fields()]
+        write_buffer_list = []
         timestamp = time.time()
 
         for follower in user.get_followers():
@@ -660,10 +726,6 @@ def consume(filter, queue, index, loops):
                 flush_buffer(write_buffer_list, suffix, timestamp)
                 write_buffer_list = []
 
-            if len(write_buffer_list) >= 100:
-                time.sleep(1)
-                print "......sleep 1s......"
-
         flush_buffer(write_buffer_list, suffix, timestamp)
         time.sleep(1)
 
@@ -675,11 +737,13 @@ def consume(filter, queue, index, loops):
 
 def main():
     f = init_bloom_filter()
+    print "bloom filter's count:%s" % f.count
+
+    # exit()
 
     # url = "http://www.zhihu.com/people/jixin"
     # url = "http://www.zhihu.com/people/jie-28"
     # user = User(url)
-    #
     # followers = user.get_followers()
     # for user in followers:
     #     print "follower: %s" % user.get_user_name()
@@ -716,17 +780,18 @@ def main():
     # print "followers num:%s" % user.get_followers_num()
     # print "focus topics num:%s" % user.get_focus_topics_num()
     # print "browse num:%s" % user.get_browse_num()
-
+    #
+    # print "...get fields:%s" % user.get_fields()
+    #
     # exit()
+
     from zhihu_thread import MyThread
     threads = []
     queue = Queue()
 
-    user_seed = "jixin"
-    user_seed = "jie-28"
-
+    user_seed = USER_SEED
     queue.put_nowait(user_seed)
-    print "Start, queue's size:%s" % queue.qsize()
+    print "Start, user seed:%s " % user_seed
 
     for i in range(THREAD_COUNT):
         t = MyThread(consume, (f, queue, i, GRAPH_DEEP_LEVEL), consume.__name__)
