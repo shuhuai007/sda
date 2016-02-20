@@ -674,7 +674,7 @@ def consume(filter, queue, index, loops):
 
 
 def main():
-    filter = init_bloom_filter()
+    f = init_bloom_filter()
 
     # url = "http://www.zhihu.com/people/jixin"
     # url = "http://www.zhihu.com/people/jie-28"
@@ -729,7 +729,7 @@ def main():
     print "Start, queue's size:%s" % queue.qsize()
 
     for i in range(THREAD_COUNT):
-        t = MyThread(consume, (filter, queue, i, GRAPH_DEEP_LEVEL), consume.__name__)
+        t = MyThread(consume, (f, queue, i, GRAPH_DEEP_LEVEL), consume.__name__)
         threads.append(t)
 
     for t in threads:
