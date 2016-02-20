@@ -24,11 +24,12 @@ from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
 # USER_SEED = "jixin"
-USER_SEED = "jie-28"
+USER_SEEDS = "jie-28,chen-hao-yu,teng-fei-91"
 THREAD_COUNT = 3
 GRAPH_DEEP_LEVEL = 1000
 
 USER_FIELD_DELIMITER = "\001"
+USER_FILE_DELIMITER = "ufdelimiter"
 
 
 class User:
@@ -678,8 +679,13 @@ class User:
 
 def init_bloom_filter():
     print "...init bloom filter..."
-    f = BloomFilter(capacity=1000000, error_rate=0.01)
-    data_dir = zhihu_util.get_data_directory("user")
+    write_bf = generate_write_bloomfilter("user")
+    return write_bf
+
+
+def generate_write_bloomfilter(dir_name, capacity=1000000, error_rate=0.01):
+    bf = BloomFilter(capacity, error_rate)
+    data_dir = zhihu_util.get_data_directory(dir_name)
     data_file_list = zhihu_util.get_file_list(data_dir)
     for data_file in data_file_list:
         # read url_suffix from data file
@@ -689,56 +695,84 @@ def init_bloom_filter():
                 url_suffix = line.split(USER_FIELD_DELIMITER)[0]
                 if url_suffix.strip() != '':
                     print "......url suffix:%s added into bloom filter" % url_suffix
-                    f.add(str(url_suffix))
+                    bf.add(str(url_suffix))
         finally:
             file_object.close()
-    return f
+    return bf
 
-def flush_buffer(write_buffer, suffix, ts):
+def flush_buffer(write_buffer, suffix, ts, thread_index):
     print "...write buffer into disk..."
 
     data_dir = zhihu_util.get_data_directory("user")
-    buffer_filename = "%s/user-%s-%s" % (data_dir, suffix, int(ts))
+    buffer_filename = "%s/%s%s-%s-%s" % (data_dir, suffix, USER_FILE_DELIMITER, int(ts),
+                                         thread_index)
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, USER_FIELD_DELIMITER)
 
-def consume(filter, queue, index, loops):
-    print "Thread[%s]consume the queue..." % str(index)
+def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
+    print "...Thread[%s]consume the queue..." % str(index)
     count = 0
 
     while count < loops and not queue.empty():
-        people_url = USER_URL.format(queue.get())
+        suffix = queue.get()
+
+        with lock:
+            if suffix in user_accessed_set:
+                continue
+
+        people_url = USER_URL.format(suffix)
         print "...people_url:%s" % people_url
         user = User(people_url)
 
-        suffix = user.get_url_suffix()
         write_buffer_list = []
         timestamp = time.time()
 
+        sleep_delta = 0
         for follower in user.get_followers():
-            print "...user %s's follower:%s" % (suffix, follower.get_url_suffix())
-            if follower.get_url_suffix() in filter:
-                print "...user %s already exist in bloom filter" % follower.get_url_suffix()
+            print "...Thread[%s] user %s's follower:%s" % (index, suffix, follower.get_url_suffix())
+            if follower.get_url_suffix() in bloomfilter:
+                print "...Thread[%s] user %s already exist in bloom filter" % \
+                      (index, follower.get_url_suffix())
                 continue
-            filter.add(suffix)
+            with bf_lock:
+                bloomfilter.add(suffix)
             write_buffer_list.append(follower.get_fields())
 
             if len(write_buffer_list) >= 1000:
-                flush_buffer(write_buffer_list, suffix, timestamp)
+                flush_buffer(write_buffer_list, suffix, timestamp, index)
                 write_buffer_list = []
+            if sleep_delta >= 100:
+                time.sleep(1)
+                print "...Thread[%s] sleep 1 second..." % index
+                sleep_delta = 0
+            else:
+                sleep_delta += 1
 
-        flush_buffer(write_buffer_list, suffix, timestamp)
-        time.sleep(1)
+        flush_buffer(write_buffer_list, suffix, timestamp, index)
 
         for followee in user.get_followees():
+            if suffix in user_accessed_set:
+                continue
             queue.put(followee.get_url_suffix())
 
+        # add user into user_accessed_set if followers and followee have been accessed.
+        with lock:
+            user_accessed_set.add(suffix)
+
         count += 1
+
+def init_user_access():
+    data_dir = zhihu_util.get_data_directory("user")
+    filenames = zhihu_util.get_file_names(data_dir)
+    result_list = [filename.split(USER_FILE_DELIMITER)[0] for filename in filenames]
+    return set(result_list)
 
 
 def main():
     f = init_bloom_filter()
     print "bloom filter's count:%s" % f.count
 
+    user_accessed_set = init_user_access()
+    print "user accessed set:%s" % user_accessed_set
     # exit()
 
     # url = "http://www.zhihu.com/people/jixin"
@@ -789,12 +823,16 @@ def main():
     threads = []
     queue = Queue()
 
-    user_seed = USER_SEED
-    queue.put_nowait(user_seed)
-    print "Start, user seed:%s " % user_seed
+    for user_seed in USER_SEEDS.split(","):
+        queue.put_nowait(user_seed)
+    print "Start, user seeds:%s " % USER_SEEDS
 
+    import threading
+    lock = threading.Lock()
+    bf_lock = threading.Lock()
     for i in range(THREAD_COUNT):
-        t = MyThread(consume, (f, queue, i, GRAPH_DEEP_LEVEL), consume.__name__)
+        t = MyThread(consume, (lock, bf_lock, f, user_accessed_set, queue, i, GRAPH_DEEP_LEVEL),
+                     consume.__name__)
         threads.append(t)
 
     for t in threads:

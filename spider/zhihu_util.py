@@ -305,7 +305,11 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
 def get_file_list(dir_path):
     return [dir_path + '/' + file_name for file_name in os.listdir(dir_path)]
 
+def get_file_names(dir_path):
+    return os.listdir(dir_path)
+
 
 if __name__ == '__main__':
     print "...question data dir:%s" % get_question_data_directory()
     print "get_file_list:%s" % get_file_list("/Users/jiezhou/OpenSource/sda/spider/entity")
+    print "get_file_names:%s" % get_file_names("/Users/jiezhou/OpenSource/sda/spider/entity")
