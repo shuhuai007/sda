@@ -38,11 +38,11 @@ def call_url(max_attempts, req, to_url):
     resp = None
     while resp is None and retry < max_attempts:
         try:
-            resp = urllib2.urlopen(req, timeout=30)
+            resp = urllib2.urlopen(req, timeout=10)
         except Exception, e:
             retry += 1
             print "Calling url: {0}, error:{1}, Re-trying.....".format(to_url, e.message)
-            time.sleep(3)
+            time.sleep(1)
     return resp
 
 
