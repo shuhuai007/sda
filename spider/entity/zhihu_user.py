@@ -699,15 +699,12 @@ def generate_write_bloomfilter(dir_name, capacity=1000000, error_rate=0.01):
     data_file_list = zhihu_util.get_file_list(data_dir)
     for data_file in data_file_list:
         # read url_suffix from data file
-        file_object = open(data_file, "r")
-        try:
+        with open(data_file, "r") as file_object:
             for line in file_object:
                 url_suffix = line.split(USER_FIELD_DELIMITER)[0]
                 if url_suffix.strip() != '':
                     print "......url suffix:%s added into bloom filter" % url_suffix
                     bf.add(str(url_suffix))
-        finally:
-            file_object.close()
     return bf
 
 def flush_buffer(write_buffer, suffix, ts, thread_index):
