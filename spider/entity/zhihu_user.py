@@ -6,6 +6,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
 from spider import zhihu_util
 
+import math
 import time
 import platform
 import re
@@ -22,9 +23,7 @@ except:
 
 
 USER_URL = "http://www.zhihu.com/people/{0}"
-# USER_SEED = "jixin"
-USER_SEEDS = "bing-deng-xing,milkr,yu-yi-duo,goal_lawyer,chsqi"
-THREAD_COUNT = 5
+THREAD_COUNT = 10
 GRAPH_DEEP_LEVEL = 1000
 
 USER_FIELD_DELIMITER = "\001"
@@ -679,12 +678,38 @@ class User:
             self.get_followers_num(), self.get_focus_topics_num(),\
             self.get_browse_num()
 
+    def generate_user_seeds(self, request_times=1):
+        if self._url is None:
+            print "I'm anonymous user."
+            return 0
+        else:
+            if self.soup is None:
+                self.parser()
+            soup = self.soup
+        seed_list = []
+        for i in range(request_times):
+            post_url = "https://www.zhihu.com/lookup/suggest_member"
+            _xsrf = soup.find("input", attrs={'name': '_xsrf'})["value"]
+            data = {
+                'ids': ",,",
+                '_xsrf': _xsrf
+            }
+            post_data = urlencode(data)
+            r_post = zhihu_util.post(post_url, post_data)
+            suggent_member_list = json.loads(r_post)["msg"]
+            for suggent_member in suggent_member_list:
+                suggent_member_soup = BeautifulSoup(suggent_member, "html.parser")
+                suggent_member_str = suggent_member_soup.find("a", class_="image-link")\
+                                                        .get("href").split("/")[-1]
+                seed_list.append(suggent_member_str)
+
+        return seed_list
+
 
 def init_bloom_filter():
     print "...init bloom filter..."
     write_bf = generate_write_bloomfilter("user")
     return write_bf
-
 
 def generate_write_bloomfilter(dir_name, capacity=1000000, error_rate=0.01):
     bf = BloomFilter(capacity, error_rate)
@@ -769,68 +794,23 @@ def init_user_access():
     result_list = [filename.split(USER_FILE_DELIMITER)[0] for filename in filenames]
     return set(result_list)
 
-
 def main():
     f = init_bloom_filter()
-    print "bloom filter's count:%s" % f.count
-    f.add("aaa")
     print "bloom filter's count:%s" % f.count
 
     user_accessed_set = init_user_access()
     print "user accessed set:%s" % user_accessed_set
-    # exit()
-
-    # url = "http://www.zhihu.com/people/jixin"
-    # url = "http://www.zhihu.com/people/jie-28"
-    # user = User(url)
-    # followers = user.get_followers()
-    # for user in followers:
-    #     print "follower: %s" % user.get_user_name()
-    #
-    # followees = user.get_followees()
-    # for user in followees:
-    #     print "followee: %s" % user.get_user_name()
-    #
-    # print "user data id:%s" % user.get_data_id()
-    #
-    # print "user name:%s" % user.get_user_name()
-    # print "user title:%s" % user.get_user_title()
-    # print "user gender:%s" % user.get_gender()
-    #
-    # print "user location:%s" % user.get_location()
-    # print "user business:%s" % user.get_business()
-    #
-    # print "user employment:%s" % user.get_employment()
-    # print "user position:%s" % user.get_position()
-    #
-    # print "user education:%s" % user.get_education()
-    # print "user education extra:%s" % user.get_education_extra()
-    #
-    # print "user agree num:%s" % user.get_user_agree_num()
-    # print "user thanks num:%s" % user.get_user_thanks_num()
-    #
-    # print "asks num:%s" % user.get_asks_num()
-    # print "answers num:%s" % user.get_answers_num()
-    # print "posts num:%s" % user.get_posts_num()
-    # print "collections num:%s" % user.get_collections_num()
-    # print "logs num:%s" % user.get_logs_num()
-    #
-    # print "followees num:%s" % user.get_followees_num()
-    # print "followers num:%s" % user.get_followers_num()
-    # print "focus topics num:%s" % user.get_focus_topics_num()
-    # print "browse num:%s" % user.get_browse_num()
-    #
-    # print "...get fields:%s" % user.get_fields()
-    #
-    # exit()
 
     from zhihu_thread import MyThread
     threads = []
     queue = Queue()
 
-    for user_seed in USER_SEEDS.split(","):
+    url = USER_URL.format("jie-28")
+    user_seed_list = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/3.0)))
+
+    for user_seed in user_seed_list:
         queue.put_nowait(user_seed)
-    print "Start, user seeds:%s " % USER_SEEDS
+    print "Start, user seeds:%s " % user_seed_list
 
     import threading
     lock = threading.Lock()
