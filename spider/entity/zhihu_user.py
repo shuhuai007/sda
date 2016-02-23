@@ -225,9 +225,12 @@ class User:
 
                         followee_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followees_num - i * 20, 20)):
-                            followee_soup = BeautifulSoup(followee_list[j], "html.parser")
-                            user_link = followee_soup.find("h2", class_="zm-list-content-title").a
-                            yield User(user_link["href"], user_link.string.encode("utf-8"))
+                            try:
+                                followee_soup = BeautifulSoup(followee_list[j], "html.parser")
+                                user_link = followee_soup.find("h2", class_="zm-list-content-title").a
+                                yield User(user_link["href"], user_link.string.encode("utf-8"))
+                            except:
+                                print("...get followee error ,just skip...")
 
     def get_followers(self):
         if self._url is None:
@@ -266,9 +269,12 @@ class User:
                         r_post = zhihu_util.post(post_url, post_data)
                         follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
-                            follower_soup = BeautifulSoup(follower_list[j], "html.parser")
-                            user_link = follower_soup.find("h2", class_="zm-list-content-title").a
-                            yield User(user_link["href"], user_link.string.encode("utf-8"))
+                            try:
+                                follower_soup = BeautifulSoup(follower_list[j], "html.parser")
+                                user_link = follower_soup.find("h2", class_="zm-list-content-title").a
+                                yield User(user_link["href"], user_link.string.encode("utf-8"))
+                            except:
+                                print "...Get follower error, just skip..."
 
     def get_asks(self):
         """
