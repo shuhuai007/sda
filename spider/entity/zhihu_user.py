@@ -24,8 +24,8 @@ from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
 # USER_SEED = "jixin"
-USER_SEEDS = "jie-28,chen-hao-yu,teng-fei-91"
-THREAD_COUNT = 3
+USER_SEEDS = "jiazhengjing,an-sen-yao-49,xiepanda,daozhuang,chenghan"
+THREAD_COUNT = 5
 GRAPH_DEEP_LEVEL = 1000
 
 USER_FIELD_DELIMITER = "\001"
@@ -712,7 +712,7 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
     print "...Thread[%s]consume the queue..." % str(index)
     count = 0
 
-    while count < loops and not queue.empty():
+    while count < loops:
         suffix = queue.get()
 
         with lock:
@@ -740,12 +740,13 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
             if len(write_buffer_list) >= 1000:
                 flush_buffer(write_buffer_list, suffix, timestamp, index)
                 write_buffer_list = []
-            if sleep_delta >= 100:
-                time.sleep(1)
-                print "...Thread[%s] sleep 1 second..." % index
-                sleep_delta = 0
-            else:
-                sleep_delta += 1
+                print "bloom filter's size:%s" % bloomfilter.count
+            # if sleep_delta >= 100:
+            #     time.sleep(1)
+            #     print "...Thread[%s] sleep 1 second..." % index
+            #     sleep_delta = 0
+            # else:
+            #     sleep_delta += 1
 
         flush_buffer(write_buffer_list, suffix, timestamp, index)
 
