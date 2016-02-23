@@ -1,6 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
+from spider import zhihu_util
+
 import time
 import platform
 import re
@@ -11,9 +17,9 @@ from urllib import urlencode
 # requirements
 import requests
 
-import sys
-sys.path.append("..")
-import zhihu_util
+# import sys
+# sys.path.append("..")
+# import zhihu_util
 
 try:
     from bs4 import BeautifulSoup
@@ -24,7 +30,7 @@ from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
 # USER_SEED = "jixin"
-USER_SEEDS = "jiazhengjing,an-sen-yao-49,xiepanda,daozhuang,chenghan"
+USER_SEEDS = "bing-deng-xing,milkr,yu-yi-duo,goal_lawyer,chsqi"
 THREAD_COUNT = 5
 GRAPH_DEEP_LEVEL = 1000
 
@@ -258,8 +264,6 @@ class User:
                         }
                         post_data = urlencode(data)
                         r_post = zhihu_util.post(post_url, post_data)
-                        # print "...data:%s" % data
-                        # print "...r_post:%s" % r_post
                         follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
                             follower_soup = BeautifulSoup(follower_list[j], "html.parser")
@@ -729,18 +733,19 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
         sleep_delta = 0
         for follower in user.get_followers():
             print "...Thread[%s] user %s's follower:%s" % (index, suffix, follower.get_url_suffix())
-            if follower.get_url_suffix() in bloomfilter:
-                print "...Thread[%s] user %s already exist in bloom filter" % \
-                      (index, follower.get_url_suffix())
-                continue
             with bf_lock:
+                if follower.get_url_suffix() in bloomfilter:
+                    print "...Thread[%s] user %s already exist in bloom filter" % \
+                          (index, follower.get_url_suffix())
+                    continue
                 bloomfilter.add(suffix)
             write_buffer_list.append(follower.get_fields())
 
             if len(write_buffer_list) >= 1000:
                 flush_buffer(write_buffer_list, suffix, timestamp, index)
                 write_buffer_list = []
-                print "bloom filter's size:%s" % bloomfilter.count
+                with bf_lock:
+                    print "bloom filter's size:%s" % bloomfilter.count
             # if sleep_delta >= 100:
             #     time.sleep(1)
             #     print "...Thread[%s] sleep 1 second..." % index
@@ -750,10 +755,11 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
 
         flush_buffer(write_buffer_list, suffix, timestamp, index)
 
-        for followee in user.get_followees():
-            if suffix in user_accessed_set:
-                continue
-            queue.put(followee.get_url_suffix())
+        with lock:
+            for followee in user.get_followees():
+                if suffix in user_accessed_set:
+                    continue
+                queue.put(followee.get_url_suffix())
 
         # add user into user_accessed_set if followers and followee have been accessed.
         with lock:
@@ -770,6 +776,8 @@ def init_user_access():
 
 def main():
     f = init_bloom_filter()
+    print "bloom filter's count:%s" % f.count
+    f.add("aaa")
     print "bloom filter's count:%s" % f.count
 
     user_accessed_set = init_user_access()
