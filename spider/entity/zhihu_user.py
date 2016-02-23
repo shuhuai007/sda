@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
@@ -11,22 +10,16 @@ import time
 import platform
 import re
 import json
+import requests
 from Queue import Queue
 from urllib import urlencode
-
-# requirements
-import requests
-
-# import sys
-# sys.path.append("..")
-# import zhihu_util
+from pybloom import BloomFilter
 
 try:
     from bs4 import BeautifulSoup
 except:
     import BeautifulSoup
 
-from pybloom import BloomFilter
 
 USER_URL = "http://www.zhihu.com/people/{0}"
 # USER_SEED = "jixin"
