@@ -718,8 +718,8 @@ def flush_buffer(write_buffer, suffix, ts, thread_index):
                                          thread_index)
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, USER_FIELD_DELIMITER)
 
-def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
-    print "...Thread[%s]consume the queue..." % str(index)
+def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, loops):
+    print "...Thread[%s]consume the queue..." % str(thread_index)
     count = 0
 
     while count < loops:
@@ -737,29 +737,31 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
         timestamp = time.time()
 
         sleep_delta = 0
-        for follower in user.get_followers():
-            print "...Thread[%s] user %s's follower:%s" % (index, suffix, follower.get_url_suffix())
+        for i, follower in enumerate(user.get_followers()):
+            print "...Thread[%s], user %s's %s follower:%s" % \
+                  (thread_index, suffix, str(i), follower.get_url_suffix())
             with bf_lock:
                 if follower.get_url_suffix() in bloomfilter:
-                    print "...Thread[%s] user %s already exist in bloom filter" % \
-                          (index, follower.get_url_suffix())
+                    print "...Thread[%s], user %s already exist in bloom filter" % \
+                          (thread_index, follower.get_url_suffix())
                     continue
+                print "...Thread[%s], bloom filter add %s" % (thread_index, suffix)
                 bloomfilter.add(suffix)
             write_buffer_list.append(follower.get_fields())
 
             if len(write_buffer_list) >= 1000:
-                flush_buffer(write_buffer_list, suffix, timestamp, index)
+                flush_buffer(write_buffer_list, suffix, timestamp, thread_index)
                 write_buffer_list = []
                 with bf_lock:
                     print "bloom filter's size:%s" % bloomfilter.count
-            # if sleep_delta >= 100:
-            #     time.sleep(1)
-            #     print "...Thread[%s] sleep 1 second..." % index
-            #     sleep_delta = 0
-            # else:
-            #     sleep_delta += 1
+            if sleep_delta >= 500:
+                time.sleep(1)
+                print "...Thread[%s] sleep 1 second..." % thread_index
+                sleep_delta = 0
+            else:
+                sleep_delta += 1
 
-        flush_buffer(write_buffer_list, suffix, timestamp, index)
+        flush_buffer(write_buffer_list, suffix, timestamp, thread_index)
 
         with lock:
             for followee in user.get_followees():
@@ -767,8 +769,6 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, index, loops):
                     continue
                 queue.put(followee.get_url_suffix())
 
-        # add user into user_accessed_set if followers and followee have been accessed.
-        with lock:
             user_accessed_set.add(suffix)
 
         count += 1
