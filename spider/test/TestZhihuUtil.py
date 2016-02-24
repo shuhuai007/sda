@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-
 import unittest
+import os
 import sys
-sys.path.append("..")
-import zhihu_util
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
+from spider import zhihu_util
+
 
 class TestZhihuUtil(unittest.TestCase):
 

@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import unittest
+import os
 import sys
-sys.path.append("..")
-import zhihu_topic
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
+from spider import zhihu_topic
 
 class TestZhihuAnswer(unittest.TestCase):
 
