@@ -5,40 +5,42 @@ from _mysql_exceptions import IntegrityError
 from connection_pool import ConnectionPool
 
 class TransactionManager(object):
-    '''
+    """
     handles all transaction and db query
-    '''
+    """
     def __init__(self):
         self.conn = ConnectionPool().pool.connection()
         self.cursor = self.conn.cursor()
 
     def startTransaction(self):
-        '''
+        """
         For databases that support transactions,
         the Python interface silently starts a transaction when the cursor is created.
         so we do nothing here.
-        '''
+        """
         pass
+
     def commitTransaction(self):
         self.cursor.close()
         self.conn.commit()
 
     def endTransaction(self):
-        '''
+        """
         结束事务
-        '''
+        """
         pass
+
     def rollbackTransaction(self):
-        '''
+        """
         回滚事务
-        '''
+        """
         self.cursor.close()
         self.conn.rollback()
 
     def queryInsert(self, sqlid, inputObject):
-        '''
+        """
         查询插入
-        '''
+        """
         #=======================================================================
         # resultclasstype参数在没有返回值的时候用不到
         #=======================================================================
@@ -50,20 +52,21 @@ class TransactionManager(object):
             return -1
 
     def queryUpdate(self, sqlid, inputObject):
-        '''
+        """
         查询更新
-        '''
+        """
         self.queryInsert(sqlid, inputObject)
+
     def queryDelete(self, sqlid, inputObject):
-        '''
+        """
         查询删除
-        '''
+        """
         self.queryInsert(sqlid, inputObject)
 
     def queryForObject(self, sqlid, inputObject):
-        '''
+        """
         查询并返回一个对象
-        '''
+        """
         sql, resultclasstype = processSql(sqlid, inputObject)
         self.cursor.execute(sql)
         objList = Data2Object.data2object(self.cursor, resultclasstype)
@@ -75,9 +78,9 @@ class TransactionManager(object):
             raise Exception('query for one object, but get many.');
 
     def queryForList(self, sqlid, inputObject):
-        '''
+        """
         查询并返回一个列表
-        '''
+        """
         sql , resultclasstype = self.processSql(sqlid, inputObject)
         self.cursor.execute(sql)
         objList = self.data2object(self.cursor, resultclasstype)
