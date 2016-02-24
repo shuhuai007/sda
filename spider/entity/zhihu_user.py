@@ -761,7 +761,7 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
                           (thread_index, follower.get_url_suffix())
                     continue
                 print "...Thread[%s], bloom filter add %s" % (thread_index, suffix)
-                bloomfilter.add(suffix)
+                bloomfilter.add(follower.get_url_suffix())
             write_buffer_list.append(follower.get_fields())
 
             if len(write_buffer_list) >= 1000:
