@@ -751,16 +751,18 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
         write_buffer_list = []
         timestamp = time.time()
 
+        total_followers = user.get_followers_num()
         sleep_delta = 0
         for i, follower in enumerate(user.get_followers()):
-            print "...Thread[%s], user %s's %s follower:%s" % \
-                  (thread_index, suffix, str(i), follower.get_url_suffix())
+            print "...Thread[%s], user %s's %s follower:%s, total:%s" % \
+                  (thread_index, suffix, str(i), follower.get_url_suffix(), total_followers)
             with bf_lock:
                 if follower.get_url_suffix() in bloomfilter:
                     print "...Thread[%s], user %s already exist in bloom filter" % \
                           (thread_index, follower.get_url_suffix())
                     continue
-                print "...Thread[%s], bloom filter add %s" % (thread_index, suffix)
+                print "...Thread[%s], bloom filter add %s" % \
+                      (thread_index, follower.get_url_suffix())
                 bloomfilter.add(follower.get_url_suffix())
             write_buffer_list.append(follower.get_fields())
 
@@ -780,7 +782,7 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
 
         with lock:
             for followee in user.get_followees():
-                if suffix in user_accessed_set:
+                if followee in user_accessed_set:
                     continue
                 queue.put(followee.get_url_suffix())
 
