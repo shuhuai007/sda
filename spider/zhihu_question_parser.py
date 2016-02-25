@@ -2,16 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import sys
-
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-from bs4 import BeautifulSoup
 from math import ceil
-import logging
-import threading
-import Queue
-import ConfigParser
+from bs4 import BeautifulSoup
 
 from zhihu_util import *
 
