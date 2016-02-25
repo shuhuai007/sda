@@ -70,7 +70,9 @@ class ZhihuQuestion(ZhihuObject):
         self.update_level2_topic_timestamp(level2_topic_id)
 
     def persist_questions(self, question_list_per_topic):
-        insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION (QUESTION_ID, QUESTION_TITLE, ANSWER, IS_TOP_QUESTION, CREATED_TIME) VALUES (%s, %s, %s, %s, %s)"
+        insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION " \
+                     "(QUESTION_ID, QUESTION_TITLE, ANSWER, IS_TOP_QUESTION, CREATED_TIME) " \
+                     "VALUES (%s, %s, %s, %s, %s)"
         self.cursor.executemany(insert_sql, question_list_per_topic)
 
     def update_level2_topic_timestamp(self, level2_topic_id):
