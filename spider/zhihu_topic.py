@@ -6,13 +6,6 @@ import zhihu_util
 from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
 
-def persist_topics(topic_list):
-    insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
-                 "VALUES (%s, %s, %s)"
-    print "insert sql:%s" % insert_sql
-    tm = TransactionManager()
-    tm.execute_many_sql(insert_sql, topic_list)
-    tm.close_connection()
 
 class ZhihuTopic(ZhihuItem):
     def __init__(self, run_mode='prod'):
@@ -31,19 +24,23 @@ class ZhihuTopic(ZhihuItem):
 
         # Fetch 2st level topics
         print "Fetch 2st level topics from Zhihu ......"
-
         level2_list = zhihu_topic_parser.fetch_level2_topic_list(level1_list, hash_id)
 
         print "level1_list's len:%d" % len(level1_list)
         print "level2_list's len:%d" % len(level2_list)
-        # level2_topic_id_list = map(lambda x: x[0], level2_list)
-        # level2_topic_id_list = list(set(level2_topic_id_list))
-        # print "after distinct, level2_topic_id_list's len:%d" % len(level2_topic_id_list)
 
         # Persist topics into database
         print "persist topics into database"
         persist_topics(level1_list + level2_list)
 
+
+def persist_topics(topic_list):
+    insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) " \
+                 "VALUES (%s, %s, %s)"
+    print "insert sql:%s" % insert_sql
+    tm = TransactionManager()
+    tm.execute_many_sql(insert_sql, topic_list)
+    tm.close_connection()
 
 def main():
     mode, last_visit_date = zhihu_util.parse_options()
