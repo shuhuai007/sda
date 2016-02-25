@@ -21,7 +21,7 @@ class ZhihuTopic(ZhihuItem):
 
     def update_topic(self):
         # Fetch 1st level topics
-        print "\n\nFetch 1st level topics from Zhihu ......"
+        print "Fetch 1st level topics from Zhihu ......"
         level1_dict = zhihu_topic_parser.fetch_level1_topic_dict()
         level1_list = level1_dict["topic_list"]
         hash_id = level1_dict["hash_id"]
@@ -30,7 +30,7 @@ class ZhihuTopic(ZhihuItem):
         print "level1_list's :%s" % level1_list
 
         # Fetch 2st level topics
-        print "\n\nFetch 2st level topics from Zhihu ......"
+        print "Fetch 2st level topics from Zhihu ......"
 
         level2_list = zhihu_topic_parser.fetch_level2_topic_list(level1_list, hash_id)
 
@@ -55,4 +55,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
