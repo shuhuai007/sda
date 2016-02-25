@@ -703,7 +703,7 @@ class User:
                                                         .get("href").split("/")[-1]
                 seed_list.append(suggent_member_str)
 
-        return seed_list
+        return set(seed_list)
 
 
 def init_bloom_filter():
@@ -808,11 +808,11 @@ def main():
     queue = Queue()
 
     url = USER_URL.format("jie-28")
-    user_seed_list = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/3.0)))
+    user_seeds = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/3.0)))
 
-    for user_seed in user_seed_list:
+    for user_seed in user_seeds:
         queue.put_nowait(user_seed)
-    print "Start, user seeds:%s " % user_seed_list
+    print "Start, user seeds:%s " % user_seeds
 
     import threading
     lock = threading.Lock()
