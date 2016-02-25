@@ -18,7 +18,6 @@ QUESTION_COUNT_WRITE_BUFFER = 10000
 def get_question_list_url(level2_topic_id, page_index):
     return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
 
-
 def write_question(temp_question_list, level2_topic_id, question_dir):
     if len(temp_question_list) == 0:
         return
@@ -31,7 +30,6 @@ def write_question(temp_question_list, level2_topic_id, question_dir):
         target.write(question_str)
         target.write('\n')
     target.close()
-
 
 def fetch_question_list_per_topic(level2_topic_id, is_develop=False):
     temp_question_list = []
@@ -57,7 +55,6 @@ def fetch_question_list_per_topic(level2_topic_id, is_develop=False):
         page_index += 1
     write_question(temp_question_list, level2_topic_id, question_dir)
 
-
 def get_max_page_index(list_question_url):
     max_index = 1
     try:
@@ -79,7 +76,6 @@ def get_max_page_index(list_question_url):
                      'question_error.log')
 
     return int(max_index)
-
 
 def generate_question_list_per_page(resp):
     question_list = []
@@ -110,12 +106,10 @@ def generate_question_list_per_page(resp):
 
     return question_list
 
-
 def transfer_timestamp(timestamp_ms):
     import time
     time_arr = time.localtime(float(timestamp_ms) / 1000)
     return time.strftime("%Y-%m-%d %H:%M:%S", time_arr)
-
 
 def get_page_index_threshold(max_page_index, is_develop=False):
     if is_develop:
