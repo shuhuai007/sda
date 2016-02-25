@@ -678,7 +678,7 @@ class User:
             self.get_followers_num(), self.get_focus_topics_num(),\
             self.get_browse_num()
 
-    def generate_user_seeds(self, request_times=1):
+    def generate_user_seeds(self, request_times=1, user_accessed_set=None):
         if self._url is None:
             print "I'm anonymous user."
             return 0
@@ -703,7 +703,9 @@ class User:
                                                         .get("href").split("/")[-1]
                 seed_list.append(suggent_member_str)
 
-        return set(seed_list)
+        seed_set = set(seed_list)
+        seed_set.difference_update(user_accessed_set)
+        return seed_set
 
 
 def init_bloom_filter():
@@ -721,7 +723,7 @@ def generate_write_bloomfilter(dir_name, capacity=1000000, error_rate=0.01):
             for line in file_object:
                 url_suffix = line.split(USER_FIELD_DELIMITER)[0]
                 if url_suffix.strip() != '':
-                    print "......url suffix:%s added into bloom filter" % url_suffix
+                    # print "......url suffix:%s added into bloom filter" % url_suffix
                     bf.add(str(url_suffix))
     return bf
 
@@ -808,7 +810,7 @@ def main():
     queue = Queue()
 
     url = USER_URL.format("jie-28")
-    user_seeds = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/3.0)))
+    user_seeds = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/2.0)), user_accessed_set)
 
     for user_seed in user_seeds:
         queue.put_nowait(user_seed)
