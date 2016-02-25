@@ -1,21 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import getopt
-import MySQLdb
-from bs4 import BeautifulSoup
-import json
-import re
-import time
-from math import ceil
-import logging
-import threading
-import Queue
-import ConfigParser
-import random
-
-import zhihu_topic_parser
 from zhihu_util import *
 from zhihu_object import ZhihuObject
 import zhihu_question_parser
