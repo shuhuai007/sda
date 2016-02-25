@@ -763,16 +763,17 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
                     print "...Thread[%s], user %s already exist in bloom filter" % \
                           (thread_index, follower.get_url_suffix())
                     continue
-                print "...Thread[%s], bloom filter add %s" % \
-                      (thread_index, follower.get_url_suffix())
                 bloomfilter.add(follower.get_url_suffix())
             write_buffer_list.append(follower.get_fields())
+            print "...Thread[%s], bloom filter add %s, write buffer's size:%s" % \
+                  (thread_index, follower.get_url_suffix(), len(write_buffer_list))
 
             if len(write_buffer_list) >= 1000:
                 flush_buffer(write_buffer_list, suffix, timestamp, thread_index)
                 write_buffer_list = []
                 with bf_lock:
-                    print "bloom filter's size:%s" % bloomfilter.count
+                    print "...Thread[%s], at present, bloom filter's size:%s" % \
+                          (thread_index, bloomfilter.count)
             if sleep_delta >= 500:
                 time.sleep(1)
                 print "...Thread[%s] sleep 1 second..." % thread_index
