@@ -52,8 +52,6 @@ def fetch_level1_topic_dict(level1_topic_url=LEVEL1_TOPICS_URL):
     # print "------level1_li_list:%s" % level1_li_list
 
     # find hash_id,which will be used when sending request to fetch level2 topic
-    #'<div class="zh-general-list clearfix" data-init="{&quot;params&quot;: {
-    # &quot;topic_id&quot;: 253, &quot;offset&quot;: 0, &quot;hash_id&quot;: &quot;dced108689287057f5cc3b5e85cb8289&quot;}, &quot;nodename&quot;: &quot;TopicsPlazzaListV2&quot;}">'
     data_init_str = soup.find('div', attrs={'class': 'zh-general-list clearfix'}).get('data-init')
     data_init_json = json.loads(data_init_str)
     hash_id = data_init_json['params']['hash_id']
@@ -65,7 +63,7 @@ def fetch_level1_topic_dict(level1_topic_url=LEVEL1_TOPICS_URL):
         # print "------topic_id:%s" % topic_id
         # print "------topic_name:%s" % topic_name
         level1_topic_list = level1_topic_list + [(topic_id, topic_name, topic_id)]
-    level1_topic_dict = {"topic_list": level1_topic_list, "hash_id" : hash_id}
+    level1_topic_dict = {"topic_list": level1_topic_list, "hash_id": hash_id}
     return level1_topic_dict
 
 def fetch_level2_topic_list(level1_list, hash_id):
@@ -100,9 +98,9 @@ def parse_level2_response(content, level1_topic_id):
     :param content: is json str, just like: {"r":0, "msg": []}
     :return: list[(level2_topic_id, level2_topic_name)]
     """
-    decodejson = json.loads(content)
+    decoded_json = json.loads(content)
     result_list = []
-    for level2_div in decodejson['msg']:
+    for level2_div in decoded_json['msg']:
         soup = BeautifulSoup(level2_div, "html.parser")
         # print "\n\n...soup:%s" % soup
         level2_topic_id = soup.find('a', attrs={'target': '_blank'}).get('href').split('/')[2]
@@ -111,7 +109,7 @@ def parse_level2_response(content, level1_topic_id):
         # print "...level2_topic_name:%s" % level2_topic_name
         result_list.append((level2_topic_id, level2_topic_name, level1_topic_id))
     if len(result_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
-        print "\n\nresult_list's len:%d" % len(result_list)
+        print "...result_list's len:%d" % len(result_list)
     return result_list
 
 def generate_post_data(hash_id, level1_topic_id, offset):
@@ -134,6 +132,11 @@ def generate_post_data(hash_id, level1_topic_id, offset):
     return post_data
 
 def persist_topics(topic_list):
+    """
+    Persist topics into mysql
+    :param topic_list: all the topics including level 1 and level 2.
+    :return: None
+    """
     insert_sql = "INSERT IGNORE INTO ZHIHU_TOPIC (TOPIC_ID, NAME, PARENT_ID) \
                   VALUES (%s, %s, %s)"
     print "insert sql:%s" % insert_sql
