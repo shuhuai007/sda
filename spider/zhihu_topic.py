@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from urllib import urlencode
 
 import zhihu_util
-from zhihu_item import ZhihuItem
 from zhihu_constants import *
 from transaction_manager import TransactionManager
 
@@ -16,69 +15,93 @@ LEVER2_TOPIC_COUNT_PER_PAGE = 20
 LEVEL2_TOPIC_MAX_PAGE_INDEX = 1000
 
 
-class ZhihuTopic(ZhihuItem):
-    def __init__(self, run_mode='prod'):
-        ZhihuItem.__init__(self, run_mode)
+class ZhihuTopicSquare:
+
+    def __init__(self, square_url, run_mode='prod'):
+        self.square_url = square_url
+        self.run_mode = run_mode
+        content = zhihu_util.get_content(self.square_url)
+        # print "...Level 1 topics's page content:%s" % content
+        self._soup = BeautifulSoup(content, "html.parser")
+
+    def _get_hash_id(self):
+        data_init_str = self._soup.find('div', attrs={'class': 'zh-general-list clearfix'}) \
+                            .get('data-init')
+        data_init_json = json.loads(data_init_str)
+        hash_id = data_init_json['params']['hash_id']
+        return hash_id
+
+    def get_level1_topics(self):
+
+        level1_li_list = self._soup.find('ul', attrs={'class': 'zm-topic-cat-main clearfix'})\
+                                   .findAll('li')
+
+        # find hash_id,which will be used when sending request to fetch level2 topic
+        hash_id = self._get_hash_id()
+
+        for level1_li in level1_li_list:
+            topic_id = level1_li.get('data-id')
+            topic_name = level1_li.a.get_text()
+            level1_topic = ZhihuLevel1Topic(topic_id, topic_name, topic_id, hash_id)
+            yield level1_topic
+
+    def get_level2_topics(self):
+        result_list = []
+        for level1_topic in self.get_level1_topics():
+            result_list += level1_topic.get_level2_topics()
+        return result_list
+
+    def get_all_topics(self):
+        return list(self.get_level1_topics()) + self.get_level2_topics()
+
+
+class ZhihuTopic:
+
+    def __init__(self, topic_id, topic_name, parent_id, run_mode='prod'):
+        # ZhihuItem.__init__(self, run_mode)
+        self.topic_id = topic_id
+        self.topic_name = topic_name
+        self.parent_id = parent_id
         self.topic_thread_amount = zhihu_util.get_thread_amount("topic_thread_amount")
 
-def update_topic():
-    # Fetch 1st level topics
-    print "Fetch 1st level topics from Zhihu ......"
-    level1_dict = fetch_level1_topic_dict()
-    level1_list = level1_dict["topic_list"]
-    hash_id = level1_dict["hash_id"]
+    def get_parent_id(self):
+        return self.parent_id
 
-    print "level1_list's len:%d" % len(level1_list)
-    print "level1_list's :%s" % level1_list
+    def get_topic_id(self):
+        return self.topic_id
 
-    # Fetch 2st level topics
-    print "Fetch 2st level topics from Zhihu ......"
-    level2_list = fetch_level2_topic_list(level1_list, hash_id)
+    def get_topic_name(self):
+        return self.topic_name
 
-    print "level1_list's len:%d" % len(level1_list)
-    print "level2_list's len:%d" % len(level2_list)
+    def get_fields(self):
+        return self.topic_id, self.topic_name, self.parent_id
 
-    # Persist topics into database
-    print "persist topics into database"
-    persist_topics(level1_list + level2_list)
 
-def fetch_level1_topic_dict(level1_topic_url=LEVEL1_TOPICS_URL):
-    content = zhihu_util.get_content(level1_topic_url)
-    # print "...Level 1 topics's page content:%s" % content
-    soup = BeautifulSoup(content, "html.parser")
-    level1_ul = soup.find('ul', attrs={'class': 'zm-topic-cat-main clearfix'})
-    # print "------level1_ul_tag:%s" % level1_ul
-    level1_li_list = level1_ul.findAll('li')
-    # print "------level1_li_list:%s" % level1_li_list
+class ZhihuLevel1Topic(ZhihuTopic):
 
-    # find hash_id,which will be used when sending request to fetch level2 topic
-    data_init_str = soup.find('div', attrs={'class': 'zh-general-list clearfix'}).get('data-init')
-    data_init_json = json.loads(data_init_str)
-    hash_id = data_init_json['params']['hash_id']
+    def __init__(self, topic_id, topic_name, parent_id, hash_id, post_url=LEVEL2_TOPICS_URL,
+                 run_mode='prod'):
+        ZhihuTopic.__init__(self, topic_id, topic_name, parent_id)
+        self.post_url = post_url
+        self.hash_id = hash_id
 
-    level1_topic_list = []
-    for level1_li in level1_li_list:
-        topic_id = level1_li.get('data-id')
-        topic_name = level1_li.a.get_text()
-        # print "------topic_id:%s" % topic_id
-        # print "------topic_name:%s" % topic_name
-        level1_topic_list = level1_topic_list + [(topic_id, topic_name, topic_id)]
-    level1_topic_dict = {"topic_list": level1_topic_list, "hash_id": hash_id}
-    return level1_topic_dict
-
-def fetch_level2_topic_list(level1_list, hash_id):
-    level2_topic_list = []
-    page_count = 0
-    for (level1_topic_id, level1_topic_name, level1_parent_id) in level1_list:
-        topic_url = generate_level2_topic_url()
+    def get_level2_topics(self):
+        level2_topic_list = []
+        page_count = 0
+        level2_url = self.post_url
 
         page_index = 1
         while page_index < LEVEL2_TOPIC_MAX_PAGE_INDEX:
             offset = (page_index - 1) * LEVER2_TOPIC_COUNT_PER_PAGE
-            content = zhihu_util.post(topic_url,
-                                      generate_post_data(hash_id, level1_topic_id, offset))
-            # print "...level2 topic content:%s:" % content
-            temp_list = parse_level2_response(content, level1_topic_id)
+            content = zhihu_util.post(level2_url,
+                                      generate_post_data(self.hash_id, self.topic_id, offset))
+            decoded_json = json.loads(content)
+            temp_list = []
+            for level2_div in decoded_json['msg']:
+                soup = BeautifulSoup(level2_div, "html.parser")
+                level2_topic_id = soup.find('a', attrs={'target': '_blank'}).get('href').split('/')[2]
+                level2_topic_name = soup.find('strong').get_text()
+                temp_list.append(ZhihuLevel2Topic(level2_topic_id, level2_topic_name, self.parent_id))
             if temp_list:
                 level2_topic_list += temp_list
             if len(temp_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
@@ -86,31 +109,15 @@ def fetch_level2_topic_list(level1_list, hash_id):
                 break
             page_index += 1
         page_count += page_index
+        print "...Total pagecount:%d" % page_count
+        return level2_topic_list
 
-    print "...Total pagecount:%d" % page_count
-    return level2_topic_list
 
-def generate_level2_topic_url():
-    return LEVEL2_TOPICS_URL
+class ZhihuLevel2Topic(ZhihuTopic):
+    def __init__(self, topic_id, topic_name, parent_id, run_mode='prod'):
+        # ZhihuItem.__init__(self, run_mode)
+        ZhihuTopic.__init__(self, topic_id, topic_name, parent_id)
 
-def parse_level2_response(content, level1_topic_id):
-    """
-    :param content: is json str, just like: {"r":0, "msg": []}
-    :return: list[(level2_topic_id, level2_topic_name)]
-    """
-    decoded_json = json.loads(content)
-    result_list = []
-    for level2_div in decoded_json['msg']:
-        soup = BeautifulSoup(level2_div, "html.parser")
-        # print "\n\n...soup:%s" % soup
-        level2_topic_id = soup.find('a', attrs={'target': '_blank'}).get('href').split('/')[2]
-        level2_topic_name = soup.find('strong').get_text()
-        # print "\n\n...level2_topic_id:%s" % level2_topic_id
-        # print "...level2_topic_name:%s" % level2_topic_name
-        result_list.append((level2_topic_id, level2_topic_name, level1_topic_id))
-    if len(result_list) < LEVER2_TOPIC_COUNT_PER_PAGE:
-        print "...result_list's len:%d" % len(result_list)
-    return result_list
 
 def generate_post_data(hash_id, level1_topic_id, offset):
     post_dict = {}
@@ -146,11 +153,14 @@ def persist_topics(topic_list):
 
 def main():
     mode, last_visit_date = zhihu_util.parse_options()
+    square_url = "https://www.zhihu.com/topics"
+    topic_square = ZhihuTopicSquare(square_url, mode)
+    print "topic's mode:%s" % topic_square.run_mode
 
-    topic_util = ZhihuTopic(mode)
-    print "topic's mode:%s" % topic_util.mode
+    topics = topic_square.get_all_topics()
+    print("topic total's size:{}".format(len(topics)))
 
-    update_topic()
+    persist_topics(topics)
 
 
 if __name__ == '__main__':
