@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
@@ -13,22 +14,10 @@ import spider.zhihu_topic
 import spider.zhihu_util
 
 
-def fun1():
-    print "fun1 was called"
-    return 1
-
-
 class TestZhihuTopic(unittest.TestCase):
 
     def setUp(self):
         pass
-    # def test_persist_topics(self):
-    #     topic = zhihu_topic.ZhihuTopic('develop')
-    #     self.assertEqual('develop', topic.mode)
-    #     topic_list = [(5561, 'test-topic', 1)]
-    #     zhihu_topic.persist_topics(topic_list)
-    #     topic_list = [(5562, 'test-topic', 1)]
-    #     zhihu_topic.persist_topics(topic_list)
 
     @mock.patch('spider.zhihu_util.get_xsrf')
     def test_generate_post_data(self, mock_get_xsrf):
