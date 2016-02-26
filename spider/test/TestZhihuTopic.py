@@ -17,9 +17,6 @@ def fun1():
     print "fun1 was called"
     return 1
 
-def generate_xsrf():
-    return
-
 
 class TestZhihuTopic(unittest.TestCase):
 
