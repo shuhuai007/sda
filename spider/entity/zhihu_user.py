@@ -259,6 +259,8 @@ class User:
                         }
                         post_data = urlencode(data)
                         r_post = zhihu_util.post(post_url, post_data)
+                        if r_post == 'FAIL':
+                            continue
                         follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
                             try:
@@ -771,9 +773,8 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
             if len(write_buffer_list) >= 1000:
                 flush_buffer(write_buffer_list, suffix, timestamp, thread_index)
                 write_buffer_list = []
-                with bf_lock:
-                    print "...Thread[%s], at present, bloom filter's size:%s" % \
-                          (thread_index, bloomfilter.count)
+                print "...Thread[%s], at present, bloom filter's size:%s" % \
+                      (thread_index, bloomfilter.count)
             if sleep_delta >= 500:
                 time.sleep(1)
                 print "...Thread[%s] sleep 1 second..." % thread_index
@@ -786,6 +787,8 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
         with lock:
             for followee in user.get_followees():
                 if followee in user_accessed_set:
+                    print "...Thread[%s], user %s's followee %s exist in user_access_set" % \
+                          (suffix, followee.get_url_suffix())
                     continue
                 queue.put(followee.get_url_suffix())
 
@@ -811,7 +814,7 @@ def main():
     queue = Queue()
 
     url = USER_URL.format("jie-28")
-    user_seeds = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT/2.0)), user_accessed_set)
+    user_seeds = User(url).generate_user_seeds(int(math.ceil(THREAD_COUNT)), user_accessed_set)
 
     for user_seed in user_seeds:
         queue.put_nowait(user_seed)
