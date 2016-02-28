@@ -15,15 +15,11 @@ import requests
 from Queue import Queue
 from urllib import urlencode
 from pybloom import BloomFilter
-
-try:
-    from bs4 import BeautifulSoup
-except:
-    import BeautifulSoup
+from bs4 import BeautifulSoup
 
 
 USER_URL = "http://www.zhihu.com/people/{0}"
-THREAD_COUNT = 10
+THREAD_COUNT = 15
 GRAPH_DEEP_LEVEL = 1000
 
 USER_FIELD_DELIMITER = "\001"
@@ -791,7 +787,7 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
                           (suffix, followee.get_url_suffix())
                     continue
                 queue.put(followee.get_url_suffix())
-                print "...Thread[%s], user %s's followee %s added into queue, queue'size:%s" % \
+                print "...Thread[%s], user %s's followee %s added into queue, queue size:%s" % \
                       (suffix, followee.get_url_suffix(), queue.qsize())
             user_accessed_set.add(suffix)
 
