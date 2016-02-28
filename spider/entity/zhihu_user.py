@@ -790,8 +790,9 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
                     print "...Thread[%s], user %s's followee %s exist in user_access_set" % \
                           (suffix, followee.get_url_suffix())
                     continue
+                print "...Thread[%s], user %s's followee %s added into queue" % \
+                      (suffix, followee.get_url_suffix())
                 queue.put(followee.get_url_suffix())
-
             user_accessed_set.add(suffix)
 
         count += 1
