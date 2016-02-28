@@ -61,7 +61,6 @@ class TestZhihuTopic(unittest.TestCase):
         self.assertTrue(isinstance(level2_topics[0], spider.zhihu_topic.ZhihuTopic))
         self.assertNotEqual(level2_topics[0].get_parent_id(), level2_topics[0].get_topic_id())
 
-
     def test_get_topics(self):
         pass
 
