@@ -758,7 +758,7 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
                   (thread_index, suffix, str(i), follower.get_url_suffix(), total_followers)
             with bf_lock:
                 if follower.get_url_suffix() in bloomfilter:
-                    print "...Thread[%s], user %s already exist in bloom filter" % \
+                    print "...Thread[%s], %s already exist in bloom filter" % \
                           (thread_index, follower.get_url_suffix())
                     continue
                 bloomfilter.add(follower.get_url_suffix())
