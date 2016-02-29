@@ -1,22 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-import getopt
+
 import MySQLdb
-from bs4 import BeautifulSoup
-import json
-import re
-import time
-from math import ceil
-import logging
-import threading
-import Queue
 import ConfigParser
 from zhihu_constants import *
 
-import zhihu_topic_parser
-import zhihu_util
 
 class ZhihuObject:
     def __init__(self, run_mode='prod'):
