@@ -18,7 +18,7 @@ QUESTION_COUNT_WRITE_BUFFER = 10000
 
 
 def get_question_list_url(level2_topic_id, page_index):
-    return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
+    return ZHIHU_QUESTION_URL.format(level2_topic_id, page_index)
 
 def write_question(temp_question_list, level2_topic_id, question_dir):
     if len(temp_question_list) == 0:
@@ -63,13 +63,9 @@ def get_max_page_index(list_question_url):
         resp = get_content(list_question_url)
         soup = BeautifulSoup(resp, "html.parser")
         pager = soup.find('div', attrs={'class': 'zm-invite-pager'})
-        # <a href="?page=2">2</a>
-
         # print "............tag_a's parent:%s" % pager.find_all('a')
         for tag_a in pager.find_all('a'):
-            # print ".........tag_a:%s" % tag_a
             page_number = int(tag_a.get('href').split('=')[1])
-            # print "\n\n.........page number:%s" % page_number
             if page_number > max_index:
                 max_index = page_number
     except:
@@ -108,12 +104,15 @@ def generate_question_list_per_page(resp):
 
     return question_list
 
-def transfer_timestamp(timestamp_ms):
+def transfer_timestamp(timestamp_ms, time_format="%Y-%m-%d %H:%M:%S"):
     import time
     time_arr = time.localtime(float(timestamp_ms) / 1000)
-    return time.strftime("%Y-%m-%d %H:%M:%S", time_arr)
+    return time.strftime(time_format, time_arr)
+
+def get_page_count_percentage():
+    return LIST_QUESTION_PAGE_COUNT_PERCENTAGE
 
 def get_page_index_threshold(max_page_index, is_develop=False):
     if is_develop:
         return 1
-    return int(ceil(LIST_QUESTION_PAGE_COUNT_PERCENTAGE * max_page_index))
+    return int(ceil(get_page_count_percentage() * max_page_index))
