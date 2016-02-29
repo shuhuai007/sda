@@ -9,16 +9,16 @@ MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
 
 
-def generate_available_topic_ids():
+def generate_available_topic_ids(max_id=MAX_TOPIC_TABLE_ID, step=TOPIC_ID_STEP):
     id_list = []
     # find the seed from config.ini
     topic_id_seed = get_topic_id_seed(get_local_ip())
     print "...............topic_id_seed:%s" % topic_id_seed
     # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
     topic_id = int(topic_id_seed)
-    while topic_id < MAX_TOPIC_TABLE_ID:
+    while topic_id <= max_id:
         id_list.append(str(topic_id))
-        topic_id += TOPIC_ID_STEP
+        topic_id += step
 
     return ",".join(id_list)
 
