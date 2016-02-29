@@ -1,11 +1,12 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
+from math import ceil
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-from math import ceil
 from bs4 import BeautifulSoup
 
 from zhihu_util import *
