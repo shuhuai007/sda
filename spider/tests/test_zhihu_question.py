@@ -5,12 +5,13 @@
 import unittest
 import os
 import sys
-sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/..')
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
 
 import mock
 
 from spider import zhihu_question
+
 
 class TestZhihuQuestion(unittest.TestCase):
 
