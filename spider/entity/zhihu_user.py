@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 
 
 USER_URL = "http://www.zhihu.com/people/{0}"
-THREAD_COUNT = 15
+THREAD_COUNT = 10
 GRAPH_DEEP_LEVEL = 1000
 
 USER_FIELD_DELIMITER = "\001"
