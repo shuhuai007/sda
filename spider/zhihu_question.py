@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 from zhihu_util import *
 from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
@@ -72,6 +73,7 @@ class ZhihuQuestion(ZhihuItem):
         tm.execute_sql(sql)
         tm.close_connection()
 
+
 def get_level2_topic_id_list(last_visit_date, is_develop=False):
     level2_topic_id_list = []
     sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" \
@@ -91,7 +93,6 @@ def get_level2_topic_id_list(last_visit_date, is_develop=False):
         level2_topic_id_list.append(str(row[0]))
 
     return level2_topic_id_list
-
 
 def main():
     run_mode, last_visit = parse_options()

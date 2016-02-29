@@ -10,10 +10,11 @@ from bs4 import BeautifulSoup
 
 from zhihu_util import *
 
-LIST_QUESTION_PAGE_COUNT_PERCENTAGE = 1
 
+LIST_QUESTION_PAGE_COUNT_PERCENTAGE = 1
 # Write 200 questions from buffer into file once
 QUESTION_COUNT_WRITE_BUFFER = 10000
+
 
 def get_question_list_url(level2_topic_id, page_index):
     return "https://www.zhihu.com/topic/%s/questions?page=%s" % (level2_topic_id, page_index)
