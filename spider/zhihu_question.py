@@ -3,6 +3,7 @@
 
 from zhihu_util import *
 from zhihu_object import ZhihuObject
+from transaction_manager import TransactionManager
 import zhihu_question_parser
 
 MAX_TOPIC_TABLE_ID = 15000
@@ -24,6 +25,7 @@ def generate_available_topic_ids(max_id=MAX_TOPIC_TABLE_ID, step=TOPIC_ID_STEP):
 
 
 class ZhihuQuestion(ZhihuObject):
+
     def __init__(self, run_mode='prod'):
         ZhihuObject.__init__(self, run_mode)
         self.question_thread_amount = int(self.cf.get("question_thread_amount",
@@ -31,9 +33,9 @@ class ZhihuQuestion(ZhihuObject):
 
     def update_question(self, last_visit_date):
         # Get the level 2 topic id list from db.
-        print "\n...Get all the level2 topic info needed from db"
-        level2_topic_id_list = self.get_level2_topic_id_list(last_visit_date)
-        print "\n...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
+        print "...Get all the level2 topic info needed from db"
+        level2_topic_id_list = get_level2_topic_id_list(last_visit_date, self.is_develop_mode())
+        print "...level2_topic_id_list's len:%s" % len(level2_topic_id_list)
         # print "\n...level2_topic_id_list:%s" % level2_topic_id_list
         # exit()
 
@@ -58,31 +60,37 @@ class ZhihuQuestion(ZhihuObject):
         insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION " \
                      "(QUESTION_ID, QUESTION_TITLE, ANSWER, IS_TOP_QUESTION, CREATED_TIME) " \
                      "VALUES (%s, %s, %s, %s, %s)"
-        self.cursor.executemany(insert_sql, question_list_per_topic)
+        tm = TransactionManager()
+        tm.execute_many_sql(insert_sql, question_list_per_topic)
+        tm.close_connection()
 
     def update_level2_topic_timestamp(self, level2_topic_id):
-        sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = %s WHERE TOPIC_ID = %s"
-        self.cursor.execute(sql, (get_current_timestamp(), level2_topic_id))
+        sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = %s WHERE TOPIC_ID = %s" % \
+              (get_current_timestamp(), level2_topic_id)
+        # self.cursor.execute(sql, (get_current_timestamp(), level2_topic_id))
+        tm = TransactionManager()
+        tm.execute_sql(sql)
+        tm.close_connection()
 
-    def get_level2_topic_id_list(self, last_visit_date):
-        level2_topic_id_list = []
-        sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" \
-              % last_visit_date
-        available_topic_ids = generate_available_topic_ids()
-        sql += " AND ID IN (%s) " % available_topic_ids
+def get_level2_topic_id_list(last_visit_date, is_develop=False):
+    level2_topic_id_list = []
+    sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" \
+          % last_visit_date
+    available_topic_ids = generate_available_topic_ids()
+    sql += " AND ID IN (%s) " % available_topic_ids
 
-        if self.is_develop_mode():
-            sql += " LIMIT 2"
+    if is_develop:
+        sql += " LIMIT 2"
 
-        print "......execute sql:%s" % sql
+    print "......execute sql:%s" % sql
+    tm = TransactionManager()
+    results = tm.execute_sql(sql)
+    tm.close_connection()
 
-        self.cursor.execute(sql)
-        results = self.cursor.fetchall()
+    for row in results:
+        level2_topic_id_list.append(str(row[0]))
 
-        for row in results:
-            level2_topic_id_list.append(str(row[0]))
-
-        return level2_topic_id_list
+    return level2_topic_id_list
 
 
 def main():

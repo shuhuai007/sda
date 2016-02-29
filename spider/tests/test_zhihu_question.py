@@ -6,6 +6,7 @@ import unittest
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/..')
 
 import mock
 
@@ -30,6 +31,11 @@ class TestZhihuQuestion(unittest.TestCase):
         expected_str = "2,4,6,8,10"
         self.assertIsNotNone(actual_str)
         self.assertEqual(expected_str, actual_str)
+
+    def test_get_level2_topic_id_list(self):
+        actual_list = zhihu_question.get_level2_topic_id_list("2016-02-29", True)
+        self.assertIsNotNone(actual_list)
+        self.assertTrue(len(actual_list) > 0)
 
     def tearDown(self):
         pass

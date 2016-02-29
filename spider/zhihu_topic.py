@@ -160,7 +160,7 @@ def main():
     topics = topic_square.get_all_topics()
     print("topic total's size:{}".format(len(topics)))
 
-    persist_topics(topics)
+    persist_topics([topic.get_fields() for topic in topics])
 
 
 if __name__ == '__main__':
