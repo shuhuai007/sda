@@ -676,7 +676,7 @@ class User:
             self.get_followers_num(), self.get_focus_topics_num(),\
             self.get_browse_num()
 
-    def generate_user_seeds(self, request_times=1, user_accessed_set={}):
+    def generate_user_seeds(self, request_times=1, user_accessed_set=None):
         if self._url is None:
             print "I'm anonymous user."
             return 0
@@ -702,8 +702,8 @@ class User:
                 seed_list.append(suggent_member_str)
 
         seed_set = set(seed_list)
-        print "seed_set:%s" % seed_set
-        seed_set.difference_update(user_accessed_set)
+        if user_accessed_set:
+            seed_set.difference_update(user_accessed_set)
         return seed_set
 
 
