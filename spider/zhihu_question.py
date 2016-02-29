@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from zhihu_util import *
-from zhihu_object import ZhihuObject
+from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
 import zhihu_question_parser
 
@@ -24,10 +24,10 @@ def generate_available_topic_ids(max_id=MAX_TOPIC_TABLE_ID, step=TOPIC_ID_STEP):
     return ",".join(id_list)
 
 
-class ZhihuQuestion(ZhihuObject):
+class ZhihuQuestion(ZhihuItem):
 
     def __init__(self, run_mode='prod'):
-        ZhihuObject.__init__(self, run_mode)
+        ZhihuItem.__init__(self, run_mode)
         self.question_thread_amount = int(self.cf.get("question_thread_amount",
                                                       "question_thread_amount"))
 

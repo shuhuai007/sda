@@ -34,9 +34,10 @@ class TestZhihuQuestion(unittest.TestCase):
         self.assertEqual(expected_str, actual_str)
 
     def test_get_level2_topic_id_list(self):
-        actual_list = zhihu_question.get_level2_topic_id_list("2016-02-29", True)
+        actual_list = zhihu_question.get_level2_topic_id_list("2025-01-01", True)
         self.assertIsNotNone(actual_list)
-        self.assertTrue(len(actual_list) > 0)
+        self.assertTrue(len(actual_list) == 2)
+
 
     def tearDown(self):
         pass
