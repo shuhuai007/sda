@@ -58,7 +58,9 @@ class ZhihuQuestionDetail(ZhihuItem):
             begin_index = i * AVAIL_ID_SIZE_THRESHOLD
             end_index = (i + 1) * AVAIL_ID_SIZE_THRESHOLD
 
-            sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')"  % last_visit
+            sql = "SELECT QUESTION_ID " \
+                  "FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  " \
+                  "WHERE timestamp(q.LAST_VISIT) < timestamp('%s')" % last_visit
             sql += " AND ID IN (%s) " % ",".join(available_id_list[begin_index:end_index])
 
             # print "...sql:%s" % sql
