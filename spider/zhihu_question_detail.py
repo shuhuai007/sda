@@ -89,6 +89,7 @@ class ZhihuQuestionDetail(ZhihuItem):
 
         wm.wait_for_complete()
 
+
 def main():
     mode, last_visit_date = parse_options()
 
