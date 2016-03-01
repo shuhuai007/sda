@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# -*- code: utf-8 -*-
+# coding=utf-8
 
 
 import unittest
@@ -11,12 +11,13 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
 import mock
 
 from spider import zhihu_question_parser
+from spider import zhihu_constants
 
 
 class TestZhihuQuestionParser(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.question_data_file = "19551296_question.data"
 
     @mock.patch("spider.zhihu_question_parser.get_page_count_percentage")
     def test_get_page_index_threshold(self, mock_get_page_count_percentage):
@@ -39,8 +40,22 @@ class TestZhihuQuestionParser(unittest.TestCase):
         actual_time_str = zhihu_question_parser.transfer_timestamp(time.time() * 1000, time_format)
         self.assertEqual(2, len(actual_time_str.split(" ")))
 
+    def test_write_question(self):
+        question_list = [(40899135, "问道那个区现在人最火爆?", 908, 0, "2016-03-01 10:53:57"),
+                         (40899078, "为什么lol有人拿四杀幸存的那个人会跑得那么快？", 0, 0, "2016-03-01 10:53:57")
+                         ]
+        zhihu_question_parser.write_question(question_list, "19551296", ".")
+        with open(self.question_data_file, "r") as f:
+            lines = f.readlines()
+        self.assertIsNotNone(lines)
+        self.assertEqual(2, len(lines))
+
+        first_line_list = lines[0].split(zhihu_constants.ZHIHU_QUESTION_DATA_DELIMETER)
+        self.assertEqual(5, len(first_line_list))
+
     def tearDown(self):
-        pass
+        if os.path.exists(self.question_data_file):
+            os.remove(self.question_data_file)
 
 
 if __name__ == "__main__":
