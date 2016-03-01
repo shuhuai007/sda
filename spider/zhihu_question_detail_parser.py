@@ -14,6 +14,9 @@ ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 # BUFFER SIZE of questions
 QUESTION_WRITE_BUFFER_SIZE = 10000
 
+QUESTION_DETAIL_FIELD_DELIMITER = "\001"
+
+
 
 def get_question_content(soup):
     content = ""
@@ -120,7 +123,7 @@ def write_buffer(buffer_list):
     dir_name = get_question_data_directory()
     buffer_filename = "%s/question-detail-%s-%s" % (dir_name, buffer_list[0][0], int(time.time()))
     # print "......buffer_filename:%s" % buffer_filename
-    write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
+    write_buffer_file(buffer_list, buffer_filename, QUESTION_DETAIL_FIELD_DELIMITER)
 
     # update the question_id_list in db
     # update_buffer_to_db(buffer_list)
