@@ -3,7 +3,6 @@
 
 from zhihu_util import *
 from zhihu_item import ZhihuItem
-from transaction_manager import TransactionManager
 import zhihu_question_detail_parser
 
 
@@ -112,6 +111,7 @@ def main():
     print "question detail's mode:%s" % question_detail.mode
 
     question_detail.update_question(last_visit_date)
+
 
 if __name__ == '__main__':
     main()
