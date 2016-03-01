@@ -709,7 +709,7 @@ class User:
 
 def init_bloom_filter():
     print "...init bloom filter..."
-    write_bf = generate_write_bloomfilter("user")
+    write_bf = generate_write_bloomfilter("user", 10000000)
     return write_bf
 
 def generate_write_bloomfilter(dir_name, capacity=1000000, error_rate=0.01):
