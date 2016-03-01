@@ -52,7 +52,6 @@ def login():
     print res.status_code
     m_cookies = res.cookies
 
-
     test_url = 'http://www.zhihu.com/people/jie-28/followees'
     res = s.get(test_url, headers=headers_base, cookies=m_cookies)
 
