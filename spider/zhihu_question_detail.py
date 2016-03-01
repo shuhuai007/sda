@@ -24,15 +24,11 @@ def generate_available_ids(max_id, step):
 
     return ",".join(id_list)
 
-
 def get_question_id_list():
     sample_file = "question_id.sample"
-    file_object = open(sample_file, 'r')
-    try:
-        line = file_object.readline()
-        question_id_list = line.split(",")
-    finally:
-        file_object.close()
+    question_id_list = []
+    with open(sample_file, 'r') as f:
+        question_id_list.add(f.readline().split(","))
     return question_id_list
 
 
@@ -59,7 +55,7 @@ class ZhihuQuestionDetail(ZhihuItem):
         if self.is_develop_mode():
             return get_question_id_list()
 
-        available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
+        available_ids = generate_available_topic_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
         available_id_list = available_ids.split(',')
 
         # debug code

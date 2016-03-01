@@ -11,20 +11,6 @@ MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
 
 
-def generate_available_topic_ids(max_id=MAX_TOPIC_TABLE_ID, step=TOPIC_ID_STEP):
-    id_list = []
-    # find the seed from config.ini
-    topic_id_seed = get_topic_id_seed(get_local_ip())
-    print "...............topic_id_seed:%s" % topic_id_seed
-    # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
-    topic_id = int(topic_id_seed)
-    while topic_id <= max_id:
-        id_list.append(str(topic_id))
-        topic_id += step
-
-    return ",".join(id_list)
-
-
 class ZhihuQuestion(ZhihuItem):
 
     def __init__(self, run_mode='prod'):
@@ -78,7 +64,7 @@ def get_level2_topic_id_list(last_visit_date, is_develop=False):
     level2_topic_id_list = []
     sql = "SELECT TOPIC_ID FROM ZHIHU_TOPIC WHERE TOPIC_ID != PARENT_ID AND LAST_VISIT < '%s'" \
           % last_visit_date
-    available_topic_ids = generate_available_topic_ids()
+    available_topic_ids = generate_available_topic_ids(MAX_TOPIC_TABLE_ID, TOPIC_ID_STEP)
     sql += " AND ID IN (%s) " % available_topic_ids
 
     if is_develop:

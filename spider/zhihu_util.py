@@ -269,6 +269,18 @@ def get_topic_id_seed(ip):
     topic_id_seed = cf.get("nodes", ip)
     return topic_id_seed
 
+def generate_available_topic_ids(max_id, step):
+    id_list = []
+    # find the seed from config.ini
+    topic_id_seed = get_topic_id_seed(get_local_ip())
+    print "...............topic_id_seed:%s" % topic_id_seed
+    # generate topic id each 10 steps. For example: 1, 11, 21, 31, 41, 51, ...
+    topic_id = int(topic_id_seed)
+    while topic_id <= max_id:
+        id_list.append(str(topic_id))
+        topic_id += step
+
+    return ",".join(id_list)
 
 def generate_id_list(id_seed=1, step_range=1, max_id=100):
     id_list = []
