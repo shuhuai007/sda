@@ -12,10 +12,11 @@ AVAIL_ID_SIZE_THRESHOLD = 10000
 
 
 def get_question_id_list():
-    sample_file = "question_id.sample"
+    import os
+    sample_file = os.path.abspath((os.path.dirname(__file__)) + "/question_id.sample")
     question_id_list = []
     with open(sample_file, 'r') as f:
-        question_id_list.add(f.readline().split(","))
+        question_id_list.append(f.readline().split(","))
     return question_id_list
 
 
@@ -99,5 +100,5 @@ def main():
     question_detail.update_question(last_visit_date)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
