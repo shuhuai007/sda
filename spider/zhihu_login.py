@@ -63,26 +63,6 @@ def login():
     print "response:%s" % res.text
     get_users(res.text)
 
-    # ids = 'fd80e95ce7069f0f06cc0ac07be34864'  #某人的member id
-    # nums = 300
-    #
-    # def get_fos(nums, ids):
-    #     users = []
-    #     for index in range(20, nums+1, 20):
-    #         fo_url = 'http://www.zhihu.com/node/ProfileFolloweesListV2'
-    #         m_data = {
-    #             'method': 'next',
-    #             'params': '{"offset":'+ str(index) + ',"order_by":"created","hash_id":"'+ ids +'"}',
-    #             '_xsrf': xsrf,
-    #         }
-    #         res = s.get(fo_url, headers=headers_base, data=m_data)
-    #         soup = BeautifulSoup(res.text, 'html.parser')
-    #         for link in soup.find_all('a', 'zm-item-link-avatar'):
-    #             users.append(link.get('href'))
-    #     return users
-    #
-    # users = get_fos(nums, ids)
-
 
 def work():
     login()
