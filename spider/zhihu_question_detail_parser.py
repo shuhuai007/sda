@@ -17,7 +17,6 @@ QUESTION_WRITE_BUFFER_SIZE = 10000
 QUESTION_DETAIL_FIELD_DELIMITER = "\001"
 
 
-
 def get_question_content(soup):
     content = ""
     try:
