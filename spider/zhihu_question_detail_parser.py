@@ -10,7 +10,6 @@ from bs4 import BeautifulSoup
 from zhihu_util import *
 
 
-ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 # BUFFER SIZE of questions
 QUESTION_WRITE_BUFFER_SIZE = 10000
 

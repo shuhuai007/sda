@@ -31,9 +31,9 @@ class ZhihuQuestionDetail(ZhihuItem):
 
     def update_question(self, last_visit):
         # 1. Get all the question id needed
-        print "\n...Get all the question id needed"
+        print "...Get all the question id needed"
         question_id_list = self.generate_question_id_list(last_visit)
-        print "\n...question_id_list's len:%s" % len(question_id_list)
+        print "...question_id_list's len:%s" % len(question_id_list)
 
         # 2. Resolve all the question id concurrently, save to local files
         self.fetch_question_detail(question_id_list)
