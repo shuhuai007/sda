@@ -5,6 +5,7 @@ from transaction_manager import TransactionManager
 
 
 class ZhihuItem:
+
     def __init__(self, run_mode='prod'):
         self.mode = run_mode
         self.transaction_manager = TransactionManager()
