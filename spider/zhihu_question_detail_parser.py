@@ -9,10 +9,11 @@ sys.setdefaultencoding("utf-8")
 from bs4 import BeautifulSoup
 from zhihu_util import *
 
-ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 
+ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 # BUFFER SIZE of questions
 QUESTION_WRITE_BUFFER_SIZE = 10000
+
 
 def get_question_content(soup):
     content = ""
@@ -22,7 +23,6 @@ def get_question_content(soup):
     except:
         print "...get content error"
     return content
-
 
 def get_comment_count(soup):
     count = 0
@@ -49,7 +49,6 @@ def get_focus_count(soup):
 
     return count
 
-
 def get_focus_users(soup):
     user_list = []
     try:
@@ -65,7 +64,6 @@ def get_focus_users(soup):
         print "......Couldn't get user list, will be empty string"
     return ",".join(user_list)
 
-
 def get_browse_count(soup):
     count = 0
     try:
@@ -74,7 +72,6 @@ def get_browse_count(soup):
         print "......get visitsCount error"
     # print "......browse_count:%s" % count
     return count
-
 
 def get_related_focus_info(soup):
     related_focus = 0
@@ -88,7 +85,6 @@ def get_related_focus_info(soup):
     print "......related_focus, last_edited : (%s,%s)" % (related_focus, last_edited)
     return related_focus, last_edited
     # print "......quesiton_status_div:%s" % quesiton_status_div
-
 
 def update_question_detail(question_id_list):
     if not question_id_list:
@@ -118,7 +114,6 @@ def update_question_detail(question_id_list):
     write_buffer(buffer_list)
     # print "...buffer_list:%s" % buffer_list
 
-
 def write_buffer(buffer_list):
     if len(buffer_list) == 0:
         return
@@ -130,7 +125,6 @@ def write_buffer(buffer_list):
     # update the question_id_list in db
     # update_buffer_to_db(buffer_list)
 
-
 def update_buffer_to_db(buffer_list, tm):
     question_id_list = map(lambda question: question[0], buffer_list)
     sql = "UPDATE ZHIHU_QUESTION_ID SET LAST_VISIT = %s WHERE QUESTION_ID = %s"
@@ -138,4 +132,3 @@ def update_buffer_to_db(buffer_list, tm):
     args = map(lambda question_id: (ts, question_id), question_id_list)
     print "......Update sql:%s, args:%s" % (sql, args)
     tm.execute_many_sql(sql, args)
-
