@@ -24,5 +24,5 @@ class TestUtil(unittest.TestCase):
         os.remove("test.log")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

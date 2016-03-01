@@ -38,7 +38,6 @@ class TestZhihuQuestion(unittest.TestCase):
         self.assertIsNotNone(actual_list)
         self.assertTrue(len(actual_list) == 2)
 
-
     def tearDown(self):
         pass
 
