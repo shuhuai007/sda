@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 import getopt
 import urllib2
 import gzip
@@ -223,35 +224,21 @@ class WorkerManager:
     def get_result(self, *args, **kwds):
         return self.resultQueue.get(*args, **kwds)
 
-
 def get_question_data_directory():
-    import os
-    # TODO (zj) should be constant variable
-    question_data_dir = os.path.abspath('../../data/zhihu/question')
-    return question_data_dir
-
+    return get_data_directory("question")
 
 def get_answer_data_directory():
-    import os
-    import stat
-    # TODO (zj) should be constant variable
-    answer_data_dir = os.path.abspath('../../data/zhihu/answer')
-    if not os.path.exists(answer_data_dir):
-        os.makedirs(answer_data_dir)
-        os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-    return answer_data_dir
-
+    return get_data_directory("answer")
 
 def get_data_directory(keyword):
     import os
     import stat
-    # TODO (zj) should be constant variable
-    answer_data_dir = os.path.abspath('../../data/zhihu/{0}'.format(keyword))
-    if not os.path.exists(answer_data_dir):
-        os.makedirs(answer_data_dir)
-        os.chmod(answer_data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-    return answer_data_dir
-
+    data_dir = os.path.abspath(os.path.dirname(__file__)) \
+        + "/../data/zhihu/{0}".format(keyword)
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+        os.chmod(data_dir, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+    return os.path.realpath(data_dir)
 
 def get_local_ip():
     import socket
@@ -260,7 +247,6 @@ def get_local_ip():
     address = socket.gethostbyname(host_name)
     print "...local address:%s" % address
     return address
-
 
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
@@ -289,18 +275,15 @@ def generate_id_list(id_seed=1, step_range=1, max_id=100):
         id_seed += step_range
     return id_list
 
-
 def get_question_detail_thread_amount():
     question_detail_thread_amount = get_thread_amount("question_detail_thread_amount")
     return question_detail_thread_amount
-
 
 def get_thread_amount(config_key):
     cf = ConfigParser.ConfigParser()
     cf.read(CONFIG_INI_PATH)
     thread_amount = int(cf.get(config_key, config_key))
     return thread_amount
-
 
 def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
