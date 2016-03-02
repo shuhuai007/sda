@@ -50,7 +50,7 @@ def get_focus_count(soup):
             find('div', attrs={'class': 'zg-gray-normal'}).a.strong.get_text()
         count = int(count)
     except:
-        print "......get count error, it will be 0"
+        print "......get focus count error, it will be 0"
     # print "......focus count:%s" % count
 
     return count
@@ -67,7 +67,7 @@ def get_focus_users(soup):
                 user_list.append(user_name)
         # print "......focus user list:%s" % ",".join(user_list)
     except Exception,e:
-        print "......Couldn't get user list, will be empty string"
+        print "......Couldn't get focus user list, will be empty string"
     return ",".join(user_list)
 
 def get_browse_count(soup):
