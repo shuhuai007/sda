@@ -33,7 +33,6 @@ def get_content(to_url, max_attempts=3):
 
     return get_content_from_resp(resp)
 
-
 def call_url(max_attempts, req, to_url):
     retry = 0
     resp = None
@@ -46,7 +45,6 @@ def call_url(max_attempts, req, to_url):
             time.sleep(1)
     return resp
 
-
 def post(to_url, post_data, max_attempts=3):
     headers = get_headers()
 
@@ -57,7 +55,6 @@ def post(to_url, post_data, max_attempts=3):
         return "FAIL"
 
     return get_content_from_resp(resp)
-
 
 def get_content_from_resp(resp):
     try:
@@ -71,7 +68,6 @@ def get_content_from_resp(resp):
     except Exception, e:
         print "Error when get_content_from_resp, error message:%s" % e.message
         return "FAIL"
-
 
 def get_xsrf_from_cookie(cookie):
     cookie_list = cookie.split(';')
@@ -88,17 +84,14 @@ def get_xsrf_from_cookie(cookie):
     print "\n\n_xsrf doesn't exist in cookie"
     return ""
 
-
 def get_xsrf():
     return get_xsrf_from_cookie(get_cookie())
-
 
 def get_cookie():
     cf = ConfigParser.ConfigParser()
     cf.read(CONFIG_INI_PATH)
     cookie = cf.get("cookie", "cookie")
     return cookie
-
 
 def get_headers():
     cookie = get_cookie()
@@ -110,7 +103,6 @@ def get_headers():
         'Accept-Encoding': 'gzip'
     }
     return headers
-
 
 def parse_options():
     def usage():
@@ -141,7 +133,6 @@ def parse_options():
             sys.exit(2)
     return mode, last_visit_date
 
-
 def error_2_file(msg, file_name):
     file_object = open(file_name, 'w+')
     try:
@@ -149,12 +140,10 @@ def error_2_file(msg, file_name):
     finally:
         file_object.close()
 
-
 def get_today_date():
     import time
 
     return time.strftime("%Y-%m-%d")
-
 
 def get_current_timestamp():
     from datetime import datetime
@@ -162,8 +151,8 @@ def get_current_timestamp():
     i = datetime.now()
     return i.strftime('%Y-%m-%d %H:%M:%S')
 
-
-import Queue, sys
+import Queue
+import sys
 from threading import Thread
 
 # working thread
@@ -202,9 +191,9 @@ class WorkerManager:
         self.resultQueue = Queue.Queue()
         self.workers = []
         self.timeout = timeout
-        self._recruitThreads(num_of_workers)
+        self._recruit_threads(num_of_workers)
 
-    def _recruitThreads(self, num_of_workers):
+    def _recruit_threads(self, num_of_workers):
         for i in range(num_of_workers):
             worker = Worker(self.workQueue, self.resultQueue)
             self.workers.append(worker)
@@ -223,6 +212,7 @@ class WorkerManager:
 
     def get_result(self, *args, **kwds):
         return self.resultQueue.get(*args, **kwds)
+
 
 def get_question_data_directory():
     return get_data_directory("question")
