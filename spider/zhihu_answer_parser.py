@@ -30,7 +30,6 @@ def get_question_content(soup):
         print "...get content error"
     return content
 
-
 def get_comment_count(soup):
     count = 0
     try:
@@ -56,7 +55,6 @@ def get_focus_count(soup):
 
     return count
 
-
 def get_focus_users(soup):
     user_list = []
     try:
@@ -72,7 +70,6 @@ def get_focus_users(soup):
         print "......Couldn't get user list, will be empty string"
     return ",".join(user_list)
 
-
 def get_browse_count(soup):
     count = 0
     try:
@@ -81,7 +78,6 @@ def get_browse_count(soup):
         print "......get visitsCount error"
     # print "......browse_count:%s" % count
     return count
-
 
 def get_related_focus_info(soup):
     related_focus = 0
@@ -95,7 +91,6 @@ def get_related_focus_info(soup):
     print "......related_focus, last_edited : (%s,%s)" % (related_focus, last_edited)
     return related_focus, last_edited
     # print "......quesiton_status_div:%s" % quesiton_status_div
-
 
 def generate_post_data(question_id, offset, pagesize=20):
     # method:next
@@ -121,7 +116,6 @@ def generate_post_data(question_id, offset, pagesize=20):
 
     return post_data
 
-
 def get_answer_id(soup):
     answer_id = '0'
     try:
@@ -144,7 +138,6 @@ def get_comment_count(soup):
     # print "......comment count:%s" % count
     return count
 
-
 def get_answer_content(soup):
     answer_content = ""
     try:
@@ -156,7 +149,6 @@ def get_answer_content(soup):
     # print "......answer_content:%s" % answer_content
     return answer_content
 
-
 def get_data_aid(soup):
     aid = '0'
     try:
@@ -166,7 +158,6 @@ def get_data_aid(soup):
         print "......get data-aid error, it will be 0"
     # print "......answer data-aid:%s" % aid
     return aid
-
 
 def get_username(soup):
     username = 'anonymous'
@@ -181,7 +172,6 @@ def get_username(soup):
     # print "......answer username:%s" % username
     return username
 
-
 def get_vote_count(soup):
     count = '0'
     try:
@@ -193,7 +183,6 @@ def get_vote_count(soup):
     # print "......vote count:%s" % count
     return count
 
-
 def get_created_time(soup):
     created = '0'
     try:
@@ -203,7 +192,6 @@ def get_created_time(soup):
         print "......get created time error, it will be 0"
     # print "......created time:%s" % created
     return created
-
 
 def generate_answer_list(resp):
     result_list = []
@@ -222,7 +210,6 @@ def generate_answer_list(resp):
         result_list.append((answer_id, answer_content, data_aid, user_name, created_time,
                             vote_count, comment_count))
     return result_list
-
 
 def get_answers_for_question(question_id):
     request_url = ZHIHU_ANSWER_POST_URL
@@ -250,7 +237,6 @@ def get_answers_for_question(question_id):
     write_buffer(buffer_list, question_id)
     print "...buffer_list's length:%s" % len(buffer_list)
 
-
 def update_answer(question_id_list):
     print "...enter update_answer..."
     if not question_id_list:
@@ -276,4 +262,3 @@ def update_buffer_to_db(buffer_list, tm):
     args = map(lambda question_id: (ts, question_id), question_id_list)
     print "......Update sql:%s, args:%s" % (sql, args)
     tm.execute_many_sql(sql, args)
-
