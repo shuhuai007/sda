@@ -64,6 +64,8 @@ class TestZhihuQuestionParser(unittest.TestCase):
         self.assertIsNotNone(lines)
         self.assertTrue(len(lines) <= 20)
 
+        self.assertTrue(len(lines[0].split(zhihu_constants.ZHIHU_QUESTION_DATA_DELIMETER)) == 5)
+
     def test_get_max_page_index(self):
         list_question_url = "https://www.zhihu.com/topic/19552397/questions?page=1"
         max_id = zhihu_question_parser.get_max_page_index(list_question_url)
