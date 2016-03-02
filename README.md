@@ -1,46 +1,10 @@
-## Python 命名规范
-python源码和其他一些书籍，命名各种个性，没有一个比较统一的命名规范。于是自己总结了一些，可供参考。
-###模块名：
-小写字母，单词之间用_分割  
-ad\_stats.py
+## SDA data process
+### spider
+Fetch data from zhihu.com
 
-###包名：
-和模块名一样
+### flume
+Collect and push the data from spider machines into HDFS
 
-###类名：
-单词首字母大写
-AdStats
-ConfigUtil
-
-###全局变量名（类变量，在java中相当于static变量）：
-大写字母，单词之间用 \_ 分割  
-NUMBER  
-COLOR_WRITE
-
-###普通变量：
-小写字母，单词之间用 \_ 分割
-this\_is\_a\_var
-
-###实例变量：
-以_开头，其他和普通变量一样  
-_price    
-_instance\_var
-
-###私有实例变量（外部访问会报错）：
-以__开头（2个下划线），其他和普通变量一样  
-__private\_var
-
-###专有变量：
-\_\_开头，\_\_结尾，一般为python的自有变量，不要以这种方式命名  
-\_\_doc\_\_  
-\_\_class\_\_
-
-###普通函数：
-和普通变量一样：  
-get\_name()  
-count\_number()  
-ad\_stat()
-
-###私有函数（外部访问会报错）：
-以__开头（2个下划线），其他和普通函数一样  
-__get\_name()
+### oozie-wf
+Do etl periodically for the data which are located in HDFS collected from spider   
+ 

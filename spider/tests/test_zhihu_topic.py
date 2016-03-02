@@ -17,8 +17,8 @@ import spider.zhihu_util
 class TestZhihuTopic(unittest.TestCase):
 
     def setUp(self):
-        squre_url = "https://www.zhihu.com/topics"
-        self.topic_square = spider.zhihu_topic.ZhihuTopicSquare(squre_url)
+        square_url = "https://www.zhihu.com/topics"
+        self.topic_square = spider.zhihu_topic.ZhihuTopicSquare(square_url)
         self.topic_level1_sample = spider.zhihu_topic.ZhihuLevel1Topic('253', '游戏', '253', 'sdfad')
 
     @mock.patch('spider.zhihu_util.get_xsrf')
