@@ -306,13 +306,12 @@ def write_buffer_file(buffer_list, file_name, delimiter=","):
     if len(buffer_list) == 0:
         return
 
-    target = open(file_name, 'a')
-    for item_tuple in buffer_list:
-        item_list = list(item_tuple)
-        item_str = delimiter.join(map(str, item_list))
-        target.write(item_str)
-        target.write('\n')
-    target.close()
+    with open(file_name, 'a') as target:
+        for item_tuple in buffer_list:
+            item_list = list(item_tuple)
+            item_str = delimiter.join(map(str, item_list))
+            target.write(item_str)
+            target.write('\n')
 
 def get_file_list(dir_path):
     return [dir_path + '/' + file_name for file_name in os.listdir(dir_path)]

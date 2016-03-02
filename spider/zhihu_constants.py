@@ -20,4 +20,7 @@ ZHIHU_ANSWER_POST_URL = "https://www.zhihu.com/node/QuestionAnswerListV2"
 
 ZHIHU_QUESTION_DATA_DELIMETER = "\001"
 
+ZHIHU_QUESTION_DETAIL_FIELD_DELIMITER = "\001"
+
+
 LOG_PREFIX = "------------------enter {0}------------------"
