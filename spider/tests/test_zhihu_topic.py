@@ -41,7 +41,7 @@ class TestZhihuTopic(unittest.TestCase):
     def test_get_topic_name(self):
         self.assertEqual("游戏", self.topic_level1_sample.get_topic_name())
 
-    def test_get_fileds(self):
+    def test_get_fields(self):
         expected_fields = ("253", "游戏", "253")
         self.assertEqual(expected_fields, self.topic_level1_sample.get_fields())
 
