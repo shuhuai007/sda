@@ -244,7 +244,7 @@ def update_answer(question_id_list):
 
     for question_id in question_id_list:
         # print "index:%s, question id:%s" % (index, question_id_list[int(index)])
-        print "\n\n......question id:%s" % question_id
+        print "\n......question id:%s" % question_id
         get_answers_for_question(question_id)
 
 def write_buffer(buffer_list, question_id):
