@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+
+DEFAULT_OOZIE_URL="http://sandbox.hortonworks.com:11000/oozie"
+
 BIN=$(cd "$( dirname "$0" )"; pwd)
 
 WORKFLOW_DIR="${BIN}/../workflow"
@@ -28,11 +31,14 @@ EOF
 }
 
 parseArgs() {
-    while getopts "j:h" arg
+    while getopts "j:o:h" arg
     do
         case ${arg} in
              j)
                 job_id=$OPTARG
+                ;;
+             o)
+                oozie_url=$OPTARG
                 ;;
              h)
                 usage
@@ -63,6 +69,16 @@ info(){
 
 
 parseArgs $*
+
+if [ -z "${OOZIE_URL}" ]; then
+    if [ -z "oozie_url" ]; then
+        export OOZIE_URL=${DEFAULT_OOZIE_URL}
+    else
+        export OOZIE_URL=${oozie_url}
+    fi
+fi
+
+echo "OOZIE_URL:${OOZIE_URL}"
 
 shift $((OPTIND-1))
 
