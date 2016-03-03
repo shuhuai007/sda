@@ -58,7 +58,7 @@ run(){
     hadoop fs -rmr "${PROJECT_HDFS_PATH}/workflow"
 
     hadoop fs -put ${WORKFLOW_DIR} ${PROJECT_HDFS_PATH}
-
+    echo "Executing: oozie job -config ${JOB_PROPERTIES_PATH} -run"
     oozie job -config ${JOB_PROPERTIES_PATH} -run
 }
 
