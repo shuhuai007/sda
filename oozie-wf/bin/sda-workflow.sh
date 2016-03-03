@@ -48,7 +48,7 @@ parseArgs() {
 
 #remove old workflow files, including config files and lib, then run the job
 run(){
-
+    echo "hadoop remove old sda workflow files, including config and lib"
     hadoop fs -rmr "${PROJECT_HDFS_PATH}/workflow"
 
     hadoop fs -put ${WORKFLOW_DIR} ${PROJECT_HDFS_PATH}
@@ -57,9 +57,8 @@ run(){
 }
 
 info(){
-
+    echo "oozie job -info ${job_id}"
     oozie job -info ${job_id}
-
 }
 
 
@@ -73,7 +72,6 @@ echo "...What:${WHAT}"
 if [ "$WHAT" == "info" ]; then
     info
 elif [ "$WHAT" == "run" ]; then
-    echo "...start the workflow job..."
     run
 else
     echo "run or info should be appended, please see the usage of command"
