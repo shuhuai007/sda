@@ -5,13 +5,11 @@ DEFAULT_OOZIE_URL="http://sandbox.hortonworks.com:11000/oozie"
 
 BIN=$(cd "$( dirname "$0" )"; pwd)
 
-WORKFLOW_DIR="${BIN}/../workflow"
-
-echo "workflow dir path: ${WORKFLOW_DIR}"
+LOCAL_WORKFLOW_DIR="${BIN}/../workflow"
+JOB_PROPERTIES_PATH="${LOCAL_WORKFLOW_DIR}/job.properties"
+echo "workflow dir path: ${LOCAL_WORKFLOW_DIR}"
 
 PROJECT_HDFS_PATH="/user/oozie/apps/sda"
-
-JOB_PROPERTIES_PATH="${PROJECT_HDFS_PATH}/workflow/job.properties"
 
 
 usage() {
@@ -57,7 +55,7 @@ run(){
     echo "hadoop remove old sda workflow files, including config and lib"
     hadoop fs -rmr "${PROJECT_HDFS_PATH}/workflow"
 
-    hadoop fs -put ${WORKFLOW_DIR} ${PROJECT_HDFS_PATH}
+    hadoop fs -put ${LOCAL_WORKFLOW_DIR} ${PROJECT_HDFS_PATH}
     echo "Executing: oozie job -config ${JOB_PROPERTIES_PATH} -run"
     oozie job -config ${JOB_PROPERTIES_PATH} -run
 }
