@@ -33,7 +33,7 @@
             <file>script/shell/move-data.sh</file>
             <capture-output/>
         </shell>
-        <ok to="hive2-nod"/>
+        <ok to="hive2-node"/>
         <error to="fail"/>
     </action>
 
