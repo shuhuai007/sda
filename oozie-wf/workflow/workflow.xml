@@ -15,9 +15,28 @@
             <arg>Hello</arg>
             <arg>Oozie!</arg>
         </java>
+        <ok to="shell-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="shell-node">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>test.sh</exec>
+            <file>test.sh/file>
+            <capture-output/>
+        </shell>
         <ok to="end"/>
         <error to="fail"/>
     </action>
+
     <kill name="fail">
         <message>Java failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
