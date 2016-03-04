@@ -157,11 +157,12 @@ from threading import Thread
 
 # working thread
 class Worker(Thread):
+
     worker_count = 0
     timeout = 2
 
-    def __init__(self, work_queue, result_queue, **kwds):
-        Thread.__init__(self, **kwds)
+    def __init__(self, work_queue, result_queue, **kwargs):
+        Thread.__init__(self, **kwargs)
         self.id = Worker.worker_count
         Worker.worker_count += 1
         self.setDaemon(True)
@@ -186,6 +187,7 @@ class Worker(Thread):
 
 
 class WorkerManager:
+
     def __init__(self, num_of_workers=10, timeout=2):
         self.workQueue = Queue.Queue()
         self.resultQueue = Queue.Queue()
@@ -207,11 +209,11 @@ class WorkerManager:
                 self.workers.append(worker)
         print "All jobs are are completed."
 
-    def add_job(self, callable, *args, **kwds):
-        self.workQueue.put((callable, args, kwds))
+    def add_job(self, callable, *args, **kwargs):
+        self.workQueue.put((callable, args, kwargs))
 
-    def get_result(self, *args, **kwds):
-        return self.resultQueue.get(*args, **kwds)
+    def get_result(self, *args, **kwargs):
+        return self.resultQueue.get(*args, **kwargs)
 
 
 def get_question_data_directory():
