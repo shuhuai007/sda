@@ -33,6 +33,29 @@
             <file>script/shell/move-data.sh</file>
             <capture-output/>
         </shell>
+        <ok to="hive2-nod"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="hive2-node">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <!--<prepare>
+                <delete path="${nameNode}/user/${wf:user()}/${examplesRoot}/output-data/hive2"/>
+                <mkdir path="${nameNode}/user/${wf:user()}/${examplesRoot}/output-data"/>
+            </prepare>-->
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${jdbcURL}</jdbc-url>
+            <script>script/hive/script.q</script>
+            <param>INPUT=/user/flume/project/test_table</param>
+            <!--<param>OUTPUT=/user/${wf:user()}/${examplesRoot}/output-data/hive2</param>-->
+        </hive2>
         <ok to="end"/>
         <error to="fail"/>
     </action>
