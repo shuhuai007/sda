@@ -29,8 +29,8 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <exec>test.sh</exec>
-            <file>test.sh</file>
+            <exec>move-data.sh</exec>
+            <file>script/shell/move-data.sh</file>
             <capture-output/>
         </shell>
         <ok to="end"/>
