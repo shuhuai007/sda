@@ -30,7 +30,7 @@
                 </property>
             </configuration>
             <exec>test.sh</exec>
-            <file>test.sh/file>
+            <file>test.sh</file>
             <capture-output/>
         </shell>
         <ok to="end"/>
