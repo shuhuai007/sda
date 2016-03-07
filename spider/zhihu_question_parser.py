@@ -103,7 +103,8 @@ def generate_question_list_per_page(resp):
             focus_count = get_focus_count(div_tag, question_id)
             # print "focus count:%s" % focus_count
             question_list.append(
-                (question_id, question_title, answer_count, is_top_question, created_time))
+                (question_id, question_title, answer_count, focus_count, is_top_question,
+                 created_time))
         except:
             print "Fail to parse when executing generate_question_list_per_page()... "
 
