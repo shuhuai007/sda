@@ -117,6 +117,7 @@ def get_focus_count(div_tag, question_id):
                              .find('a', attrs={'href': focus_href}) \
                              .get_text().split(' ')[0]
     except:
+        print "Error when get focus count for question:%s" % question_id
         focus_count = 0
     return focus_count
 
