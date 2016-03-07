@@ -64,9 +64,8 @@ CREATE TABLE sda.zhihu_user(
   followees_num STRING,
   followers_num STRING,
   focus_topics_num STRING,
-  browse_num STRING
-)
- COMMENT 'This is zhihu user table'
- ROW FORMAT DELIMITED
-   FIELDS TERMINATED BY '\001'
+  browse_num STRING)
+COMMENT 'This is zhihu user table'
+ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY '1'
 STORED AS SEQUENCEFILE;

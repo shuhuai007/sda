@@ -1,7 +1,7 @@
 
 
 create database if not exists sda;
-CREATE TABLE if not exists sda.zhihu_user(
+CREATE TABLE sda.zhihu_user(
   url_suffix STRING,
   data_id STRING,
   user_name STRING,
@@ -23,11 +23,10 @@ CREATE TABLE if not exists sda.zhihu_user(
   followees_num STRING,
   followers_num STRING,
   focus_topics_num STRING,
-  browse_num STRING
-)
- COMMENT 'This is zhihu user table'
- ROW FORMAT DELIMITED
-   FIELDS TERMINATED BY '\001'
+  browse_num STRING)
+COMMENT 'This is zhihu user table'
+ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY '1'
 STORED AS SEQUENCEFILE;
 
-LOAD DATA  INPATH '${INPUT}' INTO TABLE test_hive2;
+LOAD DATA  INPATH '${INPUT}' INTO TABLE sda.zhihu_user;
