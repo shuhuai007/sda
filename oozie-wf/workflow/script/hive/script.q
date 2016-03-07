@@ -26,7 +26,6 @@ CREATE TABLE if not exists sda.zhihu_user(
   browse_num STRING)
 COMMENT 'This is zhihu user table'
 ROW FORMAT DELIMITED
-        FIELDS TERMINATED BY '1'
-STORED AS SEQUENCEFILE;
+        FIELDS TERMINATED BY '1';
 
 LOAD DATA  INPATH '${INPUT}' INTO TABLE sda.zhihu_user;
