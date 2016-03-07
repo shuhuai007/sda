@@ -101,7 +101,7 @@ def generate_question_list_per_page(resp):
             created_time = transfer_timestamp(timestamp_ms)
 
             focus_count = get_focus_count(div_tag, question_id)
-            print "focus count:%s" % focus_count
+            # print "focus count:%s" % focus_count
             question_list.append(
                 (question_id, question_title, answer_count, is_top_question, created_time))
         except:
