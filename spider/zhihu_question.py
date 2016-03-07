@@ -7,6 +7,7 @@ from zhihu_item import ZhihuItem
 from transaction_manager import TransactionManager
 import zhihu_question_parser
 
+
 MAX_TOPIC_TABLE_ID = 15000
 TOPIC_ID_STEP = 10
 
@@ -39,7 +40,6 @@ class ZhihuQuestion(ZhihuItem):
     def update_question_for_each_topic(self, level2_topic_id):
         print "\n...Begin, to fetch questions for topic - %s" % level2_topic_id
         zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id, self.is_develop_mode())
-        # self.persist_questions(question_list_per_topic)
         update_level2_topic_timestamp(level2_topic_id)
 
     def persist_questions(self, question_list_per_topic):

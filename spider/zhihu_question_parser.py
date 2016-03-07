@@ -48,6 +48,8 @@ def fetch_question_list_per_topic(level2_topic_id, is_develop=False):
               (level2_topic_id, page_index, max_page_index)
         list_question_url = get_question_list_url(level2_topic_id, page_index)
         resp = get_content(list_question_url)
+        if resp == 'FAIL':
+            continue
         # print "......resp:%s" % resp
         question_list_per_page = generate_question_list_per_page(resp)
         temp_question_list += question_list_per_page
