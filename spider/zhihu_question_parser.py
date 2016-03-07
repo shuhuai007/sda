@@ -99,12 +99,27 @@ def generate_question_list_per_page(resp):
             question_id = h2_tag.a.get('href').split('/')[2]
             timestamp_ms = h2_tag.span.get('data-timestamp')
             created_time = transfer_timestamp(timestamp_ms)
+
+            focus_count = get_focus_count(div_tag, question_id)
+            print "focus count:%s" % focus_count
             question_list.append(
                 (question_id, question_title, answer_count, is_top_question, created_time))
         except:
             print "Fail to parse when executing generate_question_list_per_page()... "
 
     return question_list
+
+
+def get_focus_count(div_tag, question_id):
+    try:
+        focus_href = "/question/{0}/followers".format(question_id)
+        focus_count = div_tag.find('div', attrs={'class': 'question-item-meta'}) \
+                             .find('a', attrs={'href': focus_href}) \
+                             .get_text().split(' ')[0]
+    except:
+        focus_count = 0
+    return focus_count
+
 
 def transfer_timestamp(timestamp_ms, time_format="%Y-%m-%d %H:%M:%S"):
     import time
