@@ -15,8 +15,7 @@ class ZhihuQuestion(ZhihuItem):
 
     def __init__(self, run_mode='prod'):
         ZhihuItem.__init__(self, run_mode)
-        self.question_thread_amount = int(self.cf.get("question_thread_amount",
-                                                      "question_thread_amount"))
+        self.question_thread_amount = get_thread_amount("question_thread_amount")
 
     def update_question(self, last_visit_date):
         # Get the level 2 topic id list from db.
@@ -41,7 +40,7 @@ class ZhihuQuestion(ZhihuItem):
         print "\n...Begin, to fetch questions for topic - %s" % level2_topic_id
         zhihu_question_parser.fetch_question_list_per_topic(level2_topic_id, self.is_develop_mode())
         # self.persist_questions(question_list_per_topic)
-        self.update_level2_topic_timestamp(level2_topic_id)
+        update_level2_topic_timestamp(level2_topic_id)
 
     def persist_questions(self, question_list_per_topic):
         insert_sql = "INSERT IGNORE INTO ZHIHU_QUESTION " \
@@ -51,14 +50,13 @@ class ZhihuQuestion(ZhihuItem):
         tm.execute_many_sql(insert_sql, question_list_per_topic)
         tm.close_connection()
 
-    def update_level2_topic_timestamp(self, level2_topic_id):
-        sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = %s WHERE TOPIC_ID = %s" % \
-              (get_current_timestamp(), level2_topic_id)
-        # self.cursor.execute(sql, (get_current_timestamp(), level2_topic_id))
-        tm = TransactionManager()
-        tm.execute_sql(sql)
-        tm.close_connection()
 
+def update_level2_topic_timestamp(level2_topic_id):
+    sql = "UPDATE ZHIHU_TOPIC SET LAST_VISIT = '%s' WHERE TOPIC_ID = %s" % \
+          (get_current_timestamp(), level2_topic_id)
+    tm = TransactionManager()
+    tm.execute_sql(sql)
+    tm.close_connection()
 
 def get_level2_topic_id_list(last_visit_date, is_develop=False):
     level2_topic_id_list = []

@@ -243,8 +243,11 @@ def get_local_ip():
 def get_topic_id_seed(ip):
     cf = ConfigParser.ConfigParser()
     cf.read(CONFIG_INI_PATH)
+    try:
 
-    topic_id_seed = cf.get("nodes", ip)
+        topic_id_seed = cf.get("nodes", ip)
+    except:
+        topic_id_seed = 1
     return topic_id_seed
 
 def generate_available_topic_ids(max_id, step):
@@ -296,6 +299,9 @@ def get_file_names(dir_path):
 
 
 if __name__ == '__main__':
-    print "...question data dir:%s" % get_question_data_directory()
-    print "get_file_list:%s" % get_file_list("/Users/jiezhou/OpenSource/sda/spider/entity")
-    print "get_file_names:%s" % get_file_names("/Users/jiezhou/OpenSource/sda/spider/entity")
+    # print "...question data dir:%s" % get_question_data_directory()
+    # print "get_file_list:%s" % get_file_list("/Users/jiezhou/OpenSource/sda/spider/entity")
+    # print "get_file_names:%s" % get_file_names("/Users/jiezhou/OpenSource/sda/spider/entity")
+    print str(get_current_timestamp())
+    import zhihu_question
+    zhihu_question.update_level2_topic_timestamp('19551292')
