@@ -52,7 +52,7 @@
                 </property>
             </configuration>
             <jdbc-url>${jdbcURL}</jdbc-url>
-            <script>script/hive/script.q</script>
+            <script>script/hive/useradd.q</script>
             <param>INPUT=/user/flume/project/test_table</param>
             <!--<param>OUTPUT=/user/${wf:user()}/${examplesRoot}/output-data/hive2</param>-->
         </hive2>
