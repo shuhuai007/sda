@@ -1,7 +1,9 @@
 
+CREATE DATABASE IF NOT EXISTS sda;
 
-create database if not exists sda;
-CREATE TABLE if not exists sda.zhihu_user(
+USE sda;
+
+CREATE TABLE IF NOT EXISTS sda.zhihu_user(
   url_suffix STRING,
   data_id STRING,
   user_name STRING,
