@@ -16,7 +16,24 @@ INSERT OVERWRITE TABLE sda.zhihu_user_final
            max(cast(followers_num as int)), max(cast(focus_topics_num as int)),
            max(cast(browse_num as int))
     FROM sda.zhihu_user
+    WHERE data_id!='' and data_id!='NULL' and url_suffix!='' and url_suffix!='NULL'
     GROUP BY url_suffix, data_id, user_name, user_title,
              gender, location, business, employment,
              position, education, education_extra
 ;
+
+
+-- select a.* from
+--    (select employment, count(*) as count from zhihu_user_final  group by employment) as a
+--    order by a.count desc limit 10;
+
+-- select * from
+--    (select gender, count(*) as count from zhihu_user_final group by gender) as a
+--    order by a.count desc limit 3;
+
+-- select * from
+--    (select location, count(*) as count from zhihu_user_final group by location) as a
+--    order by a.count desc limit 30;
+
+
+
