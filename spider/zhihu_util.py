@@ -9,12 +9,10 @@ import StringIO
 import ConfigParser
 import time
 from zhihu_constants import *
+from transaction_manager import TransactionManager
 
-# import os
-# os.environ['http_proxy'] = '45.113.253.43:8090'
-# os.environ['https_proxy'] = '45.113.253.43:8090'
 
-def get_content(to_url, max_attempts=3):
+def get_content(to_url, max_attempts=2):
 
     try:
         install_opener()
@@ -36,25 +34,50 @@ def get_content(to_url, max_attempts=3):
 
     return get_content_from_resp(resp)
 
+def get_proxy_randomly():
+    select_sql = "SELECT PROXY_IP FROM ZHIHU_PROXY ORDER BY RAND() LIMIT 1"
+    tm = TransactionManager()
+    results = tm.execute_sql(select_sql)
+    tm.close_connection()
+    if len(results) == 0:
+        return ""
+    for row in results:
+        return str(row[0])
 
 def install_opener():
-    opener = urllib2.build_opener(urllib2.ProxyHandler())
+    proxy_ip = get_proxy_randomly()
+    print "proxy_ip:%s" % proxy_ip
+    # proxy_ip = ""
+
+    if proxy_ip == "":
+        proxy_handler = urllib2.ProxyHandler()
+    else:
+        proxy_handler = urllib2.ProxyHandler({
+            'http': proxy_ip,
+            'https': proxy_ip
+        })
+    opener = urllib2.build_opener(proxy_handler)
     urllib2.install_opener(opener)
 
-
-def call_url(max_attempts, req, to_url):
+def call_url(max_attempts, req, to_url, timeout=10):
     retry = 0
     resp = None
     while resp is None and retry < max_attempts:
         try:
-            resp = urllib2.urlopen(req, timeout=10)
+            resp = urllib2.urlopen(req, timeout=timeout)
         except Exception, e:
             retry += 1
             print "Calling url: {0}, error:{1}, Re-trying.....".format(to_url, e.message)
             time.sleep(1)
     return resp
 
-def post(to_url, post_data, max_attempts=3):
+def post(to_url, post_data, max_attempts=2):
+    try:
+        install_opener()
+    except Exception, e:
+        print "......urllib2 install opener fail:%s......" % e.message
+        return "FAIL"
+
     headers = get_headers()
 
     req = urllib2.Request(to_url, post_data, headers)

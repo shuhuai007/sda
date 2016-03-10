@@ -53,7 +53,7 @@ def send_request(url):
         'Accept-Encoding': 'gzip'
     }
     req = urllib2.Request(url=url, headers=headers)
-    resp = zhihu_util.call_url(2, req, PROXY_WEBSITE)
+    resp = zhihu_util.call_url(2, req, PROXY_WEBSITE, timeout=10)
     content = zhihu_util.get_content_from_resp(resp)
     return content
 
@@ -61,7 +61,7 @@ def check_proxy(ip_proxy):
     import os
     os.environ['http_proxy'] = ip_proxy
     os.environ['https_proxy'] = ip_proxy
-    content = zhihu_util.get_content("https://www.zhihu.com/question/27621722", max_attempts=1)
+    content = send_request(PROXY_WEBSITE)
     return content != 'FAIL'
 
 def persist(available_ip_list):
@@ -79,5 +79,6 @@ def persist(available_ip_list):
 
 
 if __name__ == "__main__":
-    available_ips = fetch_ips()
-    persist(available_ips)
+    # available_ips = fetch_ips()
+    # persist(available_ips)
+    print check_proxy("118.97.66.2:80")
