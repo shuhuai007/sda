@@ -10,8 +10,18 @@ import ConfigParser
 import time
 from zhihu_constants import *
 
+# import os
+# os.environ['http_proxy'] = '45.113.253.43:8090'
+# os.environ['https_proxy'] = '45.113.253.43:8090'
 
 def get_content(to_url, max_attempts=3):
+
+    try:
+        install_opener()
+    except Exception, e:
+        print "......urllib2 install opener fail:%s......" % e.message
+        return "FAIL"
+
     headers = get_headers()
 
     req = urllib2.Request(
@@ -19,19 +29,18 @@ def get_content(to_url, max_attempts=3):
         headers=headers
     )
 
-    try:
-        opener = urllib2.build_opener(urllib2.ProxyHandler())
-        urllib2.install_opener(opener)
-    except Exception, e:
-        print "......urllib2 install opener fail:%s......" % e.message
-        return "FAIL"
-
     resp = call_url(max_attempts, req, to_url)
 
     if resp is None:
         return "FAIL"
 
     return get_content_from_resp(resp)
+
+
+def install_opener():
+    opener = urllib2.build_opener(urllib2.ProxyHandler())
+    urllib2.install_opener(opener)
+
 
 def call_url(max_attempts, req, to_url):
     retry = 0
