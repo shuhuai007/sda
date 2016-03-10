@@ -20,10 +20,13 @@ PROXY_WEBSITE = "http://www.youdaili.net/Daili/guowai/"
 
 def parse_ips(ip_link):
     ip_content = send_request(ip_link)
-    soup = BeautifulSoup(ip_content, "html.parser")
-    ips = soup.find("div", attrs={'class': 'cont_font'}).find("p").get_text().encode("utf-8")
-    ip_list = map(lambda ip: ip.split("@")[0], ips.split("\n"))
-    return [(ip,) for ip in ip_list if check_proxy(ip)]
+    try:
+        soup = BeautifulSoup(ip_content, "html.parser")
+        ips = soup.find("div", attrs={'class': 'cont_font'}).find("p").get_text().encode("utf-8")
+        ip_list = map(lambda ip: ip.split("@")[0], ips.split("\n"))
+        return [(ip,) for ip in ip_list if check_proxy(ip)]
+    except:
+        return []
 
 def fetch_ips():
     ip_list = []
@@ -36,9 +39,10 @@ def fetch_ips():
     for ip_link in ip_links:
         ip_link = str(ip_link.get("href"))
         if ip_link.endswith(".html") and "Daili" in ip_link:
-            print ip_link
+            print "begin to parse ip_link:%s" % ip_link
             temp_list = parse_ips(ip_link)
-            ip_list += temp_list
+            if len(temp_list) > 0:
+                ip_list += temp_list
     return ip_list
 
 def send_request(url):
