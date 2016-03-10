@@ -52,10 +52,14 @@ def send_request(url):
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36',
         'Accept-Encoding': 'gzip'
     }
-    req = urllib2.Request(url=url, headers=headers)
-    resp = zhihu_util.call_url(2, req, PROXY_WEBSITE, timeout=10)
-    content = zhihu_util.get_content_from_resp(resp)
-    return content
+    try:
+        req = urllib2.Request(url=url, headers=headers)
+        resp = urllib2.urlopen(req, timeout=10)
+        content = zhihu_util.get_content_from_resp(resp)
+        return content
+    except:
+        print "send request error"
+        return "FAIL"
 
 def check_proxy(ip_proxy):
     import os
@@ -81,4 +85,4 @@ def persist(available_ip_list):
 if __name__ == "__main__":
     # available_ips = fetch_ips()
     # persist(available_ips)
-    print check_proxy("118.97.66.2:80")
+    print check_proxy("177.66.105.126:8080")

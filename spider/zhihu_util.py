@@ -1,6 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
+import sys
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/..')
+sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
+
 
 import getopt
 import urllib2
@@ -12,14 +17,7 @@ from zhihu_constants import *
 from transaction_manager import TransactionManager
 
 
-def get_content(to_url, max_attempts=2):
-
-    try:
-        install_opener()
-    except Exception, e:
-        print "......urllib2 install opener fail:%s......" % e.message
-        return "FAIL"
-
+def get_content(to_url, max_attempts=3):
     headers = get_headers()
 
     req = urllib2.Request(
@@ -34,7 +32,33 @@ def get_content(to_url, max_attempts=2):
 
     return get_content_from_resp(resp)
 
-def get_proxy_randomly():
+PROXY_HOST = "www.youdaili.net"
+PROXY_WEBSITE = "http://www.youdaili.net/Daili/guowai/"
+
+# def send_request(url):
+#     headers = {
+#         'Host': PROXY_HOST,
+#         'Referer': 'https://www.baidu.com/link?url=yZ8Z5H8yiKkLuxTC0mIBGIv3QFEvwmzu2gnzy-XU07URJkC4guyz6beWtZv8d4fh&wd=&eqid=8c6767b700042f580000000256e0d581',
+#         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36',
+#         'Accept-Encoding': 'gzip'
+#     }
+#     try:
+#         req = urllib2.Request(url=url, headers=headers)
+#         resp = urllib2.urlopen(req, timeout=10)
+#         content = get_content_from_resp(resp)
+#         return content
+#     except:
+#         print "send request error"
+#         return "FAIL"
+
+# def check_proxy(ip_proxy):
+#     import os
+#     os.environ['http_proxy'] = ip_proxy
+#     os.environ['https_proxy'] = ip_proxy
+#     content = send_request(PROXY_WEBSITE)
+#     return content != 'FAIL'
+
+def get_proxy_from_db():
     select_sql = "SELECT PROXY_IP FROM ZHIHU_PROXY ORDER BY RAND() LIMIT 1"
     tm = TransactionManager()
     results = tm.execute_sql(select_sql)
@@ -44,13 +68,22 @@ def get_proxy_randomly():
     for row in results:
         return str(row[0])
 
-def install_opener():
-    proxy_ip = get_proxy_randomly()
-    print "proxy_ip:%s" % proxy_ip
-    # proxy_ip = ""
+# def get_proxy_randomly():
+#     retry = 0
+#     while retry < 2:
+#         proxy_ip_addr = get_proxy_from_db()
+#         if check_proxy(proxy_ip_addr):
+#             print "check_proxy %s: True" % proxy_ip_addr
+#             return proxy_ip_addr
+#         retry += 1
+#     return ""
 
+def install_opener(proxy_ip):
     if proxy_ip == "":
-        proxy_handler = urllib2.ProxyHandler()
+        proxy_handler = urllib2.ProxyHandler({
+            'http': "127.0.0.1",
+            'https': "127.0.0.1"
+        })
     else:
         proxy_handler = urllib2.ProxyHandler({
             'http': proxy_ip,
@@ -64,6 +97,11 @@ def call_url(max_attempts, req, to_url, timeout=10):
     resp = None
     while resp is None and retry < max_attempts:
         try:
+            proxy_ip = get_proxy_from_db()
+            if retry == (max_attempts - 1):
+                proxy_ip = ""
+            print "proxy_ip:%s" % proxy_ip
+            install_opener(proxy_ip)
             resp = urllib2.urlopen(req, timeout=timeout)
         except Exception, e:
             retry += 1
@@ -71,13 +109,7 @@ def call_url(max_attempts, req, to_url, timeout=10):
             time.sleep(1)
     return resp
 
-def post(to_url, post_data, max_attempts=2):
-    try:
-        install_opener()
-    except Exception, e:
-        print "......urllib2 install opener fail:%s......" % e.message
-        return "FAIL"
-
+def post(to_url, post_data, max_attempts=3):
     headers = get_headers()
 
     req = urllib2.Request(to_url, post_data, headers)
