@@ -77,4 +77,3 @@ def persist(available_ip_list):
 if __name__ == "__main__":
     available_ips = fetch_ips()
     persist(available_ips)
-    # print check_proxy("54.174.103.155:3128")
