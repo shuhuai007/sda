@@ -19,19 +19,23 @@ PROXY_WEBSITE = "http://www.youdaili.net/Daili/guowai/"
 
 
 def parse_ips(ip_link):
-    ip_content = send_request(ip_link)
+    ip_content = send_request(ip_link, PROXY_HOST)
+    # print "ip content:%s" % ip_content
     try:
         soup = BeautifulSoup(ip_content, "html.parser")
         ips = soup.find("div", attrs={'class': 'cont_font'}).find("p").get_text().encode("utf-8")
+        # print "ips:%s" % ips
         ip_list = map(lambda ip: ip.split("@")[0], ips.split("\n"))
+        # print "ip_list:%s" % ip_list
         return [(ip,) for ip in ip_list if check_proxy(ip)]
-    except:
+    except Exception, e:
+        print "parse ips error:%s" % e.message
         return []
 
 def fetch_ips():
     ip_list = []
 
-    content = send_request(PROXY_WEBSITE)
+    content = send_request(PROXY_WEBSITE, PROXY_HOST)
 
     soup = BeautifulSoup(content, "html.parser")
     ip_links = soup.find_all("a", attrs={'target': '_blank'})
@@ -45,16 +49,16 @@ def fetch_ips():
                 ip_list += temp_list
     return ip_list
 
-def send_request(url):
+def send_request(url, proxy_host):
     headers = {
-        'Host': PROXY_HOST,
+        'Host': proxy_host,
         'Referer': 'https://www.baidu.com/link?url=yZ8Z5H8yiKkLuxTC0mIBGIv3QFEvwmzu2gnzy-XU07URJkC4guyz6beWtZv8d4fh&wd=&eqid=8c6767b700042f580000000256e0d581',
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.116 Safari/537.36',
         'Accept-Encoding': 'gzip'
     }
     try:
         req = urllib2.Request(url=url, headers=headers)
-        resp = urllib2.urlopen(req, timeout=10)
+        resp = urllib2.urlopen(req, timeout=3)
         content = zhihu_util.get_content_from_resp(resp)
         return content
     except:
@@ -62,11 +66,27 @@ def send_request(url):
         return "FAIL"
 
 def check_proxy(ip_proxy):
-    import os
-    os.environ['http_proxy'] = ip_proxy
-    os.environ['https_proxy'] = ip_proxy
-    content = send_request(PROXY_WEBSITE)
-    return content != 'FAIL'
+    proxy_handler = urllib2.ProxyHandler({
+        'http': ip_proxy,
+        'https': ip_proxy
+    })
+    opener = urllib2.build_opener(proxy_handler)
+    # urllib2.install_opener(opener)
+
+    headers = zhihu_util.get_headers()
+
+    req = urllib2.Request(
+        url="https://www.zhihu.com/question/40299633",
+        headers=headers
+    )
+    try:
+        resp = opener.open(req, timeout=5)
+        content = zhihu_util.get_content_from_resp(resp)
+        print "check proxy %s:%s" % (ip_proxy, content != 'FAIL')
+        return content != 'FAIL'
+    except:
+        print "check proxy %s:%s" % (ip_proxy, False)
+        return False
 
 def persist(available_ip_list):
     truncate_sql = "truncate TABLE ZHIHU_PROXY"
@@ -83,6 +103,6 @@ def persist(available_ip_list):
 
 
 if __name__ == "__main__":
-    # available_ips = fetch_ips()
+    available_ips = fetch_ips()
     # persist(available_ips)
-    print check_proxy("177.66.105.126:8080")
+    # print check_proxy("177.73.72.208:8080")
