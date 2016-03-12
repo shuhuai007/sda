@@ -14,12 +14,14 @@ from spider import zhihu_util
 from spider.transaction_manager import TransactionManager
 
 
-PROXY_HOST = "www.youdaili.net"
-PROXY_WEBSITE = "http://www.youdaili.net/Daili/guowai/"
+PROXY_HOST_1 = "www.youdaili.net"
+PROXY_WEBSITE_1 = "http://www.youdaili.net/Daili/guowai/"
+PROXY_HOST_2 = "free-proxy-list.net"
+PROXY_WEBSITE_2 = "http://free-proxy-list.net/"
 
 
-def parse_ips(ip_link):
-    ip_content = send_request(ip_link, PROXY_HOST)
+def parse_ips_1(ip_link):
+    ip_content = send_request(ip_link, PROXY_HOST_1, timeout=10)
     # print "ip content:%s" % ip_content
     try:
         soup = BeautifulSoup(ip_content, "html.parser")
@@ -32,10 +34,10 @@ def parse_ips(ip_link):
         print "parse ips error:%s" % e.message
         return []
 
-def fetch_ips():
+def resolve_1():
     ip_list = []
 
-    content = send_request(PROXY_WEBSITE, PROXY_HOST)
+    content = send_request(PROXY_WEBSITE_1, PROXY_HOST_1, timeout=10)
 
     soup = BeautifulSoup(content, "html.parser")
     ip_links = soup.find_all("a", attrs={'target': '_blank'})
@@ -44,12 +46,36 @@ def fetch_ips():
         ip_link = str(ip_link.get("href"))
         if ip_link.endswith(".html") and "Daili" in ip_link:
             print "begin to parse ip_link:%s" % ip_link
-            temp_list = parse_ips(ip_link)
+            temp_list = parse_ips_1(ip_link)
             if len(temp_list) > 0:
                 ip_list += temp_list
     return ip_list
 
-def send_request(url, proxy_host):
+def resolve_2():
+    ip_list = []
+
+    content = send_request(PROXY_WEBSITE_2, PROXY_HOST_2, timeout=10)
+
+    soup = BeautifulSoup(content, "html.parser")
+    # print "resolve 2:%s" % soup
+    tr_list = soup.find('tbody').find_all('tr')
+    for tr_item in tr_list:
+        td_list = tr_item.find_all('td')
+        if td_list[-2] == 'no':  # https:no
+            continue
+        ip = td_list[0].get_text()
+        port = td_list[1].get_text()
+        ip_link = ip + ':' + port
+        print "ip:port--%s" % ip_link
+        if check_proxy(ip_link):
+            ip_list.append(ip_link)
+
+    return ip_list
+
+def fetch_ips():
+    return resolve_1() + resolve_2()
+
+def send_request(url, proxy_host, timeout=3):
     headers = {
         'Host': proxy_host,
         'Referer': 'https://www.baidu.com/link?url=yZ8Z5H8yiKkLuxTC0mIBGIv3QFEvwmzu2gnzy-XU07URJkC4guyz6beWtZv8d4fh&wd=&eqid=8c6767b700042f580000000256e0d581',
@@ -58,7 +84,7 @@ def send_request(url, proxy_host):
     }
     try:
         req = urllib2.Request(url=url, headers=headers)
-        resp = urllib2.urlopen(req, timeout=3)
+        resp = urllib2.urlopen(req, timeout=timeout)
         content = zhihu_util.get_content_from_resp(resp)
         return content
     except:
@@ -89,11 +115,6 @@ def check_proxy(ip_proxy):
         return False
 
 def persist(available_ip_list):
-    truncate_sql = "truncate TABLE ZHIHU_PROXY"
-    tm = TransactionManager()
-    tm.execute_sql(truncate_sql)
-    tm.close_connection()
-
     insert_sql = "INSERT IGNORE INTO ZHIHU_PROXY (PROXY_IP) \
                   VALUES (%s)"
     print "insert sql:%s" % insert_sql
@@ -101,8 +122,15 @@ def persist(available_ip_list):
     tm.execute_many_sql(insert_sql, available_ip_list)
     tm.close_connection()
 
+def empty_table():
+    truncate_sql = "truncate TABLE ZHIHU_PROXY"
+    tm = TransactionManager()
+    tm.execute_sql(truncate_sql)
+    tm.close_connection()
+
 
 if __name__ == "__main__":
     available_ips = fetch_ips()
-    # persist(available_ips)
-    # print check_proxy("177.73.72.208:8080")
+    empty_table()
+    persist(available_ips)
+    # print check_proxy("210.101.131.232:8080")

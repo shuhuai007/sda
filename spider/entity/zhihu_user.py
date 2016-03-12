@@ -785,11 +785,11 @@ def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, 
             for followee in user.get_followees():
                 if followee in user_accessed_set:
                     print "...Thread[%s], user %s's followee %s exist in user_access_set" % \
-                          (suffix, followee.get_url_suffix())
+                          (thread_index, suffix, followee.get_url_suffix())
                     continue
                 queue.put(followee.get_url_suffix())
                 print "...Thread[%s], user %s's followee %s added into queue, queue size:%s" % \
-                      (suffix, followee.get_url_suffix(), queue.qsize())
+                      (thread_index, suffix, followee.get_url_suffix(), queue.qsize())
             user_accessed_set.add(suffix)
 
         count += 1
