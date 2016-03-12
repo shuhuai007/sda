@@ -219,6 +219,7 @@ class User:
                                 yield User(user_link["href"], user_link.string.encode("utf-8"))
                             except:
                                 print("...get followee error ,just skip...")
+                                return
                                 yield
 
     def get_followers(self):
@@ -266,6 +267,7 @@ class User:
                                 yield User(user_link["href"], user_link.string.encode("utf-8"))
                             except:
                                 print "...Get follower error, just skip..."
+                                return
                                 yield
 
     def get_asks(self):

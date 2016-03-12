@@ -68,7 +68,7 @@ def resolve_2():
         ip_link = ip + ':' + port
         print "ip:port--%s" % ip_link
         if check_proxy(ip_link):
-            ip_list.append(ip_link)
+            ip_list.append((ip_link,))
 
     return ip_list
 
