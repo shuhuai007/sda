@@ -6,6 +6,9 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)) + '/../..')
 from spider import zhihu_util
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import math
 import time
 import platform
