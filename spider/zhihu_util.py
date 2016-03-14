@@ -14,6 +14,7 @@ import StringIO
 import ConfigParser
 import time
 from contextlib import contextmanager
+from bs4 import BeautifulSoup
 
 from zhihu_constants import *
 from transaction_manager import TransactionManager
@@ -338,6 +339,11 @@ def get_file_list(dir_path):
 
 def get_file_names(dir_path):
     return os.listdir(dir_path)
+
+def get_soup(content):
+    parser_name = "html.parser" if sys.version_info >= (2, 7) else "html5lib"
+    soup = BeautifulSoup(content, parser_name)
+    return soup
 
 
 if __name__ == '__main__':
