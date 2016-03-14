@@ -15,7 +15,6 @@ import requests
 from Queue import Queue
 from urllib import urlencode
 from pybloom import BloomFilter
-from bs4 import BeautifulSoup
 
 
 USER_URL = "http://www.zhihu.com/people/{0}"
@@ -43,7 +42,7 @@ class User:
     def parser(self):
         # r = requests.get(self._url)
         resp_content = zhihu_util.get_content(self._url)
-        soup = BeautifulSoup(resp_content, "html.parser")
+        soup = zhihu_util.get_soup(resp_content)
         self.soup = soup
 
     def get_url_suffix(self):
@@ -189,7 +188,7 @@ class User:
                 followee_url = self._url + "/followees"
                 r = zhihu_util.get_content(followee_url)
                 # print "r:%s" % r
-                soup = BeautifulSoup(r, "html.parser")
+                soup = zhihu_util.get_soup(r)
                 for i in xrange((followees_num - 1) / 20 + 1):
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
@@ -214,7 +213,8 @@ class User:
                         followee_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followees_num - i * 20, 20)):
                             try:
-                                followee_soup = BeautifulSoup(followee_list[j], "html.parser")
+                                followee_soup = zhihu_util.get_soup(followee_list[j])
+
                                 user_link = followee_soup.find("h2", class_="zm-list-content-title").a
                                 yield User(user_link["href"], user_link.string.encode("utf-8"))
                             except:
@@ -235,7 +235,7 @@ class User:
             else:
                 follower_url = self._url + "/followers"
                 r = zhihu_util.get_content(follower_url)
-                soup = BeautifulSoup(r, "html.parser")
+                soup = zhihu_util.get_soup(r)
                 for i in xrange((followers_num - 1) / 20 + 1):
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
@@ -262,7 +262,7 @@ class User:
                         follower_list = json.loads(r_post)["msg"]
                         for j in xrange(min(followers_num - i * 20, 20)):
                             try:
-                                follower_soup = BeautifulSoup(follower_list[j], "html.parser")
+                                follower_soup = zhihu_util.get_soup(follower_list[j])
                                 user_link = follower_soup.find("h2", class_="zm-list-content-title").a
                                 yield User(user_link["href"], user_link.string.encode("utf-8"))
                             except:
@@ -290,7 +290,7 @@ class User:
                     ask_url = self._url + "/asks?page=" + str(i + 1)
                     r = requests.get(ask_url)
 
-                    soup = BeautifulSoup(r.content, "html.parser")
+                    soup = zhihu_util.get_soup(r.content)
                     for question in soup.find_all("a", class_="question_link"):
                         url = "http://www.zhihu.com" + question["href"]
                         title = question.string.encode("utf-8")
@@ -310,7 +310,7 @@ class User:
                 for i in xrange((answers_num - 1) / 20 + 1):
                     answer_url = self._url + "/answers?page=" + str(i + 1)
                     r = requests.get(answer_url)
-                    soup = BeautifulSoup(r.content, "html.parser")
+                    soup = zhihu_util.get_soup(r.content)
                     for answer in soup.find_all("a", class_="question_link"):
                         question_url = "http://www.zhihu.com" + answer["href"][0:18]
                         question_title = answer.string.encode("utf-8")
@@ -333,7 +333,7 @@ class User:
 
                     r = requests.get(collection_url)
 
-                    soup = BeautifulSoup(r.content, "html.parser")
+                    soup = zhihu_util.get_soup(r.content)
                     for collection in soup.find_all("div",
                                                     class_="zm-profile-section-item zg-clear"):
                         url = "http://www.zhihu.com" + \
@@ -351,7 +351,7 @@ class User:
             yield
         else:
             r = requests.get(self._url)
-            soup = BeautifulSoup(r.content, "html.parser")
+            soup = zhihu_util.get_soup(r.content)
             # Handle the first liked item
             first_item = soup.find("div",
                                    attrs={'class': 'zm-profile-section-item zm-item clearfix'})
@@ -700,7 +700,7 @@ class User:
             r_post = zhihu_util.post(post_url, post_data)
             suggent_member_list = json.loads(r_post)["msg"]
             for suggent_member in suggent_member_list:
-                suggent_member_soup = BeautifulSoup(suggent_member, "html.parser")
+                suggent_member_soup = zhihu_util.get_soup(suggent_member)
                 suggent_member_str = suggent_member_soup.find("a", class_="image-link")\
                                                         .get("href").split("/")[-1]
                 seed_list.append(suggent_member_str)
