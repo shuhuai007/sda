@@ -24,7 +24,7 @@ def parse_ips_1(ip_link):
     ip_content = send_request(ip_link, PROXY_HOST_1, timeout=10)
     # print "ip content:%s" % ip_content
     try:
-        soup = BeautifulSoup(ip_content, "html.parser")
+        soup = get_soup(ip_content)
         ips = soup.find("div", attrs={'class': 'cont_font'}).find("p").get_text().encode("utf-8")
         # print "ips:%s" % ips
         ip_list = map(lambda ip: ip.split("@")[0], ips.split("\n"))
@@ -34,12 +34,17 @@ def parse_ips_1(ip_link):
         print "parse ips error:%s" % e.message
         return []
 
+def get_soup(content):
+    parser_name = "html.parser" if sys.version_info >= (2, 7) else "html5lib"
+    soup = BeautifulSoup(content, parser_name)
+    return soup
+
 def resolve_1():
     ip_list = []
 
     content = send_request(PROXY_WEBSITE_1, PROXY_HOST_1, timeout=10)
 
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_soup(content)
     ip_links = soup.find_all("a", attrs={'target': '_blank'})
     # print len(ip_links)
     for ip_link in ip_links:
@@ -56,7 +61,7 @@ def resolve_2():
 
     content = send_request(PROXY_WEBSITE_2, PROXY_HOST_2, timeout=10)
 
-    soup = BeautifulSoup(content, "html.parser")
+    soup = get_soup(content)
     # print "resolve 2:%s" % soup
     tr_list = soup.find('tbody').find_all('tr')
     for tr_item in tr_list:
