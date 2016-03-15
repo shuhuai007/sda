@@ -826,7 +826,6 @@ def main():
         queue.put_nowait(user_seed)
     print "Start, user seeds:%s " % user_seeds
 
-    exit()
     import threading
     lock = threading.Lock()
     bf_lock = threading.Lock()
