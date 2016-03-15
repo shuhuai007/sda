@@ -68,7 +68,7 @@ def call_url(max_attempts, req, to_url, timeout=5):
                     proxy_ip = get_proxy_from_db()
                 else:
                     proxy_ip = ""
-            print "proxy_ip:%s" % proxy_ip
+            # print "proxy_ip:%s" % proxy_ip
 
             install_opener(proxy_ip)
             resp = urllib2.urlopen(req, timeout=timeout)
