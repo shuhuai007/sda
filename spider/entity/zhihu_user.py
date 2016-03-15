@@ -739,7 +739,7 @@ def flush_buffer(write_buffer, suffix, ts, thread_index, mode="finish"):
     buffer_filename = "%s/%s%s-%s-%s" % (data_dir, suffix, USER_FILE_DELIMITER, int(ts),
                                          thread_index)
     if mode == "doing":
-        buffer_filename += ".doing"
+        buffer_filename += ".tmp"
     zhihu_util.write_buffer_file(write_buffer, buffer_filename, USER_FIELD_DELIMITER)
 
 def consume(lock, bf_lock, bloomfilter, user_accessed_set, queue, thread_index, loops):
