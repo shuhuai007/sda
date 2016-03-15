@@ -13,12 +13,12 @@ import gzip
 import StringIO
 import ConfigParser
 import time
-from contextlib import contextmanager
 from bs4 import BeautifulSoup
 
 from zhihu_constants import *
 from transaction_manager import TransactionManager
 
+PROXY_USED_SWITCH = False
 
 def get_content(to_url, max_attempts=3):
     headers = get_headers()
@@ -34,10 +34,6 @@ def get_content(to_url, max_attempts=3):
         return "FAIL"
 
     return get_content_from_resp(resp)
-
-PROXY_HOST = "www.youdaili.net"
-PROXY_WEBSITE = "http://www.youdaili.net/Daili/guowai/"
-
 
 def get_proxy_from_db():
     select_sql = "SELECT PROXY_IP FROM ZHIHU_PROXY ORDER BY RAND() LIMIT 1"
@@ -60,13 +56,6 @@ def install_opener(proxy_ip):
     opener = urllib2.build_opener(proxy_handler)
     urllib2.install_opener(opener)
 
-@contextmanager
-def no_proxies():
-    orig_getproxies = urllib2.getproxies
-    urllib2.getproxies = lambda: {}
-    yield
-    urllib2.getproxies = orig_getproxies
-
 def call_url(max_attempts, req, to_url, timeout=5):
     retry = 0
     resp = None
@@ -75,7 +64,10 @@ def call_url(max_attempts, req, to_url, timeout=5):
             if retry == (max_attempts - 1):
                 proxy_ip = ""
             else:
-                proxy_ip = get_proxy_from_db()
+                if PROXY_USED_SWITCH:
+                    proxy_ip = get_proxy_from_db()
+                else:
+                    proxy_ip = ""
             print "proxy_ip:%s" % proxy_ip
 
             install_opener(proxy_ip)
