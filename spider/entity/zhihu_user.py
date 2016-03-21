@@ -196,8 +196,13 @@ class User:
                     if i == 0:
                         user_url_list = soup.find_all("h2", class_="zm-list-content-title")
                         for j in xrange(min(followees_num, 20)):
-                            yield User(user_url_list[j].a["href"],
-                                       user_url_list[j].a.string.encode("utf-8"))
+                            try:
+                                yield User(user_url_list[j].a["href"],
+                                           user_url_list[j].a.string.encode("utf-8"))
+                            except:
+                                print("...get followee error ,just skip...")
+                                return
+                                yield
                     else:
                         post_url = "http://www.zhihu.com/node/ProfileFolloweesListV2"
                         _xsrf = soup.find("input", attrs={'name': '_xsrf'})["value"]
