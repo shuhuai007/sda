@@ -56,14 +56,13 @@ start() {
     sleep 3
 }
 
-REMOTE_SPIDER_DATA_DIR="/root/work/data/zhihu"
+REMOTE_SPIDER_DATA_DIR="/root/work/sda/data/zhihu"
 REMOTE_SPIDER_LOG_DIR="/root/work/sda/spider/log"
 status() {
     echo "########################Slave Status######################"
     ${bin}/remote-execute.sh ${ip} ${password} \
-    "ps -ef | grep zhihu;sleep 3; \
-    echo data-file:\`ls -l ${REMOTE_SPIDER_DATA_DIR}/${content} | wc -l \`; \
-    echo question-id:\`grep -a \"......question id\" ${REMOTE_SPIDER_LOG_DIR}/${content}.log |wc -l\`"
+    "ps -ef | grep zhihu | grep ${content};sleep 3; echo "------------------------------------";\
+    ls -lrt ${REMOTE_SPIDER_DATA_DIR}/${content}/ | tail -10"
     sleep 3
 }
 
