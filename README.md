@@ -1,6 +1,6 @@
 ## SDA data process
 ### spider
-Fetch data from zhihu.com
+Fetch data from www.zhihu.com
 
 ### flume
 Collect and push the data from spider machines into HDFS
