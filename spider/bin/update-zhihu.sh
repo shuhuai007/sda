@@ -40,7 +40,7 @@ parseArgs() {
                 exit 1
                 ;;
              ?)
-                echo "Unkonw argument"
+                echo "Unknown argument"
                 exit 1
                 ;;
         esac
