@@ -17,5 +17,5 @@ For example:
 ` `./slave-control.sh -i 127.0.0.1 -p ${password} -c answer start
 
 ##### 4. Generate zhihu user info
-` `\#cd sda/spider/entity  
-` `\#nohup python zhihu_user.py > user.log 2>&1 &
+` `\# cd sda/spider/entity  
+` `\# nohup python zhihu_user.py > user.log 2>&1 &
