@@ -21,7 +21,7 @@
 
     <decision name="check-flume-input-node">
         <switch>
-            <case to="shell-node">${fs:fileSize(concat(nameNode, '/user/flume/project/sda/spider/user')) gt 1 * KB}</case>
+            <case to="shell-node">${fs:fileSize(concat(nameNode, '/user/flume/project/sda/spider/user')) gt 0}</case>
             <default to="end"/>
         </switch>
     </decision>
