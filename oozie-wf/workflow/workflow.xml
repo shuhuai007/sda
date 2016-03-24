@@ -49,8 +49,11 @@
                 </property>
             </configuration>
             <exec>move-data.sh</exec>
+            <argument>-i</argument>
+            <argument>/user/flume/project/sda/spider/user</argument>
+            <argument>-o</argument>
+            <argument>/user/flume/project/test_user_table</argument>
             <file>script/shell/move-data.sh</file>
-            <capture-output/>
         </shell>
         <ok to="hive2-user-add-node"/>
         <error to="fail"/>
@@ -66,13 +69,12 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <exec>move-question-data.sh</exec>
+            <exec>move-data.sh</exec>
             <argument>-i</argument>
             <argument>/user/flume/project/sda/spider/question</argument>
             <argument>-o</argument>
             <argument>/user/flume/project/test_question_table</argument>
-            <file>script/shell/move-question-data.sh</file>
-            <capture-output/>
+            <file>script/shell/move-data.sh</file>
         </shell>
         <ok to="join-node"/>
         <error to="fail"/>
