@@ -33,7 +33,7 @@
 
     <decision name="check-question-flume-input-node">
         <switch>
-            <case to="join-node">${fs:dirSize(concat(nameNode, '/user/flume/project/sda/spider/question')) gt 0}</case>
+            <case to="shell-question-node">${fs:dirSize(concat(nameNode, '/user/flume/project/sda/spider/question')) gt 0}</case>
             <default to="join-node"/>
         </switch>
     </decision>
@@ -53,6 +53,25 @@
             <capture-output/>
         </shell>
         <ok to="hive2-user-add-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="shell-question-node">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>move-data.sh</exec>
+            <file>script/shell/move-question-data.sh</file>
+            <argument>-i /user/flume/project/sda/spider/question -o /user/flume/project/test_question_table</argument>
+            <capture-output/>
+        </shell>
+        <ok to="join-node"/>
         <error to="fail"/>
     </action>
 
