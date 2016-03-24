@@ -66,12 +66,12 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <exec>move-data.sh</exec>
-            <file>script/shell/move-question-data.sh</file>
+            <exec>move-question-data.sh</exec>
             <argument>-i</argument>
             <argument>/user/flume/project/sda/spider/question</argument>
             <argument>-o</argument>
             <argument>/user/flume/project/test_question_table</argument>
+            <file>script/shell/move-question-data.sh</file>
             <capture-output/>
         </shell>
         <ok to="join-node"/>
