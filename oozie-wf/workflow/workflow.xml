@@ -15,14 +15,19 @@
             <arg>Hello</arg>
             <arg>Oozie!</arg>
         </java>
-        <ok to="check-user-flume-input-node"/>
+        <ok to="parallel-node"/>
         <error to="fail"/>
     </action>
+
+    <fork name="parallel-node">
+        <path start="check-user-flume-input-node"/>
+        <!--<path start="streaming-node"/>-->
+    </fork>
 
     <decision name="check-user-flume-input-node">
         <switch>
             <case to="shell-user-node">${fs:fileSize(concat(nameNode, '/user/flume/project/sda/spider/user')) gt 0}</case>
-            <default to="end"/>
+            <default to="join-node"/>
         </switch>
     </decision>
 
@@ -76,9 +81,12 @@
             <jdbc-url>${jdbcURL}</jdbc-url>
             <script>script/hive/user-duplicate-remove.q</script>
         </hive2>
-        <ok to="end"/>
+        <ok to="join-node"/>
         <error to="fail"/>
     </action>
+
+
+    <join name="join-node" to="end"/>
 
     <kill name="fail">
         <message>Java failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
