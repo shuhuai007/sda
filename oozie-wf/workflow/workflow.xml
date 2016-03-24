@@ -21,12 +21,19 @@
 
     <fork name="parallel-node">
         <path start="check-user-flume-input-node"/>
-        <!--<path start="streaming-node"/>-->
+        <path start="check-question-flume-input-node"/>
     </fork>
 
     <decision name="check-user-flume-input-node">
         <switch>
             <case to="shell-user-node">${fs:dirSize(concat(nameNode, '/user/flume/project/sda/spider/user')) gt 0}</case>
+            <default to="join-node"/>
+        </switch>
+    </decision>
+
+    <decision name="check-question-flume-input-node">
+        <switch>
+            <case to="join-node">${fs:dirSize(concat(nameNode, '/user/flume/project/sda/spider/question')) gt 0}</case>
             <default to="join-node"/>
         </switch>
     </decision>
