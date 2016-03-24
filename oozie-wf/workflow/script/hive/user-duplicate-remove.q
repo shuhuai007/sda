@@ -35,5 +35,7 @@ INSERT OVERWRITE TABLE sda.zhihu_user_final
 --    (select location, count(*) as count from zhihu_user_final group by location) as a
 --    order by a.count desc limit 30;
 
+-- top 10 user who have the most followers.
+-- select url_suffix, user_name, followers_num from zhihu_user_final order by cast(followers_num as int) desc limit 10;
 
 
