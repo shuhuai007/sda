@@ -15,9 +15,16 @@
             <arg>Hello</arg>
             <arg>Oozie!</arg>
         </java>
-        <ok to="shell-node"/>
+        <ok to="check-flume-input-node"/>
         <error to="fail"/>
     </action>
+
+    <decision name="check-flume-input-node">
+        <switch>
+            <case to="shell-node">${fs:fileSize(concat(nameNode, '/user/flume/project/sda/spider/user')) gt 1 * KB}</case>
+            <default to="end"/>
+        </switch>
+    </decision>
 
     <action name="shell-node">
         <shell xmlns="uri:oozie:shell-action:0.2">
