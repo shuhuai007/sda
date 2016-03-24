@@ -68,7 +68,10 @@
             </configuration>
             <exec>move-data.sh</exec>
             <file>script/shell/move-question-data.sh</file>
-            <argument>-i /user/flume/project/sda/spider/question -o /user/flume/project/test_question_table</argument>
+            <argument>-i</argument>
+            <argument>/user/flume/project/sda/spider/question</argument>
+            <argument>-o</argument>
+            <argument>/user/flume/project/test_question_table</argument>
             <capture-output/>
         </shell>
         <ok to="join-node"/>
