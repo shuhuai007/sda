@@ -130,6 +130,23 @@
             <script>script/hive/question-add.q</script>
             <param>INPUT=/user/flume/project/test_question_table</param>
         </hive2>
+        <ok to="hive2-question-duplicate-remove-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="hive2-question-duplicate-remove-node">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${jdbcURL}</jdbc-url>
+            <script>script/hive/question-duplicate-remove.q</script>
+        </hive2>
         <ok to="join-node"/>
         <error to="fail"/>
     </action>
