@@ -59,27 +59,6 @@
         <error to="fail"/>
     </action>
 
-    <action name="shell-question-node">
-        <shell xmlns="uri:oozie:shell-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <configuration>
-                <property>
-                    <name>mapred.job.queue.name</name>
-                    <value>${queueName}</value>
-                </property>
-            </configuration>
-            <exec>move-data.sh</exec>
-            <argument>-i</argument>
-            <argument>/user/flume/project/sda/spider/question</argument>
-            <argument>-o</argument>
-            <argument>/user/flume/project/test_question_table</argument>
-            <file>script/shell/move-data.sh</file>
-        </shell>
-        <ok to="join-node"/>
-        <error to="fail"/>
-    </action>
-
     <action name="hive2-user-add-node">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
@@ -116,6 +95,44 @@
         <error to="fail"/>
     </action>
 
+    <action name="shell-question-node">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>move-data.sh</exec>
+            <argument>-i</argument>
+            <argument>/user/flume/project/sda/spider/question</argument>
+            <argument>-o</argument>
+            <argument>/user/flume/project/test_question_table</argument>
+            <file>script/shell/move-data.sh</file>
+        </shell>
+        <ok to="hive2-question-add-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="hive2-question-add-node">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <jdbc-url>${jdbcURL}</jdbc-url>
+            <script>script/hive/question-add.q</script>
+            <param>INPUT=/user/flume/project/test_question_table</param>
+        </hive2>
+        <ok to="join-node"/>
+        <error to="fail"/>
+    </action>
 
     <join name="join-node" to="end"/>
 
