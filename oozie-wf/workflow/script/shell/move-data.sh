@@ -33,6 +33,7 @@ hadoop fs -test -e ${FLUME_DATA_TEMP_DIR}
 if [ $? != "0" ]; then
     echo "create directory"
     hadoop fs -mkdir ${FLUME_DATA_TEMP_DIR}
+    hadoop fs -chmod 777 ${FLUME_DATA_TEMP_DIR}
 fi
 
 data_file_count=$(hadoop fs -ls ${FLUME_SOURCE_DIR} | wc -l)
