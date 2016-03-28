@@ -3,7 +3,7 @@
 
 import requests
 import re
-from bs4 import BeautifulSoup
+
 
 def login():
     url = 'http://www.zhihu.com'
@@ -25,16 +25,15 @@ def login():
 
     s = requests.session()
 
-    def get_xsrf(url=None):
-        r = s.get(url, headers=headers_base)
+    def get_xsrf(url_link=None):
+        r = s.get(url_link, headers=headers_base)
         xsrf = re.search(r'(?<=name="_xsrf" value=")[^"]*(?="/>)', r.text)
-        if xsrf == None:
+        if xsrf is None:
             return ''
         else:
             return xsrf.group(0)
 
-    xsrf = get_xsrf(url)
-    login_data['_xsrf'] = xsrf.encode('utf-8')
+    login_data['_xsrf'] = get_xsrf(url).encode('utf-8')
 
     captcha_url = 'http://www.zhihu.com/captcha.gif'
     captcha = s.get(captcha_url, stream=True)
