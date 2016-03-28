@@ -105,7 +105,7 @@ def check_proxy(ip_proxy):
         headers=headers
     )
     try:
-        resp = opener.open(req, timeout=5)
+        resp = opener.open(req, timeout=3)
         content = zhihu_util.get_content_from_resp(resp)
         print "check proxy %s:%s" % (ip_proxy, content != 'FAIL')
         return content != 'FAIL'
