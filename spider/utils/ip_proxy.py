@@ -129,7 +129,9 @@ def empty_table():
 
 
 if __name__ == "__main__":
+    print "...Start get proxy ip: %s..." % zhihu_util.get_current_timestamp()
     available_ips = fetch_ips()
     empty_table()
     persist(available_ips)
+    print "...End get proxy ip: %s..." % zhihu_util.get_current_timestamp()
     # print check_proxy("210.101.131.232:8080")
