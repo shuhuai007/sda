@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 from zhihu_constants import *
 from transaction_manager import TransactionManager
 
-PROXY_USED_SWITCH = False
+PROXY_USED_SWITCH = True
 
 def get_content(to_url, max_attempts=3):
     headers = get_headers()
