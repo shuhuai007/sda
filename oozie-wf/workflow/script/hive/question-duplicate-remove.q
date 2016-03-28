@@ -12,7 +12,11 @@ INSERT OVERWRITE TABLE sda.zhihu_question_final
            max(cast(is_top_question as int)),
            created_time
     FROM sda.zhihu_question
-    WHERE question_id!='' and question_id!='NULL'
+    WHERE question_id!='' and question_id!='NULL' and question_id!='?'
+          and answer_count!='NULL'
+          and focus_count!='NULL'
+          and is_top_question!='NULL'
+          and created_time!='NULL'
     GROUP BY question_id, question_title, answer_count, focus_count,
              is_top_question, created_time
 ;
