@@ -154,7 +154,7 @@
     <join name="join-node" to="end"/>
 
     <kill name="fail">
-        <message>Java failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        <message>Error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
     <end name="end"/>
 </workflow-app>
