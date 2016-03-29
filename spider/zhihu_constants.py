@@ -19,6 +19,7 @@ ZHIHU_QUESTION_DETAIL_URL = "https://www.zhihu.com/question/{0}"
 ZHIHU_ANSWER_POST_URL = "https://www.zhihu.com/node/QuestionAnswerListV2"
 
 ZHIHU_QUESTION_DATA_DELIMETER = "\001"
+ZHIHU_ANSWER_DATA_DELIMETER = "\001"
 
 ZHIHU_QUESTION_DETAIL_FIELD_DELIMITER = "\001"
 

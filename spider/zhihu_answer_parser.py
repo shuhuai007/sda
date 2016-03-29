@@ -253,7 +253,7 @@ def write_buffer(buffer_list, question_id):
     dir_name = get_answer_data_directory()
     buffer_filename = "%s/answer-%s-%s" % (dir_name, question_id, int(time.time()))
     # print "......buffer_filename:%s" % buffer_filename
-    write_buffer_file(buffer_list, buffer_filename, "question-detail-delimiter")
+    write_buffer_file(buffer_list, buffer_filename, ZHIHU_ANSWER_DATA_DELIMETER)
 
 def update_buffer_to_db(buffer_list, tm):
     question_id_list = map(lambda question: question[0], buffer_list)
