@@ -147,6 +147,24 @@
             <jdbc-url>${jdbcURL}</jdbc-url>
             <script>script/hive/question-duplicate-remove.q</script>
         </hive2>
+        <ok to="sqoop2mysql-node"/>
+        <error to="fail"/>
+    </action>
+
+    <action name="sqoop2mysql-node">
+        <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <command>
+                export --connect jdbc:mysql://10.29.10.111:3306/sda  --username root --password root --table zhihu_question_id_incremental --input-fields-terminated-by "\001"  --export-dir /apps/hive/warehouse/sda.db/zhihu_question_id_incremental
+            </command>
+        </sqoop>
         <ok to="join-node"/>
         <error to="fail"/>
     </action>
