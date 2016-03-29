@@ -23,4 +23,6 @@ INSERT OVERWRITE TABLE sda.zhihu_question_final
 
 DROP TABLE sda.zhihu_question_id;
 CREATE TABLE IF NOT EXISTS sda.zhihu_question_id
-    AS SELECT cast(question_id as bigint), created_time FROM sda.zhihu_question_final;
+ROW FORMAT DELIMITED
+        FIELDS TERMINATED BY '1'
+AS SELECT cast(question_id as bigint), '0' as access_time FROM sda.zhihu_question_final;
