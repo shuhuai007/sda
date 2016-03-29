@@ -161,9 +161,8 @@
                     <value>${queueName}</value>
                 </property>
             </configuration>
-            <command>
-                export --connect jdbc:mysql://10.29.10.111:3306/sda  --username root --password root --table zhihu_question_id_incremental --input-fields-terminated-by "\001"  --export-dir /apps/hive/warehouse/sda.db/zhihu_question_id_incremental
-            </command>
+            <command>export --connect jdbc:mysql://10.29.10.111:3306/sda --driver com.mysql.jdbc.Driver --username root --password root --table ZHIHU_QUESTION_ID --input-fields-terminated-by "\001"  --export-dir /apps/hive/warehouse/sda.db/zhihu_question_id_incremental</command>
+            <archive>/user/oozie/share/lib/lib_20160105152110/oozie/mysql-connector-java.jar#mysql-connector-java.jar</archive>
         </sqoop>
         <ok to="join-node"/>
         <error to="fail"/>
