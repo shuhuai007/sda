@@ -63,9 +63,6 @@ class ZhihuAnswer(ZhihuItem):
         available_ids = generate_available_ids(MAX_QUESTION_TABLE_ID, QUESTION_ID_STEP)
         available_id_list = available_ids.split(',')
 
-        # debug code
-        # available_id_list = ['40079131', '26497360', '39977714', '39019297']
-
         import math
         loop = int(math.ceil(float(len(available_id_list))/AVAIL_ID_SIZE_THRESHOLD))
         print "......loop:%s" % loop
@@ -76,10 +73,9 @@ class ZhihuAnswer(ZhihuItem):
             begin_index = i * AVAIL_ID_SIZE_THRESHOLD
             end_index = (i + 1) * AVAIL_ID_SIZE_THRESHOLD
 
-            sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')"  % last_visit
+            sql = "SELECT QUESTION_ID FROM (select @index:=@index+1 as ID, QUESTION_ID, LAST_VISIT from ZHIHU_QUESTION_ID) AS q  WHERE timestamp(q.LAST_VISIT) < timestamp('%s')" % last_visit
             sql += " AND ID IN (%s) " % ",".join(available_id_list[begin_index:end_index])
 
-            # print "...sql:%s" % sql
             if i == 1:
                 pre_sql = "SET @index=0;"
             results = tm.execute_sql(sql, pre_sql)
