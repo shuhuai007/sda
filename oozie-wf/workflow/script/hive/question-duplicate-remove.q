@@ -20,3 +20,7 @@ INSERT OVERWRITE TABLE sda.zhihu_question_final
     GROUP BY question_id, question_title, answer_count,
              is_top_question, created_time
 ;
+
+DROP TABLE sda.zhihu_question_id;
+CREATE TABLE IF NOT EXISTS sda.zhihu_question_id
+    AS SELECT cast(question_id as bigint), created_time FROM sda.zhihu_question_final;
