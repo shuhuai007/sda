@@ -30,14 +30,13 @@ class TestZhihuUtil(unittest.TestCase):
 
     def test_post(self):
         post_url = 'https://www.zhihu.com/node/TopicsPlazzaListV2'
-        post_data = 'method=next&params=%7B%22topic_id%22%3A686%2C%22offset%22%3A80%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=81d4317bc49ba8e6a35c9a9da4c7c58f'
         post_data = 'method=next&params=%7B%22topic_id%22%3A253%2C%22offset%22%3A60%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=c6946d5914172133e875956a711be3ad'
         zhihu_util.post(post_url, post_data)
 
     def test_post_repeatedly(self):
         count = 0
         post_url = 'https://www.zhihu.com/node/TopicsPlazzaListV2'
-        post_data = 'method=next&params=%7B%22topic_id%22%3A686%2C%22offset%22%3A80%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=81d4317bc49ba8e6a35c9a9da4c7c58f'
+        post_data = 'method=next&params=%7B%22topic_id%22%3A686%2C%22offset%22%3A80%2C%22hash_id%22%3A%22dced108689287057f5cc3b5e85cb8289%22%7D&_xsrf=c6946d5914172133e875956a711be3ad'
 
         while count < 3:
             response = zhihu_util.post(post_url, post_data)
