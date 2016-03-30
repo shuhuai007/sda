@@ -65,7 +65,6 @@ class TestZhihuUtil(unittest.TestCase):
 
         self.assertTrue("sda/data/zhihu/question" in question_data_dir)
 
-
     def tearDown(self):
         pass
 
