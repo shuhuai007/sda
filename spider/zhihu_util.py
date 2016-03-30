@@ -106,14 +106,10 @@ def get_content_from_resp(resp):
 
 def get_xsrf_from_cookie(cookie):
     cookie_list = cookie.split(';')
-    # print "\n\ncookie_list:%s" % cookie_list
 
     for cookie_item in cookie_list:
         cookie_key = cookie_item.split('=')[0].strip()
         cookie_value = cookie_item.split('=')[1]
-        # print "\n\ncookie_key:%s" % cookie_key
-        # print "\n\ncookie_value:%s" % cookie_value
-
         if cookie_key == '_xsrf':
             return cookie_value
     print "\n\n_xsrf doesn't exist in cookie"
